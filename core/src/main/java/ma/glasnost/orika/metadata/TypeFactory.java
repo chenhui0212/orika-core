@@ -491,4 +491,23 @@ public abstract class TypeFactory {
         }
     }
 
+    /**
+     * Gets the name for a type, using the Simple name when the type does not
+     * match the associated type, but using fully-qualified name when the associated
+     * type has a matching simple name, but is not the same.
+     * 
+     * @param type the type for which to return the name
+     * @param associatedType the associated type, used to decide the level of detail 
+     *  required in the returned name
+     * @return
+     */
+    public static String nameOf(Type<?> type, Type<?> associatedType) {
+    	if (type.getSimpleName().equals(associatedType.getSimpleName())
+    			&& !type.equals(associatedType)) {
+    		return type.toFullyQualifiedString();
+    	} else {
+    		return type.toString();
+    	}
+    }
+    
 }

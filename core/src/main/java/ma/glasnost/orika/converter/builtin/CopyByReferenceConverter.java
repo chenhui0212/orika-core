@@ -18,7 +18,6 @@
 
 package ma.glasnost.orika.converter.builtin;
 
-import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.Type;
 
@@ -29,7 +28,7 @@ import ma.glasnost.orika.metadata.Type;
  * @author matt.deboer@gmail.com
  * 
  */
-public class CopyByReferenceConverter extends CustomConverter<Object, Object> {
+public class CopyByReferenceConverter extends BuiltinCustomConverter<Object, Object> {
     
     /*
      * (non-Javadoc)

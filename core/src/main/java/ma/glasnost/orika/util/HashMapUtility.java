@@ -20,7 +20,6 @@ package ma.glasnost.orika.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import ma.glasnost.orika.MappedTypePair;
 
@@ -41,7 +40,7 @@ public class HashMapUtility {
      * @param capacity
      * @return a new instance of ConcurrentLinkedHashMap with the specified max weighted capacity
      */
-    public static <K, V extends MappedTypePair<Object, Object>> Map<K, V> getConcurrentLinkedHashMap(int capacity) {
+    public static <K, V extends MappedTypePair<Object, Object>> ConcurrentLinkedHashMap<K, V> getConcurrentLinkedHashMap(int capacity) {
         
         Builder<K, V> builder = new ConcurrentLinkedHashMap.Builder<K, V>();
        

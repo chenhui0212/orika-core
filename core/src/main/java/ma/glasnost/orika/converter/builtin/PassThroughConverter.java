@@ -38,7 +38,7 @@ import ma.glasnost.orika.metadata.TypeFactory;
 public class PassThroughConverter extends CustomConverter<Object, Object> {
 
 	private final Set<Type<?>> passThroughTypes = new HashSet<Type<?>>();
-	
+	private final String description;
 	/**
 	 * Constructs a new PassThroughConverter configured to treat the provided
 	 * list of types as immutable.
@@ -46,9 +46,16 @@ public class PassThroughConverter extends CustomConverter<Object, Object> {
 	 * @param types one or more types that should be treated as immutable
 	 */
 	public PassThroughConverter(java.lang.reflect.Type...types) {
+		StringBuilder desc = new StringBuilder(PassThroughConverter.class.getSimpleName()+"(Copy by reference:");
+		String separator = "";
 		for (java.lang.reflect.Type type: types) {
-			passThroughTypes.add(TypeFactory.valueOf(type));
+			Type<?> theType = TypeFactory.valueOf(type);
+			passThroughTypes.add(theType);
+			desc.append(separator).append(theType);
+			separator = ", ";
 		}
+		desc.append(")");
+		description = desc.toString();
 	}
 	
 	private boolean shouldPassThrough(Type<?> type) {
@@ -70,4 +77,26 @@ public class PassThroughConverter extends CustomConverter<Object, Object> {
 	public Object convert(Object source, Type<? extends Object> destinationType) {
 	    return source;
     }
+	
+	
+	public String toString() {
+		return description;
+	}
+	
+	/**
+	 * Extends PassThroughConverter for use as a built-in Converter 
+	 */
+	static class Builtin extends PassThroughConverter {
+		
+		private final String description;
+		
+		Builtin(java.lang.reflect.Type...types) {
+			super(types);
+			description = "builtin:" + super.toString();
+		}
+		
+		public String toString() {
+			return description;
+		}
+	}
 }

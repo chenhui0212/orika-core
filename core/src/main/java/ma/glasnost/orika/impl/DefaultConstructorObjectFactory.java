@@ -30,9 +30,11 @@ import ma.glasnost.orika.ObjectFactory;
 public class DefaultConstructorObjectFactory<T> implements ObjectFactory<T> {
 
     private final Class<T> type;
+    private final String description;
     
     public DefaultConstructorObjectFactory(Class<T> type) {
         this.type = type;
+        this.description = getClass().getSimpleName() + "<" + type.getSimpleName() + ">";
     }
     
     /* (non-Javadoc)
@@ -46,6 +48,10 @@ public class DefaultConstructorObjectFactory<T> implements ObjectFactory<T> {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
+    }
+    
+    public String toString() {
+    	return description;
     }
     
 }

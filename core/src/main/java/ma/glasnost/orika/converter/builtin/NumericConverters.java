@@ -20,7 +20,6 @@ package ma.glasnost.orika.converter.builtin;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.metadata.Type;
 
 /**
@@ -42,10 +41,10 @@ public class NumericConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class BigDecimalToDoubleConverter extends
-			BidirectionalConverter<BigDecimal, Double> {
+			BuiltinBidirectionalConverter<BigDecimal, Double> {
 
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public Double convertTo(BigDecimal source, Type<Double> destinationType) {
@@ -53,7 +52,7 @@ public class NumericConverters {
 		}
 
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public BigDecimal convertFrom(Double source,
@@ -71,10 +70,10 @@ public class NumericConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class BigDecimalToFloatConverter extends
-			BidirectionalConverter<BigDecimal, Float> {
+			BuiltinBidirectionalConverter<BigDecimal, Float> {
 
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public Float convertTo(BigDecimal source, Type<Float> destinationType) {
@@ -82,7 +81,7 @@ public class NumericConverters {
 		}
 
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public BigDecimal convertFrom(Float source,
@@ -98,7 +97,7 @@ public class NumericConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class BigIntegerToLongConverter extends
-			BidirectionalConverter<BigInteger, Long> {
+			BuiltinBidirectionalConverter<BigInteger, Long> {
 
 		private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
 		private static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
@@ -116,7 +115,7 @@ public class NumericConverters {
 		}
 		
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public Long convertTo(BigInteger source, Type<Long> destinationType) {
@@ -127,7 +126,7 @@ public class NumericConverters {
 		}
 
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public BigInteger convertFrom(Long source,
@@ -142,7 +141,7 @@ public class NumericConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class BigIntegerToIntegerConverter extends
-			BidirectionalConverter<BigInteger, Integer> {
+			BuiltinBidirectionalConverter<BigInteger, Integer> {
 
 		private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
 		private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
@@ -160,7 +159,7 @@ public class NumericConverters {
 			this.truncate = truncate;
 		}
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public Integer convertTo(BigInteger source, Type<Integer> destinationType) {
@@ -171,7 +170,7 @@ public class NumericConverters {
 		}
 
 		/* (non-Javadoc)
-		 * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+		 * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
 		 */
 		@Override
 		public BigInteger convertFrom(Integer source,
@@ -187,7 +186,7 @@ public class NumericConverters {
      * @author matt.deboer@gmail.com
      */
     public static class IntegerToShortConverter extends
-            BidirectionalConverter<Integer, Short> {
+            BuiltinBidirectionalConverter<Integer, Short> {
 
         private final boolean truncate;
         
@@ -202,7 +201,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Short convertTo(Integer source, Type<Short> destinationType) {
@@ -213,7 +212,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Integer convertFrom(Short source, Type<Integer> destinationType) {
@@ -227,7 +226,7 @@ public class NumericConverters {
      * @author matt.deboer@gmail.com
      */
     public static class LongToShortConverter extends
-            BidirectionalConverter<Long, Short> {
+            BuiltinBidirectionalConverter<Long, Short> {
 
         private final boolean truncate;
         
@@ -242,7 +241,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Short convertTo(Long source, Type<Short> destinationType) {
@@ -253,7 +252,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Long convertFrom(Short source, Type<Long> destinationType) {
@@ -267,7 +266,7 @@ public class NumericConverters {
      * @author matt.deboer@gmail.com
      */
     public static class LongToIntegerConverter extends
-            BidirectionalConverter<Long, Integer> {
+            BuiltinBidirectionalConverter<Long, Integer> {
 
         private final boolean truncate;
         
@@ -282,7 +281,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Integer convertTo(Long source, Type<Integer> destinationType) {
@@ -293,7 +292,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Long convertFrom(Integer source, Type<Long> destinationType) {
@@ -306,7 +305,7 @@ public class NumericConverters {
      * 
      * @author matt.deboer@gmail.com
      */
-    public static class DoubleToLongConverter extends BidirectionalConverter<Double, Long> {
+    public static class DoubleToLongConverter extends BuiltinBidirectionalConverter<Double, Long> {
 
         private final boolean truncate;
         
@@ -321,7 +320,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Long convertTo(Double source, Type<Long> destinationType) {
@@ -332,7 +331,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Double convertFrom(Long source, Type<Double> destinationType) {
@@ -345,7 +344,7 @@ public class NumericConverters {
      * 
      * @author matt.deboer@gmail.com
      */
-    public static class DoubleToIntegerConverter extends BidirectionalConverter<Double, Integer> {
+    public static class DoubleToIntegerConverter extends BuiltinBidirectionalConverter<Double, Integer> {
 
         private final boolean truncate;
         
@@ -360,7 +359,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Integer convertTo(Double source, Type<Integer> destinationType) {
@@ -371,7 +370,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Double convertFrom(Integer source, Type<Double> destinationType) {
@@ -384,7 +383,7 @@ public class NumericConverters {
      * 
      * @author matt.deboer@gmail.com
      */
-    public static class DoubleToShortConverter extends BidirectionalConverter<Double, Short> {
+    public static class DoubleToShortConverter extends BuiltinBidirectionalConverter<Double, Short> {
 
         private final boolean truncate;
         
@@ -399,7 +398,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Short convertTo(Double source, Type<Short> destinationType) {
@@ -410,7 +409,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Double convertFrom(Short source, Type<Double> destinationType) {
@@ -425,7 +424,7 @@ public class NumericConverters {
      * 
      * @author matt.deboer@gmail.com
      */
-    public static class FloatToLongConverter extends BidirectionalConverter<Float, Long> {
+    public static class FloatToLongConverter extends BuiltinBidirectionalConverter<Float, Long> {
 
         private final boolean truncate;
         
@@ -440,7 +439,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Long convertTo(Float source, Type<Long> destinationType) {
@@ -451,7 +450,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Float convertFrom(Long source, Type<Float> destinationType) {
@@ -464,7 +463,7 @@ public class NumericConverters {
      * 
      * @author matt.deboer@gmail.com
      */
-    public static class FloatToIntegerConverter extends BidirectionalConverter<Float, Integer> {
+    public static class FloatToIntegerConverter extends BuiltinBidirectionalConverter<Float, Integer> {
 
         private final boolean truncate;
         
@@ -479,7 +478,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Integer convertTo(Float source, Type<Integer> destinationType) {
@@ -490,7 +489,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Float convertFrom(Integer source, Type<Float> destinationType) {
@@ -503,7 +502,7 @@ public class NumericConverters {
      * 
      * @author matt.deboer@gmail.com
      */
-    public static class FloatToShortConverter extends BidirectionalConverter<Float, Short> {
+    public static class FloatToShortConverter extends BuiltinBidirectionalConverter<Float, Short> {
 
         private final boolean truncate;
         
@@ -518,7 +517,7 @@ public class NumericConverters {
             this.truncate = truncate;
         }
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Short convertTo(Float source, Type<Short> destinationType) {
@@ -529,7 +528,7 @@ public class NumericConverters {
         }
 
         /* (non-Javadoc)
-         * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+         * @see ma.glasnost.orika.converter.BuiltinBidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
          */
         @Override
         public Float convertFrom(Short source, Type<Float> destinationType) {

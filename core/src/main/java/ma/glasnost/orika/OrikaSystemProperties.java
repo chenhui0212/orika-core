@@ -133,7 +133,16 @@ public final class OrikaSystemProperties {
     
     /**
      * Specifies whether Mapper and ObjectFactory instances for registered ClassMap instances
-     * default value is <code>false</code>
+     * <p>
+     * Default value is <code>false</code>
      */
     public static final String USE_AUTO_MAPPING = "ma.glasnost.orika.useAutoMapping";
+    
+    /**
+     * Specifies whether the current state of the core mapping objects should be printed
+     * to the log upon an exception.
+     * <p>
+     * Default value is <code>true</code>
+     */
+    public static final String DUMP_STATE_ON_EXCEPTION = "ma.glasnost.orika.dumpStateOnException";
 }

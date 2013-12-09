@@ -45,6 +45,8 @@ public class CloneableConverter extends CustomConverter<Object, Object> {
 	private final Set<Type<Cloneable>> clonedTypes = new HashSet<Type<Cloneable>>();
 	private final Map<Class<?>, Method> cachedMethods;
 	private final Method cloneMethod;
+	private final String description;
+	
 	/**
 	 * Constructs a new ClonableConverter configured to handle the provided
 	 * list of types by cloning.
@@ -67,9 +69,16 @@ public class CloneableConverter extends CustomConverter<Object, Object> {
 	    cloneMethod = clone;
 	    cachedMethods = methodCache;
 	    
+	    StringBuilder desc = new StringBuilder(CloneableConverter.class.getSimpleName()+"(Copy by cloning:");
+	    String separator = "";
 	    for (java.lang.reflect.Type type: types) {
-			clonedTypes.add(TypeFactory.<Cloneable>valueOf(type));
+	    	Type<Cloneable> cloneableType = TypeFactory.<Cloneable>valueOf(type);
+			clonedTypes.add(cloneableType);
+			desc.append(separator).append(cloneableType);
+			separator = ", ";
 		}
+	    desc.append(")");
+	    description = desc.toString();
 	}
 	
 	private boolean shouldClone(Type<?> type) {
@@ -79,6 +88,10 @@ public class CloneableConverter extends CustomConverter<Object, Object> {
 			}
 		}
 		return false;
+	}
+	
+	public String toString() {
+		return description;
 	}
 	
 	/* (non-Javadoc)
@@ -154,6 +167,23 @@ public class CloneableConverter extends CustomConverter<Object, Object> {
 			}
 		}
 		
+	}
+	
+	/**
+	 * Extends CloneableConverter for use as a built-in Converter 
+	 */
+	static class Builtin extends CloneableConverter {
+		
+		private final String description;
+		
+		Builtin(java.lang.reflect.Type...types) {
+			super(types);
+			description = "builtin:" + super.toString();
+		}
+		
+		public String toString() {
+			return description;
+		}
 	}
 	
 }

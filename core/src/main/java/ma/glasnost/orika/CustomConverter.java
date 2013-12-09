@@ -41,12 +41,15 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     
     public CustomConverter() {
         java.lang.reflect.Type genericSuperclass = getClass().getGenericSuperclass();
+        while (genericSuperclass instanceof Class) {
+        	genericSuperclass = ((Class<?>)genericSuperclass).getGenericSuperclass();
+        }
         if (genericSuperclass != null && genericSuperclass instanceof ParameterizedType) {
             ParameterizedType superType = (ParameterizedType)genericSuperclass;
             sourceType = TypeFactory.valueOf(superType.getActualTypeArguments()[0]);
             destinationType = TypeFactory.valueOf(superType.getActualTypeArguments()[1]);
         } else {
-            throw new IllegalStateException("When you subclass the ConverterBase S and D type-parameters are required.");
+            throw new IllegalStateException("When you subclass CustomConverter S and D type-parameters are required.");
         }
     }
     
@@ -59,7 +62,7 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     }
     
     public String toString() {
-    	String subClass = getClass().equals(CustomConverter.class) ? "" : "("+getClass().getSimpleName()+")";
+    	String subClass = getClass().equals(CustomConverter.class) || getClass().isAnonymousClass() ? "" : "("+getClass().getSimpleName()+")";
     	return CustomConverter.class.getSimpleName()+subClass+"<"+sourceType + ", " + destinationType+">";
     }
     

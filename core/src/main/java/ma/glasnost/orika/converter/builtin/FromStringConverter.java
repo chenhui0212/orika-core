@@ -17,7 +17,6 @@
  */
 package ma.glasnost.orika.converter.builtin;
 
-import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.metadata.Type;
 
 
@@ -33,7 +32,7 @@ import ma.glasnost.orika.metadata.Type;
  * @author matt.deboer@gmail.com
  *
  */
-public class FromStringConverter extends CustomConverter<Object, Object> {
+public class FromStringConverter extends BuiltinCustomConverter<Object, Object> {
 
 	
 	public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {

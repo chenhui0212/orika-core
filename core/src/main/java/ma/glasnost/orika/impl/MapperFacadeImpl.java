@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.impl;
 
+import static ma.glasnost.orika.StateReporter.DIVIDER;
+import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
 import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingContextFactory;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.ObjectFactory;
+import ma.glasnost.orika.StateReporter.Reportable;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.mapping.strategy.MappingStrategy;
 import ma.glasnost.orika.impl.mapping.strategy.MappingStrategyKey;
@@ -52,17 +55,20 @@ import ma.glasnost.orika.unenhance.UnenhanceStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+
 /**
  * MapperFacadeImpl is the base implementation of MapperFacade
  */
-public class MapperFacadeImpl implements MapperFacade {
+public class MapperFacadeImpl implements MapperFacade, Reportable {
     
     private final MapperFactory mapperFactory;
     private final MappingContextFactory contextFactory;
     private final UnenhanceStrategy unenhanceStrategy;
     private final UnenhanceStrategy userUnenhanceStrategy;
-    private final Map<MappingStrategyKey, MappingStrategy> strategyCache = getConcurrentLinkedHashMap(500);
+    private final ConcurrentLinkedHashMap<MappingStrategyKey, MappingStrategy> strategyCache = getConcurrentLinkedHashMap(500);
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final ExceptionUtility exceptionUtil;
     
     /**
      * Constructs a new MapperFacadeImpl
@@ -72,9 +78,9 @@ public class MapperFacadeImpl implements MapperFacade {
      * @param unenhanceStrategy
      */
     public MapperFacadeImpl(final MapperFactory mapperFactory, final MappingContextFactory contextFactory,
-            final UnenhanceStrategy unenhanceStrategy) {
+            final UnenhanceStrategy unenhanceStrategy, final ExceptionUtility exceptionUtil) {
         this.mapperFactory = mapperFactory;
-        
+        this.exceptionUtil = exceptionUtil;
         this.unenhanceStrategy = unenhanceStrategy;
         this.userUnenhanceStrategy = mapperFactory.getUserUnenhanceStrategy();
         this.contextFactory = contextFactory;
@@ -212,7 +218,10 @@ public class MapperFacadeImpl implements MapperFacade {
             if (log.isDebugEnabled()) {
                 log.debug(strategyRecorder.describeDetails());
             }
-            strategyCache.put(key, strategy);
+            MappingStrategy existing = strategyCache.putIfAbsent(key, strategy);
+            if (existing != null) {
+            	strategy = existing;
+            }
         }
         
         /*
@@ -250,7 +259,8 @@ public class MapperFacadeImpl implements MapperFacade {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw new MappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
+            throw exceptionUtil.newMappingException(
+            		"Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
                     + "\nsourceClass=" + (sourceObject != null ? sourceObject.getClass() : null) + "\nsourceType=" + sourceType
                     + "\ndestinationType=" + destinationType, e);
         }
@@ -315,7 +325,7 @@ public class MapperFacadeImpl implements MapperFacade {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw new MappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
+            throw exceptionUtil.newMappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
                     + "\nsourceClass=" + (sourceObject != null ? sourceObject.getClass() : null) + "\nsourceType=" + sourceType
                     + "\nrawDestination=" + destinationObject + "\ndestinationClass="
                     + (destinationObject != null ? destinationObject.getClass() : null) + "\ndestinationType=" + destinationType, e);
@@ -356,7 +366,7 @@ public class MapperFacadeImpl implements MapperFacade {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw new MappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
+            throw exceptionUtil.newMappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
                     + "\nsourceClass=" + (sourceObject != null ? sourceObject.getClass() : null) + "\nrawDestination=" + destinationObject
                     + "\ndestinationClass=" + (destinationObject != null ? destinationObject.getClass() : null), e);
         }
@@ -703,7 +713,7 @@ public class MapperFacadeImpl implements MapperFacade {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw new MappingException(
+            throw exceptionUtil.newMappingException(
                     "Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject + "\nsourceClass="
                             + (sourceObject != null ? sourceObject.getClass() : null) + "\ndestinationClass=" + destinationClass, e);
         }
@@ -1018,5 +1028,24 @@ public class MapperFacadeImpl implements MapperFacade {
         } finally {
             contextFactory.release(context);
         }
+    }
+    
+    /**
+     * Prints the current state of this MapperFacade to the supplied 
+     * StringBuilder instance.
+     * 
+     * @param out
+     */
+    public void reportCurrentState(StringBuilder out) {
+    	out.append(DIVIDER);
+    	out.append("\nResolved strategies: ").append(strategyCache.size())
+    		.append(" (approximate size: ").append(humanReadableSizeInMemory(strategyCache))
+    		.append(")");
+    	for (Entry<MappingStrategyKey, MappingStrategy> entry: strategyCache.entrySet()) {
+    		out.append("\n  [").append(entry.getKey()).append("] : ")
+    			.append(entry.getValue());
+    	}
+    	out.append(DIVIDER);
+    	out.append("\nUnenhance strategy: ").append(unenhanceStrategy);
     }
 }

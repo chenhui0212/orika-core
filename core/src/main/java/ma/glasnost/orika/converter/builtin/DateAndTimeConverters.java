@@ -28,8 +28,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import ma.glasnost.orika.CustomConverter;
-import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.metadata.Type;
 
 /**
@@ -55,7 +53,7 @@ public class DateAndTimeConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class DateToCalendarConverter extends
-			BidirectionalConverter<Date, Calendar> {
+			BuiltinBidirectionalConverter<Date, Calendar> {
 
 		@Override
 		public Calendar convertTo(Date source, Type<Calendar> destinationType) {
@@ -74,7 +72,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class DateToSqlDateConverter extends
-        CustomConverter<Date, java.sql.Date> {
+        BuiltinCustomConverter<Date, java.sql.Date> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -90,7 +88,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class DateToTimeConverter extends
-            CustomConverter<Date, Time> {
+            BuiltinCustomConverter<Date, Time> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -106,7 +104,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class SqlDateToDateConverter extends
-        CustomConverter<java.sql.Date, Date> {
+        BuiltinCustomConverter<java.sql.Date, Date> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -122,7 +120,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class TimeToDateConverter extends
-            CustomConverter<Time, Date> {
+            BuiltinCustomConverter<Time, Date> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -138,7 +136,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class XmlGregorianCalendarToSqlDateConverter extends
-        CustomConverter<XMLGregorianCalendar, java.sql.Date> {
+        BuiltinCustomConverter<XMLGregorianCalendar, java.sql.Date> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -154,7 +152,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class XmlGregorianCalendarToTimeConverter extends
-        CustomConverter<XMLGregorianCalendar, Time> {
+        BuiltinCustomConverter<XMLGregorianCalendar, Time> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -170,7 +168,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class CalendarToSqlDateConverter extends
-        CustomConverter<Calendar, java.sql.Date> {
+        BuiltinCustomConverter<Calendar, java.sql.Date> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -186,7 +184,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class CalendarToTimeConverter extends
-        CustomConverter<Calendar, Time> {
+        BuiltinCustomConverter<Calendar, Time> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -202,7 +200,7 @@ public class DateAndTimeConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class DateToXmlGregorianCalendarConverter extends
-			BidirectionalConverter<Date, XMLGregorianCalendar> {
+			BuiltinBidirectionalConverter<Date, XMLGregorianCalendar> {
 
 	    private DatatypeFactory factory;
         
@@ -233,7 +231,7 @@ public class DateAndTimeConverters {
 	 * @author matt.deboer@gmail.com
 	 */
 	public static class CalendarToXmlGregorianCalendarConverter extends
-			BidirectionalConverter<Calendar, XMLGregorianCalendar> {
+			BuiltinBidirectionalConverter<Calendar, XMLGregorianCalendar> {
 
 	    private DatatypeFactory factory;
 	    
@@ -265,7 +263,7 @@ public class DateAndTimeConverters {
 	 *
 	 */
 	public static class LongToDateConverter extends
-			BidirectionalConverter<Long, Date> {
+			BuiltinBidirectionalConverter<Long, Date> {
 
 		@Override
 		public Date convertTo(Long source, Type<Date> destinationType) {
@@ -286,7 +284,7 @@ public class DateAndTimeConverters {
      *
      */
     public static class LongToSqlDateConverter extends
-            BidirectionalConverter<Long, java.sql.Date> {
+            BuiltinBidirectionalConverter<Long, java.sql.Date> {
 
         @Override
         public java.sql.Date convertTo(Long source, Type<java.sql.Date> destinationType) {
@@ -306,7 +304,7 @@ public class DateAndTimeConverters {
      *
      */
     public static class LongToTimeConverter extends
-            BidirectionalConverter<Long, Time> {
+            BuiltinBidirectionalConverter<Long, Time> {
 
         @Override
         public Time convertTo(Long source, Type<Time> destinationType) {
@@ -326,7 +324,7 @@ public class DateAndTimeConverters {
 	 *
 	 */
 	public static class LongToCalendarConverter extends
-			BidirectionalConverter<Long, Calendar> {
+			BuiltinBidirectionalConverter<Long, Calendar> {
 
 		@Override
 		public Calendar convertTo(Long source, Type<Calendar> destinationType) {
@@ -347,7 +345,7 @@ public class DateAndTimeConverters {
      *
      */
     public static class LongToXmlGregorianCalendarConverter extends
-            BidirectionalConverter<Long, XMLGregorianCalendar> {
+            BuiltinBidirectionalConverter<Long, XMLGregorianCalendar> {
 
         private DatatypeFactory factory;
         
@@ -377,7 +375,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class XmlGregorianCalendarToTimestampConverter extends
-        CustomConverter<XMLGregorianCalendar, Timestamp> {
+        BuiltinCustomConverter<XMLGregorianCalendar, Timestamp> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
@@ -393,7 +391,7 @@ public class DateAndTimeConverters {
      * @author matt.deboer@gmail.com
      */
     public static class DateToTimestampConverter extends
-        CustomConverter<Date, Timestamp> {
+        BuiltinCustomConverter<Date, Timestamp> {
 
         /* (non-Javadoc)
          * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)

@@ -82,8 +82,6 @@ public abstract class BuiltinConverters {
     public static void register(ConverterFactory converterFactory) {
         
         converterFactory.registerConverter(new CopyByReferenceConverter());
-//        converterFactory.registerConverter(new WrapperToPrimitiveConverter());
-//        converterFactory.registerConverter(new StringToCharacterConverter());
         /*
          * Register converter to instantiate by using a constructor on
          * the destination which takes the source as argument
@@ -146,7 +144,7 @@ public abstract class BuiltinConverters {
         /*
          * Register additional common "immutable" types
          */
-        converterFactory.registerConverter(new PassThroughConverter(
+        converterFactory.registerConverter(new PassThroughConverter.Builtin(
               URL.class,
               URI.class,
               UUID.class,
@@ -160,7 +158,7 @@ public abstract class BuiltinConverters {
         /*
          * Register additional common "cloneable" types
          */
-        converterFactory.registerConverter(new CloneableConverter(
+        converterFactory.registerConverter(new CloneableConverter.Builtin(
               Date.class,
               Calendar.class,
               XMLGregorianCalendar.class

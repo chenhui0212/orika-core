@@ -17,13 +17,18 @@
  */
 package ma.glasnost.orika.converter;
 
+import static ma.glasnost.orika.StateReporter.DIVIDER;
+import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
+
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.StateReporter.Reportable;
 import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.ConverterKey;
 import ma.glasnost.orika.metadata.Type;
@@ -38,11 +43,11 @@ import ma.glasnost.orika.util.SortedSet;
  * @author mattdeboer
  *
  */
-public class DefaultConverterFactory implements ConverterFactory {
+public class DefaultConverterFactory implements ConverterFactory, Reportable {
     
     private static final Integer CACHE_SIZE = 2000;
     private final Map<ConverterKey, Converter<Object, Object>> converterCache;
-    private final Set<Converter<Object, Object>> converters;
+    private Set<Converter<Object, Object>> converters;
     private final Map<String, Converter<Object, Object>> convertersMap;
     private MapperFacade mapperFacade;
     
@@ -68,9 +73,13 @@ public class DefaultConverterFactory implements ConverterFactory {
     
     public synchronized void setMapperFacade(MapperFacade mapperFacade) {
     	this.mapperFacade = mapperFacade;
-    	for (Converter<?,?> converter: converters) {
+    	Set<Converter<Object,Object>> orderedConverters = 
+    			new LinkedHashSet<Converter<Object,Object>>();
+    	for (Converter<Object,Object> converter: converters) {
     		converter.setMapperFacade(mapperFacade);
+    		orderedConverters.add(converter);
     	}
+    	converters = orderedConverters;
     	for (Converter<?,?> converter: convertersMap.values()) {
     		converter.setMapperFacade(mapperFacade);
     	}
@@ -95,7 +104,7 @@ public class DefaultConverterFactory implements ConverterFactory {
      * )
      */
     public boolean hasConverter(String converterId) {
-        return convertersMap.containsKey(converterId);
+    	return convertersMap.containsKey(converterId);
     }
     
     /*
@@ -168,8 +177,8 @@ public class DefaultConverterFactory implements ConverterFactory {
      */
     @SuppressWarnings({ "unchecked"})
     public <S, D> void registerConverter(Converter<S, D> converter) {
-    	if (this.mapperFacade != null) {
-    		converter.setMapperFacade(mapperFacade);
+    	if (mapperFacade != null) {
+    		throw new IllegalStateException("Cannot register converters after MapperFactory begins building");
     	}
     	converters.add((Converter<Object, Object>) converter);
     }
@@ -183,8 +192,8 @@ public class DefaultConverterFactory implements ConverterFactory {
      */
     @SuppressWarnings({ "unchecked" })
     public <S, D> void registerConverter(String converterId, Converter<S, D> converter) {
-    	if (this.mapperFacade != null) {
-    		converter.setMapperFacade(mapperFacade);
+    	if (mapperFacade != null) {
+    		throw new IllegalStateException("Cannot register converters after MapperFactory begins building");
     	}
     	convertersMap.put(converterId, (Converter<Object, Object>) converter);
     }
@@ -198,7 +207,9 @@ public class DefaultConverterFactory implements ConverterFactory {
      */
     @Deprecated
     public <S, D> void registerConverter(ma.glasnost.orika.converter.Converter<S, D> converter) {
-        
+    	if (mapperFacade != null) {
+    		throw new IllegalStateException("Cannot register converters after MapperFactory begins building");
+    	}
         registerConverter(new ma.glasnost.orika.converter.Converter.LegacyConverter<S, D>(converter));
     }
     
@@ -211,7 +222,37 @@ public class DefaultConverterFactory implements ConverterFactory {
      */
     @Deprecated
     public <S, D> void registerConverter(String converterId, ma.glasnost.orika.converter.Converter<S, D> converter) {
-        
+    	if (mapperFacade != null) {
+    		throw new IllegalStateException("Cannot register converters after MapperFactory begins building");
+    	}
         registerConverter(converterId, new ma.glasnost.orika.converter.Converter.LegacyConverter<S, D>(converter));
+    }
+    
+    /* (non-Javadoc)
+     * @see ma.glasnost.orika.StateReporter.Reportable#reportCurrentState(java.lang.StringBuilder)
+     */
+    public void reportCurrentState(StringBuilder out) {
+    	out.append(DIVIDER);
+    	out.append("\nRegistered converters: ").append(converters.size())
+    		.append(" (approximate size: ").append(humanReadableSizeInMemory(converters))
+    		.append(")");
+    	int index = 0;
+    	for (Converter<Object,Object> converter: converters) {
+    		out.append("\n  [").append(index++).append("]: ").append(converter);
+    	}
+    	out.append(DIVIDER);
+    	out.append("\nConverter cache: ").append(converterCache.size())
+    		.append(" (approximate size: ").append(humanReadableSizeInMemory(converterCache))
+    		.append(")");
+    	for (Entry<ConverterKey, Converter<Object, Object>> entry: converterCache.entrySet()) {
+    		Type<?> srcType = TypeFactory.valueOf(entry.getKey().getSourceClass());
+    		Type<?> dstType = TypeFactory.valueOf(entry.getKey().getDestinationClass());
+    		String srcName = TypeFactory.nameOf(srcType, dstType);
+    		String dstName = TypeFactory.nameOf(dstType, srcType);
+    		
+    		out.append("\n  [").append(srcName)
+    			.append(" -> ").append(dstName)
+    			.append("] : ").append(entry.getValue());
+    	}
     }
 }

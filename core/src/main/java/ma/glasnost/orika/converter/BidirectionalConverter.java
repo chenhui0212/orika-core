@@ -52,7 +52,7 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
     }
     
     public String toString() {
-    	String subClass = getClass().equals(BidirectionalConverter.class) ? "" : "("+getClass().getSimpleName()+")";
+    	String subClass = getClass().equals(BidirectionalConverter.class) || getClass().isAnonymousClass() ? "" : "("+getClass().getSimpleName()+")";
     	return "BidirectionalConverter"+subClass+"<"+sourceType + ", " + destinationType+">";
     }
 

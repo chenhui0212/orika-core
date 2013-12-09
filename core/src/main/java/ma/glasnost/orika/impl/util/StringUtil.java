@@ -17,6 +17,7 @@
  */
 package ma.glasnost.orika.impl.util;
 
+
 /**
  * @author matt.deboer@gmail.com
  *
@@ -32,6 +33,4 @@ public abstract class StringUtil {
             return string.substring(0,1).toUpperCase() + string.substring(1);
         }
     }
-    
-    
 }

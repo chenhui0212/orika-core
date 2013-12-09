@@ -20,9 +20,12 @@ package ma.glasnost.orika.impl;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static ma.glasnost.orika.OrikaSystemProperties.DUMP_STATE_ON_EXCEPTION;
 import static ma.glasnost.orika.OrikaSystemProperties.MAP_NULLS;
 import static ma.glasnost.orika.OrikaSystemProperties.USE_AUTO_MAPPING;
 import static ma.glasnost.orika.OrikaSystemProperties.USE_BUILTIN_CONVERTERS;
+import static ma.glasnost.orika.StateReporter.DIVIDER;
+import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
 import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
 
 import java.lang.reflect.Constructor;
@@ -36,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +57,7 @@ import ma.glasnost.orika.MappingContextFactory;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.ObjectFactory;
 import ma.glasnost.orika.Properties;
+import ma.glasnost.orika.StateReporter.Reportable;
 import ma.glasnost.orika.constructor.ConstructorResolverStrategy;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.converter.builtin.BuiltinConverters;
@@ -90,7 +95,7 @@ import org.slf4j.LoggerFactory;
  * @author S.M. El Aatifi
  * 
  */
-public class DefaultMapperFactory implements MapperFactory {
+public class DefaultMapperFactory implements MapperFactory, Reportable {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMapperFactory.class);
     
@@ -122,6 +127,8 @@ public class DefaultMapperFactory implements MapperFactory {
     private volatile boolean isBuilt = false;
     private volatile boolean isBuilding = false;
     
+    private final ExceptionUtility exceptionUtil;
+    
     /**
      * Constructs a new instance of DefaultMapperFactory
      * 
@@ -143,6 +150,7 @@ public class DefaultMapperFactory implements MapperFactory {
         this.unenhanceStrategy = buildUnenhanceStrategy(builder.unenhanceStrategy, builder.superTypeStrategy);
         this.contextFactory = builder.mappingContextFactory;
         this.nonCyclicContextFactory = new NonCyclicMappingContext.Factory(this.contextFactory.getGlobalProperties());
+        this.exceptionUtil = new ExceptionUtility(this, builder.dumpStateOnException);
         this.mapperFacade = buildMapperFacade(contextFactory, unenhanceStrategy);
         this.concreteTypeRegistry = new ConcurrentHashMap<java.lang.reflect.Type, Type<?>>();
         
@@ -269,7 +277,11 @@ public class DefaultMapperFactory implements MapperFactory {
          * null.
          */
         protected Boolean mapNulls;
-        
+        /**
+         * The configured value of whether the full state of the core Orika mapping
+         * objects should be printed on exception
+         */
+        protected Boolean dumpStateOnException;
         /**
          * Instantiates a new MapperFactoryBuilder
          */
@@ -284,6 +296,7 @@ public class DefaultMapperFactory implements MapperFactory {
             useBuiltinConverters = valueOf(getProperty(USE_BUILTIN_CONVERTERS, "true"));
             useAutoMapping = valueOf(getProperty(USE_AUTO_MAPPING, "true"));
             mapNulls = valueOf(getProperty(MAP_NULLS, "true"));
+            dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "true"));
         }
         
         /**
@@ -592,7 +605,7 @@ public class DefaultMapperFactory implements MapperFactory {
      * @return the MapperFacade to use
      */
     protected MapperFacade buildMapperFacade(MappingContextFactory contextFactory, UnenhanceStrategy unenhanceStrategy) {
-        return new MapperFacadeImpl(this, contextFactory, unenhanceStrategy);
+        return new MapperFacadeImpl(this, contextFactory, unenhanceStrategy, exceptionUtil);
     }
     
     /*
@@ -653,7 +666,7 @@ public class DefaultMapperFactory implements MapperFactory {
                 } catch (MappingException e) {
                     e.setSourceType(mapperKey.getAType());
                     e.setDestinationType(mapperKey.getBType());
-                    throw e;
+                    throw exceptionUtil.decorate(e);
                 }
             }
             
@@ -871,7 +884,7 @@ public class DefaultMapperFactory implements MapperFactory {
                                 }
                             }
                             if (result == null) {
-                                throw e;
+                                throw exceptionUtil.decorate(e);
                             }
                         }
                     }
@@ -1037,11 +1050,10 @@ public class DefaultMapperFactory implements MapperFactory {
             
             MappingContext context = contextFactory.getContext();
             try {
-                converterFactory.setMapperFacade(mapperFacade);
-                
                 if (useBuiltinConverters) {
                     BuiltinConverters.register(converterFactory);
                 }
+                converterFactory.setMapperFacade(mapperFacade);
                 
                 buildClassMapRegistry();
                 
@@ -1093,7 +1105,7 @@ public class DefaultMapperFactory implements MapperFactory {
             for (final MapperKey parentMapperKey : classMap.getUsedMappers()) {
                 ClassMap<Object, Object> usedClassMap = classMapsDictionary.get(parentMapperKey);
                 if (usedClassMap == null) {
-                    throw new MappingException("Cannot find class mapping using mapper : " + classMap.getMapperClassName());
+                    throw exceptionUtil.newMappingException("Cannot find class mapping using mapper : " + classMap.getMapperClassName());
                 }
                 usedClassMapSet.add(usedClassMap);
             }
@@ -1168,7 +1180,7 @@ public class DefaultMapperFactory implements MapperFactory {
     private void collectUsedMappers(ClassMap<?, ?> classMap, Set<Mapper<Object, Object>> parentMappers, MapperKey parentMapperKey) {
         Mapper<Object, Object> parentMapper = lookupMapper(parentMapperKey);
         if (parentMapper == null) {
-            throw new MappingException("Cannot find used mappers for : " + classMap.getMapperClassName());
+            throw exceptionUtil.newMappingException("Cannot find used mappers for : " + classMap.getMapperClassName());
         }
         parentMappers.add(parentMapper);
         
@@ -1356,4 +1368,34 @@ public class DefaultMapperFactory implements MapperFactory {
     public void registerFilter(Filter<?, ?> filter) {
         this.filtersRegistry.add((Filter<Object, Object>) filter);
     }
+    
+    public void reportCurrentState(StringBuilder out) {
+    	out.append(DIVIDER);
+    	out.append("\nRegistered object factories: ").append(objectFactoryRegistry.size())
+    		.append(" (approximate size: ").append(humanReadableSizeInMemory(objectFactoryRegistry))
+    		.append(")");
+    	for (Entry<Type<? extends Object>, ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>> entry: 
+    			objectFactoryRegistry.entrySet()) {
+    		out.append("\n  [").append(entry.getKey())
+			.append("] : ").append(entry.getValue());
+    	}
+    	out.append(DIVIDER);
+    	out.append("\nRegistered mappers: ").append(mappersRegistry.size())
+    		.append(" (approximate size: ").append(humanReadableSizeInMemory(mappersRegistry))
+    		.append(")");
+		int index = 0;
+    	for (Mapper<Object,Object> mapper: mappersRegistry) {
+			out.append("\n  [").append(index++).append("] : ")
+					.append(mapper);
+		}
+    	out.append(DIVIDER);
+    	out.append("\nRegistered concrete types: ").append(concreteTypeRegistry.size())
+    		.append(" (approximate size: ").append(humanReadableSizeInMemory(concreteTypeRegistry))
+    		.append(")");
+    	for (Entry<java.lang.reflect.Type, Type<?>> entry: concreteTypeRegistry.entrySet()) {
+    		out.append("\n  [").append(entry.getKey())
+    			.append("] : ").append(entry.getValue());
+    	}
+    }
+    
 }

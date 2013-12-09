@@ -18,11 +18,14 @@
 
 package ma.glasnost.orika.impl;
 
+import java.util.Arrays;
+
 import ma.glasnost.orika.BoundMapperFacade;
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
+import ma.glasnost.orika.metadata.TypeFactory;
 
 public abstract class GeneratedMapperBase extends GeneratedObjectBase implements Mapper<Object, Object> {
     
@@ -93,6 +96,13 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
     }
     
     public String toString() {
-        return "GeneratedMapper(" + aType + ", " + bType + ")";
+    	String aTypeName = TypeFactory.nameOf(aType, bType);
+    	String bTypeName = TypeFactory.nameOf(bType, aType);
+    			
+        return "GeneratedMapper<" + aTypeName + ", " + bTypeName + "> {" +
+        		"usedConverters: " + Arrays.toString(usedConverters) + ", " +
+        		"usedMappers: " + Arrays.toString(usedMappers) + ", " +
+        		"usedMapperFacades: " + Arrays.toString(usedMapperFacades) + ", " +
+        		"usedTypes: " + Arrays.toString(usedTypes) + " }";
     }
 }
