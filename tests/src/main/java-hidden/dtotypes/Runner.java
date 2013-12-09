@@ -25,8 +25,6 @@ import types.AuthorHidden;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
-import org.junit.Test;
-
 public class Runner {
 
 	public static void run(MapperFactory mapperFactory) {
@@ -43,8 +41,6 @@ public class Runner {
 		
 	}
 	
-	
-	@Test
 	public void test() {
 		run(MappingUtil.getMapperFactory());
 	}

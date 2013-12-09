@@ -24,8 +24,6 @@ import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.BookDTO;
 
-import org.junit.Test;
-
 public class Runner {
 
 	public static void run(MapperFactory mapperFactory) {
@@ -44,7 +42,6 @@ public class Runner {
 	}
 	
 	
-	@Test
 	public void test() {
 		run(MappingUtil.getMapperFactory());
 	}
