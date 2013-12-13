@@ -100,10 +100,6 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
 			return delegate;
 		}
 
-		public int hashCode() {
-			return delegate.hashCode();
-		}
-
 		public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
 			return delegate.canConvert(sourceType, destinationType);
 		}
@@ -118,10 +114,6 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
 
 		public Type<Object> getBType() {
 			return delegate.getAType();
-		}
-
-		public boolean equals(Object obj) {
-			return delegate.equals(obj);
 		}
     }
 }
