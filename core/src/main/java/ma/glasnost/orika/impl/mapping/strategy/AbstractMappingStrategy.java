@@ -18,7 +18,13 @@
 
 package ma.glasnost.orika.impl.mapping.strategy;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.metadata.Type;
+import ma.glasnost.orika.metadata.TypeFactory;
 
 /**
  * AbstractMappingStrategy provides base MappingStrategy functionality
@@ -52,7 +58,21 @@ public abstract class AbstractMappingStrategy implements MappingStrategy {
     }
     
     public String toString() {
-        return getClass().getSimpleName() + "(" + sourceType + ", " + destinationType + ")";
+    	StringBuilder out = new StringBuilder(getClass().getSimpleName());
+    	String srcName = TypeFactory.nameOf(sourceType, destinationType);
+    	String dstName = TypeFactory.nameOf(destinationType, sourceType);
+    	out.append("<").append(srcName).append(", ")
+    		.append(dstName).append(">").append(" {");
+    	LinkedHashMap<String, Object> members = new LinkedHashMap<String, Object>();
+    	describeMembers(members);
+    	String separator = "";
+    	for (Entry<String, Object> member: members.entrySet()) {
+    		out.append(separator).append(member.getKey()).append(": ").append(member.getValue());
+    		separator = ", ";
+    	}
+    	out.append("}");
+    	return out.toString();
     }
     
+    protected abstract void describeMembers(Map<String, Object> members);
 }

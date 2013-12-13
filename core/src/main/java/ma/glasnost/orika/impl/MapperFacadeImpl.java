@@ -40,10 +40,10 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingContextFactory;
 import ma.glasnost.orika.MappingException;
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.ObjectFactory;
 import ma.glasnost.orika.StateReporter.Reportable;
 import ma.glasnost.orika.converter.ConverterFactory;
-import ma.glasnost.orika.impl.mapping.strategy.MappingStrategy;
 import ma.glasnost.orika.impl.mapping.strategy.MappingStrategyKey;
 import ma.glasnost.orika.impl.mapping.strategy.MappingStrategyRecorder;
 import ma.glasnost.orika.impl.util.ClassUtil;
@@ -202,7 +202,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                                     + resolvedSourceType.getName());
                             e.setDestinationType(destinationType);
                             e.setSourceType(resolvedSourceType);
-                            throw e;
+                            throw exceptionUtil.decorate(e);
                         } else {
                             resolvedDestinationType = destinationType;
                         }
@@ -230,6 +230,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
          */
         context.setResolvedSourceType(strategy.getAType());
         context.setResolvedDestinationType(strategy.getBType());
+        context.setResolvedStrategy(strategy);
         
         return strategy;
     }
@@ -237,6 +238,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     @SuppressWarnings("unchecked")
     public <S, D> D map(final S sourceObject, final Type<S> sourceType, final Type<D> destinationType, final MappingContext context) {
         
+    	MappingStrategy strategy = null;
         try {
             if (destinationType == null) {
                 throw new MappingException("Can not map to a null class.");
@@ -247,22 +249,23 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             
             D existingResult = (D) context.getMappedObject(sourceObject, destinationType);
             if (existingResult == null) {
-                MappingStrategy strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, false, context);
+                strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, false, context);
                 existingResult = (D) strategy.map(sourceObject, null, context);
             }
             return existingResult;
             
         } catch (MappingException e) {
-            /* don't wrap our own exceptions */
-            throw e;
+            throw exceptionUtil.decorate(e);
         } catch (RuntimeException e) {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw exceptionUtil.newMappingException(
-            		"Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
-                    + "\nsourceClass=" + (sourceObject != null ? sourceObject.getClass() : null) + "\nsourceType=" + sourceType
-                    + "\ndestinationType=" + destinationType, e);
+            MappingException me = exceptionUtil.newMappingException(e);
+            me.setSourceClass(sourceObject.getClass());
+            me.setSourceType(sourceType);
+            me.setDestinationType(destinationType);
+            me.setMappingStrategy(strategy);
+            throw me;
         }
     }
     
@@ -297,17 +300,16 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     
     public <S, D> void map(final S sourceObject, final D destinationObject, final Type<S> sourceType, final Type<D> destinationType,
             final MappingContext context) {
-        
+    	MappingStrategy strategy = null;
         try {
             
             if (context.getMappedObject(sourceObject, destinationType) == null) {
-                MappingStrategy strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, true, context);
+                strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, true, context);
                 strategy.map(sourceObject, destinationObject, context);
             }
             
         } catch (MappingException e) {
-            /* don't wrap our own exceptions */
-            throw e;
+            throw exceptionUtil.decorate(e);
         } catch (RuntimeException e) {
             
             if (destinationObject == null) {
@@ -325,10 +327,12 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw exceptionUtil.newMappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
-                    + "\nsourceClass=" + (sourceObject != null ? sourceObject.getClass() : null) + "\nsourceType=" + sourceType
-                    + "\nrawDestination=" + destinationObject + "\ndestinationClass="
-                    + (destinationObject != null ? destinationObject.getClass() : null) + "\ndestinationType=" + destinationType, e);
+            MappingException me = exceptionUtil.newMappingException(e);
+            me.setSourceClass(sourceObject.getClass());
+            me.setSourceType(sourceType);
+            me.setDestinationType(destinationType);
+            me.setMappingStrategy(strategy);
+            throw me;
         }
         
     }
@@ -344,10 +348,11 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     
     public <S, D> void map(final S sourceObject, final D destinationObject, final MappingContext context) {
         
+    	MappingStrategy strategy = null;
         try {
-            MappingStrategy strategy = resolveMappingStrategy(sourceObject, null, destinationObject.getClass(), true, context);
+        	strategy = resolveMappingStrategy(sourceObject, null, destinationObject.getClass(), true, context);
             if (null == context.getMappedObject(sourceObject, strategy.getBType())) {
-                strategy.map(sourceObject, destinationObject, context);
+            	strategy.map(sourceObject, destinationObject, context);
             }
             
         } catch (MappingException e) {
@@ -366,9 +371,11 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw exceptionUtil.newMappingException("Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject
-                    + "\nsourceClass=" + (sourceObject != null ? sourceObject.getClass() : null) + "\nrawDestination=" + destinationObject
-                    + "\ndestinationClass=" + (destinationObject != null ? destinationObject.getClass() : null), e);
+            MappingException me = exceptionUtil.newMappingException(e);
+            me.setSourceClass(sourceObject.getClass());
+            me.setDestinationType(TypeFactory.valueOf(destinationObject.getClass()));
+            me.setMappingStrategy(strategy);
+            throw me;
         }
     }
     
@@ -651,11 +658,27 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 strategy = resolveMappingStrategy(item, sourceType, destinationType, false, context);
                 sourceClass = item.getClass();
             }
-            D mappedItem = (D) context.getMappedObject(item, destinationType);
-            if (mappedItem == null) {
-                mappedItem = (D) strategy.map(item, null, context);
+            
+            try {
+	            D mappedItem = (D) context.getMappedObject(item, destinationType);
+	            if (mappedItem == null) {
+	                mappedItem = (D) strategy.map(item, null, context);
+	            }
+	            destination.add(mappedItem);
+            } catch (MappingException e) {
+                /* don't wrap our own exceptions */
+                throw e;
+            } catch (RuntimeException e) {
+                
+                if (!ExceptionUtility.originatedByOrika(e)) {
+                    throw e;
+                }
+                MappingException me = exceptionUtil.newMappingException(e);
+                me.setSourceClass(item.getClass());
+                me.setDestinationType(destinationType);
+                me.setMappingStrategy(strategy);
+                throw me;
             }
-            destination.add(mappedItem);
         }
         return destination;
     }
@@ -691,9 +714,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     @SuppressWarnings("unchecked")
     public <S, D> D map(final S sourceObject, final Class<D> destinationClass, final MappingContext context) {
         
+    	MappingStrategy strategy = null;
         try {
             if (destinationClass == null) {
-                throw new MappingException("Can not map to a null class.");
+                throw new MappingException("'destinationClass' is required");
             }
             if (sourceObject == null) {
                 return null;
@@ -701,21 +725,22 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             
             D result = (D) context.getMappedObject(sourceObject, TypeFactory.valueOf(destinationClass));
             if (result == null) {
-                MappingStrategy strategy = resolveMappingStrategy(sourceObject, null, destinationClass, false, context);
+                strategy = resolveMappingStrategy(sourceObject, null, destinationClass, false, context);
                 result = (D) strategy.map(sourceObject, null, context);
             }
             return result;
             
         } catch (MappingException e) {
-            /* don't wrap our own exceptions */
-            throw e;
+            throw exceptionUtil.decorate(e);
         } catch (RuntimeException e) {
             if (!ExceptionUtility.originatedByOrika(e)) {
                 throw e;
             }
-            throw exceptionUtil.newMappingException(
-                    "Error encountered while mapping for the following inputs: " + "\nrawSource=" + sourceObject + "\nsourceClass="
-                            + (sourceObject != null ? sourceObject.getClass() : null) + "\ndestinationClass=" + destinationClass, e);
+            MappingException me = exceptionUtil.newMappingException(e);
+            me.setSourceClass(sourceObject.getClass());
+            me.setDestinationType(TypeFactory.valueOf(destinationClass));
+            me.setMappingStrategy(strategy);
+            throw me;
         }
     }
     
@@ -1042,7 +1067,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     		.append(" (approximate size: ").append(humanReadableSizeInMemory(strategyCache))
     		.append(")");
     	for (Entry<MappingStrategyKey, MappingStrategy> entry: strategyCache.entrySet()) {
-    		out.append("\n  [").append(entry.getKey()).append("] : ")
+    		out.append("\n").append(entry.getKey()).append(": ")
     			.append(entry.getValue());
     	}
     	out.append(DIVIDER);

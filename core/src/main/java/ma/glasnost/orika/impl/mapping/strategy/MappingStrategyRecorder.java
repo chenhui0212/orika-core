@@ -20,6 +20,7 @@ package ma.glasnost.orika.impl.mapping.strategy;
 
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Mapper;
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.ObjectFactory;
 import ma.glasnost.orika.impl.ReversedMapper;
 import ma.glasnost.orika.metadata.Type;
@@ -195,7 +196,7 @@ public class MappingStrategyRecorder {
      * @return a new instance of the MappingStrategy which can "playback" the
      *         route taken to map a given set of inputs.
      */
-    public MappingStrategy playback() {
+    public synchronized MappingStrategy playback() {
         
         UnenhanceStrategy unenhanceStrategy;
         unenhanceStrategy = this.unenhanceStrategy;
@@ -270,6 +271,10 @@ public class MappingStrategyRecorder {
         
         public <T> T unenhanceObject(final T object, final Type<T> type) {
             return object;
+        }
+        
+        public String toString() {
+        	return getClass().getSimpleName();
         }
     }
 }

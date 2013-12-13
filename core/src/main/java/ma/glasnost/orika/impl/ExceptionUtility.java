@@ -44,37 +44,31 @@ public class ExceptionUtility {
     }
     
     public MappingException newMappingException(String message, Throwable cause) {
-    	StringBuilder out = new StringBuilder();
-    	if (reportStateOnException) {
-    		StateReporter.reportCurrentState(out, mapperFactory);
-    		out.replace(0, StateReporter.DIVIDER.length(), 
-    				"\n-----begin dump of current state-----------------------------");
-    		out.append("\n-----end dump of current state-------------------------------");
-    	}
-    	out.insert(0, message);
-    	if (cause != null) {
-    		return new MappingException(out.toString(), cause);
-    	} else {
-    		return new MappingException(out.toString());
-    	}
+    	return decorate(new MappingException(message, cause));
     }
     
     public MappingException newMappingException(String message) {
     	return newMappingException(message, null);
     }
     
+    public MappingException newMappingException(Throwable cause) {
+    	return decorate(new MappingException(cause));
+    }
+    
     /**
      * @param e
      * @return
      */
-    public MappingException decorate(MappingException e) {
-		if (reportStateOnException) {
-			MappingException nme = newMappingException(e.getMessage(), e.getCause());
-			nme.setStackTrace(e.getStackTrace());
-			return nme;
-		} else {
-			return e;
-		}
+    public MappingException decorate(MappingException me) {
+    	if (reportStateOnException && !me.containsStateReport()) {
+    		StringBuilder report = new StringBuilder();
+    		StateReporter.reportCurrentState(report, mapperFactory);
+    		report.replace(0, StateReporter.DIVIDER.length(), 
+    				"\n-----begin dump of current state-----------------------------");
+    		report.append("\n-----end dump of current state-------------------------------");
+    		me.setStateReport(report.toString());
+    	}
+    	return me;
 	}
     
     /**

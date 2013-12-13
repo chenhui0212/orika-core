@@ -63,7 +63,9 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     
     public String toString() {
     	String subClass = getClass().equals(CustomConverter.class) || getClass().isAnonymousClass() ? "" : "("+getClass().getSimpleName()+")";
-    	return CustomConverter.class.getSimpleName()+subClass+"<"+sourceType + ", " + destinationType+">";
+    	String srcName = TypeFactory.nameOf(sourceType, destinationType);
+    	String dstName = TypeFactory.nameOf(destinationType, sourceType);
+    	return CustomConverter.class.getSimpleName()+subClass+"<"+srcName + ", " + dstName+">";
     }
     
     public Type<S> getAType() {

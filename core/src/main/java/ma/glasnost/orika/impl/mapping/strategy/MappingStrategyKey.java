@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.impl.mapping.strategy;
 
+import ma.glasnost.orika.metadata.TypeFactory;
+
 /**
  * MappingStrategyKey defines the minimum information necessary to cache a
  * particular mapping strategy
@@ -124,6 +126,14 @@ public final class MappingStrategyKey {
     }
     
     public String toString() {
-    	return "[" + rawSourceType.getSimpleName() + ", " + sourceType + ", " + destinationType +"]";
+    	StringBuilder out = new StringBuilder("{");
+    	java.lang.reflect.Type srcType = rawSourceType==null ? sourceType : rawSourceType;
+    	String srcName = TypeFactory.nameOf(srcType, destinationType);
+    	String dstName = TypeFactory.nameOf(destinationType, srcType);
+    	out.append("source: ").append(srcName)
+    		.append(", ").append("dest: ").append(dstName)
+    		.append(", ").append("in-place:").append(destinationProvided)
+    		.append("}");
+    	return out.toString();
     }
 }

@@ -19,6 +19,7 @@
 package ma.glasnost.orika.impl.mapping.strategy;
 
 import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.metadata.Type;
 
 /**

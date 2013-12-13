@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.impl.mapping.strategy;
 
+import java.util.Map;
+
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
@@ -80,4 +82,9 @@ public abstract class UseCustomMapperStrategy extends AbstractMappingStrategy {
      * @return an instance of the destination type to be mapped
      */
     protected abstract Object getInstance(Object sourceObject, Object destinationObject, MappingContext context);
+    
+    protected void describeMembers(Map<String, Object> members) {
+    	members.put("customMapper", customMapper);
+    	members.put("unenhancer", unenhancer);
+    }
 }

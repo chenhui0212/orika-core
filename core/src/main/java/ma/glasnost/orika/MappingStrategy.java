@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package ma.glasnost.orika.impl.mapping.strategy;
+package ma.glasnost.orika;
 
-import ma.glasnost.orika.MappedTypePair;
-import ma.glasnost.orika.MappingContext;
 
 /**
  * MappingStrategy defines the contract for a pre-resolved classification of mapping

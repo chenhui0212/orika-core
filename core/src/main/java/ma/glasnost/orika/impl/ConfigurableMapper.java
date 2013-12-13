@@ -27,7 +27,7 @@ import ma.glasnost.orika.BoundMapperFacade;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.impl.mapping.strategy.MappingStrategy;
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.metadata.Type;
 
 /**

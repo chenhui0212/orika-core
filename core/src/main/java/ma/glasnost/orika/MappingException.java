@@ -30,6 +30,8 @@ public class MappingException extends RuntimeException {
 	private Class<?> sourceClass;
 	private Type<?> sourceType;
 	private Type<?> destinationType;
+	private MappingStrategy mappingStrategy;
+	private String stateReport;
 	
 	public MappingException(Throwable e) {
 		super(e);
@@ -61,12 +63,19 @@ public class MappingException extends RuntimeException {
 		if (destinationProperty != null) {
 			message.append("\ndestinationProperty = " + destinationProperty);
 		}
+		if (mappingStrategy != null) {
+			message.append("\nresolvedStrategy = " + mappingStrategy);
+		}
 		if (message.length() > 0) {
 			message.insert(0, "While attempting the following mapping:");
 			message.append("\nError occurred: ");
 		}
 		
 		message.append(super.getLocalizedMessage());
+		
+		if (stateReport != null) {
+			message.append(stateReport);
+		}
 		
 		return message.toString();
 	}
@@ -110,4 +119,21 @@ public class MappingException extends RuntimeException {
 	public void setSourceClass(Class<?> sourceClass) {
 		this.sourceClass = sourceClass;
 	}
+	
+	public MappingStrategy getMappingStrategy() {
+		return mappingStrategy;
+	}
+
+	public void setMappingStrategy(MappingStrategy mappingStrategy) {
+		this.mappingStrategy = mappingStrategy;
+	}
+
+	public void setStateReport(String stateReport) {
+		this.stateReport = stateReport;
+	}
+	
+	public boolean containsStateReport() {
+		return this.stateReport != null;
+	}
+	
 }

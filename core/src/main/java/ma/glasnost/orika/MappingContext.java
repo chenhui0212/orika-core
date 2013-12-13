@@ -48,6 +48,7 @@ public class MappingContext {
     private int depth;
     private Type<?> resolvedSourceType;
     private Type<?> resolvedDestinationType;
+    private MappingStrategy resolvedStrategy;
     
     /**
      * Factory constructs instances of the base MappingContext
@@ -275,6 +276,9 @@ public class MappingContext {
         if (mappersSeen != null) {
             mappersSeen.clear();
         }
+        resolvedSourceType = null;
+        resolvedDestinationType = null;
+        resolvedStrategy = null;
         isNew = true;
         depth = 0;
     }
@@ -336,4 +340,20 @@ public class MappingContext {
     public void setResolvedDestinationType(Type<?> resolvedDestinationType) {
         this.resolvedDestinationType = resolvedDestinationType;
     }
+
+	/**
+	 * @return the resolved strategy in the current context
+	 */
+	public MappingStrategy getResolvedStrategy() {
+		return resolvedStrategy;
+	}
+
+	/**
+	 * @param resolvedStrategy the mapping strategy to set
+	 */
+	public void setResolvedStrategy(MappingStrategy resolvedStrategy) {
+		this.resolvedStrategy = resolvedStrategy;
+	}
+    
+    
 }

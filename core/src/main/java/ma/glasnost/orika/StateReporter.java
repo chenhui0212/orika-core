@@ -56,7 +56,7 @@ public final class StateReporter {
 	 * @author mattdeboer
 	 *
 	 */
-	public interface Reportable {
+	public static interface Reportable {
 
 		/**
 		 * Writes details of the current state of this object to the provided

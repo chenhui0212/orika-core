@@ -24,8 +24,8 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingContextFactory;
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.ObjectFactory;
-import ma.glasnost.orika.impl.mapping.strategy.MappingStrategy;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.unenhance.UnenhanceStrategy;
@@ -185,7 +185,9 @@ class DefaultBoundMapperFacade<A, B> implements BoundMapperFacade<A, B> {
     }
     
     public String toString() {
-        return getClass().getSimpleName() + "(" + aType +", " + bType + ")";
+    	String srcName = TypeFactory.nameOf(aType, bType);
+    	String dstName = TypeFactory.nameOf(bType, aType);
+        return getClass().getSimpleName() + "<" + srcName +", " + dstName + ">";
     }
 
     /* (non-Javadoc)

@@ -501,12 +501,45 @@ public abstract class TypeFactory {
      *  required in the returned name
      * @return
      */
-    public static String nameOf(Type<?> type, Type<?> associatedType) {
-    	if (type.getSimpleName().equals(associatedType.getSimpleName())
-    			&& !type.equals(associatedType)) {
-    		return type.toFullyQualifiedString();
+    public static String nameOf(java.lang.reflect.Type type, java.lang.reflect.Type associatedType) {
+    	String shortTypeName;
+    	String longTypeName;
+    	String shortAscTypeName;
+    	String longAscTypeName;
+    	
+    	if (type instanceof Type) {
+    		longTypeName = ((Type<?>)type).toFullyQualifiedString();
+    		shortTypeName = type.toString();
+    	} else if (type instanceof Class) {
+    		longTypeName = ((Class<?>)type).getCanonicalName();
+    		shortTypeName = ((Class<?>)type).getSimpleName();
     	} else {
-    		return type.toString();
+    		longTypeName = String.valueOf(type);
+    		String[] parts = longTypeName.split("\\s+");
+    		longTypeName = parts[parts.length-1];
+    		parts = longTypeName.split("[.]");
+    		shortTypeName = parts[parts.length-1];
+    	}
+    	
+    	if (associatedType instanceof Type) {
+    		longAscTypeName = ((Type<?>)associatedType).toFullyQualifiedString();
+    		shortAscTypeName = associatedType.toString();
+    	} else if (associatedType instanceof Class) {
+    		longAscTypeName = ((Class<?>)associatedType).getCanonicalName();
+    		shortAscTypeName = ((Class<?>)associatedType).getSimpleName();
+    	} else {
+    		longAscTypeName = String.valueOf(associatedType);
+    		String[] parts = longAscTypeName.split("\\s+");
+    		longAscTypeName = parts[parts.length-1];
+    		parts = longAscTypeName.split("[.]");
+    		shortAscTypeName = parts[parts.length-1];
+    	}
+    	
+    	if (shortTypeName.equals(shortAscTypeName) &&
+    			!longTypeName.equals(longAscTypeName)) {
+    		return longTypeName;
+    	} else {
+    		return shortTypeName;
     	}
     }
     

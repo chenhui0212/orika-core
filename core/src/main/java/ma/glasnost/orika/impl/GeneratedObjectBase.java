@@ -30,7 +30,7 @@ import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Filter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.impl.mapping.strategy.MappingStrategy;
+import ma.glasnost.orika.MappingStrategy;
 import ma.glasnost.orika.metadata.Type;
 
 public abstract class GeneratedObjectBase {

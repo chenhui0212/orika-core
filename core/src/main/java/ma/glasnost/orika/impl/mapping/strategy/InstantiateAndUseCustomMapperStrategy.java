@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.impl.mapping.strategy;
 
+import java.util.Map;
+
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.ObjectFactory;
@@ -52,4 +54,10 @@ public class InstantiateAndUseCustomMapperStrategy extends UseCustomMapperStrate
     protected Object getInstance(Object sourceObject, Object destinationObject, MappingContext context) {
     	return objectFactory.create(sourceObject, context);
     }
+
+	@Override
+	protected void describeMembers(Map<String, Object> members) {
+		super.describeMembers(members);
+		members.put("objectFactory", objectFactory);
+	}
 }

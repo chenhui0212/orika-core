@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.impl.mapping.strategy;
 
+import java.util.Map;
+
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
@@ -56,4 +58,10 @@ public class UseConverterStrategy extends AbstractMappingStrategy {
             context.endMapping();
         }
     }
+
+	@Override
+	protected void describeMembers(Map<String, Object> members) {
+		members.put("converter", converter);
+		members.put("unenhancer", unenhancer);
+	}
 }
