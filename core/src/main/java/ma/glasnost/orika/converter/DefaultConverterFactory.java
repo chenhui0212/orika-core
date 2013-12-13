@@ -178,9 +178,12 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
     @SuppressWarnings({ "unchecked"})
     public <S, D> void registerConverter(Converter<S, D> converter) {
     	if (mapperFacade != null) {
-    		throw new IllegalStateException("Cannot register converters after MapperFactory begins building");
+    		throw new IllegalStateException("Cannot register converters after MapperFacade has been initialized");
     	}
     	converters.add((Converter<Object, Object>) converter);
+    	if (converter instanceof BidirectionalConverter) {
+    		converters.add((Converter<Object, Object>)((BidirectionalConverter<?,?>)converter).reverse());
+    	}
     }
     
     /*
@@ -193,7 +196,7 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
     @SuppressWarnings({ "unchecked" })
     public <S, D> void registerConverter(String converterId, Converter<S, D> converter) {
     	if (mapperFacade != null) {
-    		throw new IllegalStateException("Cannot register converters after MapperFactory begins building");
+    		throw new IllegalStateException("Cannot register converters after MapperFacade has been initialized");
     	}
     	convertersMap.put(converterId, (Converter<Object, Object>) converter);
     }

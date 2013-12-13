@@ -18,6 +18,7 @@
 package ma.glasnost.orika.converter;
 
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.metadata.Type;
 
 
@@ -31,6 +32,8 @@ import ma.glasnost.orika.metadata.Type;
  */
 public abstract class BidirectionalConverter<S, D> extends CustomConverter<Object, Object> implements ma.glasnost.orika.Converter<Object, Object> {
     
+	private volatile Reversed<D,S> reversed;
+	
     public abstract D convertTo(S source, Type<D> destinationType);
     
     public abstract S convertFrom(D source, Type<S> destinationType);
@@ -53,7 +56,72 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
     
     public String toString() {
     	String subClass = getClass().equals(BidirectionalConverter.class) || getClass().isAnonymousClass() ? "" : "("+getClass().getSimpleName()+")";
-    	return "BidirectionalConverter"+subClass+"<"+sourceType + ", " + destinationType+">";
+    	return BidirectionalConverter.class.getSimpleName()+subClass+"<"+sourceType + ", " + destinationType+">";
     }
 
+    
+    public BidirectionalConverter<D, S> reverse() {
+    	if (reversed == null) {
+    		synchronized(this) {
+    			if (reversed == null) {
+    				reversed = new Reversed<D,S>(this);
+    			}
+    		}
+    	}
+    	return reversed;
+    }
+    
+    /**
+     * Provides a reversed facade to a given converter
+     *
+     * @param <S>
+     * @param <D>
+     */
+    public static class Reversed<S,D> extends BidirectionalConverter<S,D> {
+
+    	private final BidirectionalConverter<D, S> delegate;
+    	
+    	public Reversed(BidirectionalConverter<D, S> bidi) {
+    		super();
+    		delegate = bidi;
+    	}
+    	
+		@Override
+		public D convertTo(S source, Type<D> destinationType) {
+			return delegate.convertFrom(source, destinationType);
+		}
+
+		@Override
+		public S convertFrom(D source, Type<S> destinationType) {
+			return delegate.convertTo(source, destinationType);
+		}
+		
+		public BidirectionalConverter<D, S> reverse() {
+			return delegate;
+		}
+
+		public int hashCode() {
+			return delegate.hashCode();
+		}
+
+		public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
+			return delegate.canConvert(sourceType, destinationType);
+		}
+
+		public void setMapperFacade(MapperFacade mapper) {
+			delegate.setMapperFacade(mapper);
+		}
+
+		public Type<Object> getAType() {
+			return delegate.getBType();
+		}
+
+		public Type<Object> getBType() {
+			return delegate.getAType();
+		}
+
+		public boolean equals(Object obj) {
+			return delegate.equals(obj);
+		}
+    }
 }
