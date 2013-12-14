@@ -52,13 +52,13 @@ public class MappingException extends RuntimeException {
 			message.append("\nsourceClass = " + sourceClass);
 		}
 		if (sourceType != null) {
-			message.append("\nsourceType = " + sourceType);
+			message.append("\nsourceType = " + sourceType.toFullyQualifiedString());
 		}
 		if (sourceProperty != null) {
 			message.append("\nsourceProperty = " + sourceProperty);
 		}
 		if (destinationType != null) {
-			message.append("\ndestinationType = " + destinationType);
+			message.append("\ndestinationType = " + destinationType.toFullyQualifiedString());
 		}
 		if (destinationProperty != null) {
 			message.append("\ndestinationProperty = " + destinationProperty);
