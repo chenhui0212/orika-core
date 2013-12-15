@@ -354,6 +354,4 @@ public class MappingContext {
 	public void setResolvedStrategy(MappingStrategy resolvedStrategy) {
 		this.resolvedStrategy = resolvedStrategy;
 	}
-    
-    
 }

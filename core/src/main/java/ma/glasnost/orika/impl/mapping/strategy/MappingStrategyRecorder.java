@@ -21,6 +21,7 @@ package ma.glasnost.orika.impl.mapping.strategy;
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MappingStrategy;
+import ma.glasnost.orika.MappingStrategy.Key;
 import ma.glasnost.orika.ObjectFactory;
 import ma.glasnost.orika.impl.ReversedMapper;
 import ma.glasnost.orika.metadata.Type;
@@ -50,13 +51,13 @@ public class MappingStrategyRecorder {
     private MappingStrategy resolvedStrategy;
     
     private final UnenhanceStrategy unenhanceStrategy;
-    private final MappingStrategyKey key;
+    private final Key key;
     
     /**
      * @param key
      * @param unenhanceStrategy
      */
-    public MappingStrategyRecorder(final MappingStrategyKey key, final UnenhanceStrategy unenhanceStrategy) {
+    public MappingStrategyRecorder(final Key key, final UnenhanceStrategy unenhanceStrategy) {
         this.unenhanceStrategy = unenhanceStrategy;
         this.key = key;
     }

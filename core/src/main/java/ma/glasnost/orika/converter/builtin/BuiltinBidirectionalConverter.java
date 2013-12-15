@@ -18,6 +18,7 @@
 package ma.glasnost.orika.converter.builtin;
 
 import ma.glasnost.orika.converter.BidirectionalConverter;
+import ma.glasnost.orika.metadata.TypeFactory;
 
 /**
  * BidirectionalConverter which describes itself as builtin
@@ -28,10 +29,46 @@ import ma.glasnost.orika.converter.BidirectionalConverter;
 abstract class BuiltinBidirectionalConverter<C, D> extends
 		BidirectionalConverter<C, D> {
 
-	private String description = "builtin:" + getClass().getSimpleName() + "<"
-			+ sourceType + ", " + destinationType + ">";
-
+	private final String description;
+	private volatile Reversed<D, C> reversed;
+	
+	public BuiltinBidirectionalConverter() {
+	    super();
+	    String srcName = TypeFactory.nameOf(sourceType, destinationType);
+	    String dstName = TypeFactory.nameOf(destinationType, sourceType); 
+	    description = "builtin:" + getClass().getSimpleName() + "<"
+        + srcName + ", " + dstName + ">";
+	}
+	
 	public String toString() {
 		return description;
+	}
+	
+	public BidirectionalConverter<D, C> reverse() {
+	    if (reversed == null) {
+	        synchronized(this) {
+	            if (reversed == null) {
+	                reversed = new Reversed<D, C>(this);
+	            }
+	        }
+	    }
+	    return reversed;
+	}
+	
+	public static class Reversed<D, C> extends BidirectionalConverter.Reversed<D, C> {
+
+	    private final String description;
+	    
+        public Reversed(BidirectionalConverter<C, D> bidi) {
+            super(bidi);
+            String srcName = TypeFactory.nameOf(getAType(), getBType());
+            String dstName = TypeFactory.nameOf(getBType(), getAType());
+            description = "builtin:reversed:" + bidi.getClass().getSimpleName() + "<"
+            + srcName + ", " + dstName + ">";
+        }
+	    
+        public String toString() {
+            return description;
+        }
 	}
 }
