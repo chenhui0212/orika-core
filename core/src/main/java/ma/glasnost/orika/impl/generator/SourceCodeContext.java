@@ -739,7 +739,7 @@ public class SourceCodeContext {
             
             boolean mapNulls = AbstractSpecification.shouldMapNulls(fieldMap, this);
             
-            if (destinationProperty.isNestedProperty()) {
+            if (destinationProperty.isNullPathPossible()) {
                 if (!sourceProperty.isPrimitive()) {
                     if (!mapNulls) {
                         out.append(sourceProperty.ifNotNull());

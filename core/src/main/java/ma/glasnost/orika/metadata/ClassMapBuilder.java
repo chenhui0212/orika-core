@@ -731,7 +731,13 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     		if (f.isExcluded()) {
     			output.append("\n\t .exclude('" + f.getSourceName() + "')");
     		} else {
-    			output.append("\n\t .field( " + f.getSource() + ", " + f.getDestination() + " )");
+    		    String dir = "";
+    		    if (f.getDirection() == MappingDirection.A_TO_B) {
+    		        dir = "AToB";
+    		    } else if (f.getDirection() == MappingDirection.B_TO_A) {
+    		        dir = "BToA";
+    		    }
+    			output.append("\n\t .field" + dir + "( " + f.getSource() + ", " + f.getDestination() + " )");
     		}
     	}	
     	if (constructorA != null) {

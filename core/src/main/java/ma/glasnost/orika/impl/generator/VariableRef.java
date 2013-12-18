@@ -378,10 +378,8 @@ public class VariableRef {
             } else if (!value.isPrimitive()) {
                 castValue = format("%s.valueOf(\"\"+%s).%sValue()", type.getWrapperType().getCanonicalName(), castValue, typeName);
             }
-        } else if (type.isPrimitiveWrapper()) {
-            if (value.isPrimitive()) {
-                castValue = format("%s.valueOf(%s)", type.getCanonicalName(), castValue);
-            }
+        } else if (type.isPrimitiveWrapper() && value.isPrimitive()) {
+            castValue = format("%s.valueOf(%s)", type.getCanonicalName(), castValue);
         } else if (type.isString() && !value.type().isString()) {
             castValue = "\"\" + " + castValue;
         } else if (!castValue.replace("(", "").startsWith(typeName)){

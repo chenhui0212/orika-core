@@ -162,11 +162,10 @@ public final class MapperGenerator {
                 fieldMap = fieldMap.flip();
             }
             
-            if (code.aggregateSpecsApply(fieldMap)) {
-                continue;
-            }
-            
             if (!fieldMap.isIgnored()) {
+                if (code.aggregateSpecsApply(fieldMap)) {
+                    continue;
+                }
                 try {
                     mappedFields.add(currentFieldMap);
                     String sourceCode = generateFieldMapCode(code, fieldMap, classMap, destination, logDetails);
