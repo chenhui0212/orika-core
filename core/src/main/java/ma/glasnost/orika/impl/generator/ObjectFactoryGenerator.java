@@ -122,7 +122,7 @@ public class ObjectFactoryGenerator {
                 IllegalArgumentException.class.getCanonicalName()));
         
         out.append(addSourceClassConstructor(code, type, sourceType, mappingContext, logDetails));
-        out.append(addUnmatchedSourceHandler(code, type, mappingContext, logDetails));
+        out.append(addUnmatchedSourceHandler(code, type, sourceType, mappingContext, logDetails));
         
         out.append("\n}");
         
@@ -147,17 +147,16 @@ public class ObjectFactoryGenerator {
             classMap = mapperFactory.getClassMap(new MapperKey(destinationType, sourceType));
         }
         
-        boolean constructorCallAdded = false;
         StringBuilder out = new StringBuilder();
-        if (destinationType.isArray() && classMap != null) {
-            out.append(addArrayClassConstructor(code, destinationType, sourceType, classMap.getFieldsMapping().size()));
-        } else {
+        if (classMap != null) {
+            if (destinationType.isArray()) {
+                out.append(addArrayClassConstructor(code, destinationType, sourceType, classMap.getFieldsMapping().size()));
+            } else {
+                
+                out.append(format("if (s instanceof %s) {", sourceType.getCanonicalName()));
+                out.append(format("%s source = (%s) s;", sourceType.getCanonicalName(), sourceType.getCanonicalName()));
+                out.append("\ntry {\n");
             
-            out.append(format("if (s instanceof %s) {", sourceType.getCanonicalName()));
-            out.append(format("%s source = (%s) s;", sourceType.getCanonicalName(), sourceType.getCanonicalName()));
-            out.append("\ntry {\n");
-            
-            if (classMap != null) {
                 ConstructorMapping<?> constructorMapping = (ConstructorMapping<?>) constructorResolverStrategy.resolve(classMap,
                         destinationType);
                 Constructor<?> constructor = constructorMapping.getConstructor();
@@ -200,35 +199,16 @@ public class ObjectFactoryGenerator {
                     }
                 }
                 out.append(");");
-                constructorCallAdded = true;
-            } else {
                 /*
-                 * Attempt
+                 * Any exceptions thrown calling constructors should be propagated
                  */
-                for (Constructor<?> constructor : destinationType.getRawType().getConstructors()) {
-                    if (constructor.getParameterTypes().length == 1 && Modifier.isPublic(constructor.getModifiers())) {
-                        Type<?> argType = TypeFactory.valueOf(constructor.getGenericParameterTypes()[0]);
-                        if (argType.isAssignableFrom(sourceType)) {
-                            out.append(format("return new %s((%s)s);", destinationType.getCanonicalName(), sourceType.getCanonicalName()));
-                            constructorCallAdded = true;
-                            break;
-                        }
-                    }
-                }
+                append(out, "\n} catch (java.lang.Exception e) {\n", "if (e instanceof RuntimeException) {\n", "throw (RuntimeException)e;\n",
+                        "} else {",
+                        "throw new java.lang.RuntimeException(" + "\"Error while constructing new " + destinationType.getSimpleName()
+                                + " instance\", e);", "\n}\n}\n}");
             }
-            /*
-             * Any exceptions thrown calling constructors should be propagated
-             */
-            append(out, "\n} catch (java.lang.Exception e) {\n", "if (e instanceof RuntimeException) {\n", "throw (RuntimeException)e;\n",
-                    "} else {",
-                    "throw new java.lang.RuntimeException(" + "\"Error while constructing new " + destinationType.getSimpleName()
-                            + " instance\", e);", "\n}\n}\n}");
         }
-        if (!constructorCallAdded) {
-            return "";
-        } else {
-            return out.toString();
-        }
+        return out.toString();
     }
     
     /**
@@ -241,7 +221,8 @@ public class ObjectFactoryGenerator {
      * @param logDetails
      * @return
      */
-    private String addUnmatchedSourceHandler(SourceCodeContext code, Type<?> type, MappingContext mappingContext, StringBuilder logDetails) {
+    private String addUnmatchedSourceHandler(SourceCodeContext code, Type<?> type, Type<?> sourceType, MappingContext mappingContext,
+            StringBuilder logDetails) {
         StringBuilder out = new StringBuilder();
         for (Constructor<?> constructor : type.getRawType().getConstructors()) {
             if (constructor.getParameterTypes().length == 0 && Modifier.isPublic(constructor.getModifiers())) {
@@ -250,7 +231,24 @@ public class ObjectFactoryGenerator {
             }
         }
         
+        /*
+         * If no default constructor field exists, attempt to locate and 
+         * call a constructor which takes a single argument of source type
+         */
         if (out.length() == 0) {
+            for (Constructor<?> constructor : type.getRawType().getConstructors()) {
+                if (constructor.getParameterTypes().length == 1 && Modifier.isPublic(constructor.getModifiers())) {
+                    Type<?> argType = TypeFactory.valueOf(constructor.getGenericParameterTypes()[0]);
+                    if (argType.isAssignableFrom(sourceType)) {
+                        out.append(format("return new %s((%s)s);", type.getCanonicalName(), sourceType.getCanonicalName()));
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (out.length() == 0) {
+            
             out.append(format(
                     "throw new %s(s.getClass().getCanonicalName() + \" is an unsupported source class for constructing instances of "
                             + type.getCanonicalName() + "\");", IllegalArgumentException.class.getCanonicalName()));

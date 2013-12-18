@@ -328,7 +328,8 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
         
         String mapStmt = statement(code.mapFields(currentNode.value, s, d, destType, null));
         VariableRef elRef = currentNode.parent != null ? currentNode.parent.elementRef : null;
-        if (elRef != null && !elRef.isPrimitive() && !ClassUtil.isImmutable(elRef.type())) {
+        if (elRef != null && !elRef.isPrimitive() && !ClassUtil.isImmutable(elRef.type()) && srcNode.parent != null) {
+            // assure instance exists for the element reference
             append(out, format("if((%s)) { \n", elRef.isNull()), elRef.assign(code.newObject(srcNode.parent.elementRef, elRef.type())), "}");
         }
         out.append(mapStmt);
