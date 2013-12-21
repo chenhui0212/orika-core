@@ -42,13 +42,14 @@ public class NestedProperty extends Property {
      */
     public NestedProperty(String expression, Property property, Property[] path) {
         super(expression,property.getName(),property.getGetter(),property.getSetter(),property.getType(),property.getElementType(), property.getContainer());
-        this.path = collapse(path);
+        this.path = collapse(property.getPath(), path);
         this.tail = property;
     }
     
-    private static Property[] collapse(Property[] path) {
+    private static Property[] collapse(Property[] primaryPath, Property[] path) {
         List<Property> collapsed = new ArrayList<Property>();
         collapsed.addAll(Arrays.asList(path));
+        collapsed.addAll(Arrays.asList(primaryPath));
         int i = 0;
         while (i < collapsed.size()) {
             Property p = collapsed.get(i);
