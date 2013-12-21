@@ -117,21 +117,6 @@ public class Issue141TestCase {
 	}
 
 	@Test
-	public void resolveNestedArrayElement() throws Throwable {
-		
-		PropertyResolver resolver = new IntrospectorPropertyResolver();
-		Property property = resolver.getProperty(Clazz.class, "subClass.strings[0]");
-		
-		Assert.assertTrue(property instanceof NestedProperty);
-		NestedProperty np = (NestedProperty)property;
-		Property[] path = np.getPath();
-		
-		VariableRef var = new VariableRef(property, "source");
-		String varRef = var.toString();
-		
-	}
-	
-	@Test
 	public void test() {
 		SubClass subClass = new SubClass();
 		subClass.setStrings(new ArrayList<String>(Arrays.asList("abc@mail.com")));
