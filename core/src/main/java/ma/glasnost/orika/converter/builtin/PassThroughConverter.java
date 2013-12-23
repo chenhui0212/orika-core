@@ -83,7 +83,39 @@ public class PassThroughConverter extends CustomConverter<Object, Object> {
 		return description;
 	}
 	
-	/**
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((passThroughTypes == null) ? 0 : passThroughTypes.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        PassThroughConverter other = (PassThroughConverter) obj;
+        if (passThroughTypes == null) {
+            if (other.passThroughTypes != null) {
+                return false;
+            }
+        } else if (!passThroughTypes.equals(other.passThroughTypes)) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+    /**
 	 * Extends PassThroughConverter for use as a built-in Converter 
 	 */
 	static class Builtin extends PassThroughConverter {

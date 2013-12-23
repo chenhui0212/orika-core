@@ -20,6 +20,7 @@ package ma.glasnost.orika.converter;
 import static ma.glasnost.orika.StateReporter.DIVIDER;
 import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,7 +36,7 @@ import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.util.HashMapUtility;
 import ma.glasnost.orika.util.Ordering;
-import ma.glasnost.orika.util.SortedSet;
+import ma.glasnost.orika.util.SortedCollection;
 
 /**
  * DefaultConverterFactory is the base implementation of ConverterFactory
@@ -47,7 +48,7 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
 
 	private static final Integer CACHE_SIZE = 2000;
 	private final Map<ConverterKey, Converter<Object, Object>> converterCache;
-	private Set<Converter<Object, Object>> converters;
+	private Collection<Converter<Object, Object>> converters;
 	private final Map<String, Converter<Object, Object>> convertersMap;
 	private MapperFacade mapperFacade;
 
@@ -60,8 +61,8 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
 			Set<Converter<Object, Object>> converters) {
 		super();
 		this.converterCache = converterCache;
-		this.converters = new SortedSet<Converter<Object, Object>>(converters,
-				Ordering.CONVERTER);
+		this.converters = new SortedCollection<Converter<Object, Object>>(converters,
+		        Ordering.CONVERTER);
 		this.convertersMap = new ConcurrentHashMap<String, Converter<Object, Object>>();
 	}
 

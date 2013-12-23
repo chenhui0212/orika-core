@@ -140,7 +140,37 @@ public class CloneableConverter extends CustomConverter<Object, Object> {
         }
     }
 	
-	/**
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((clonedTypes == null) ? 0 : clonedTypes.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CloneableConverter other = (CloneableConverter) obj;
+        if (clonedTypes == null) {
+            if (other.clonedTypes != null) {
+                return false;
+            }
+        } else if (!clonedTypes.equals(other.clonedTypes)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
 	 * CloneAction provides privileged access to the clone method in
 	 * presence of a SecurityManager
 	 */

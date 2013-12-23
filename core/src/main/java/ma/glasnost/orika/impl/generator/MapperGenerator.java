@@ -34,6 +34,7 @@ import ma.glasnost.orika.metadata.ClassMap;
 import ma.glasnost.orika.metadata.FieldMap;
 import ma.glasnost.orika.metadata.MapperKey;
 import ma.glasnost.orika.metadata.Type;
+import ma.glasnost.orika.metadata.TypeFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,9 @@ public final class MapperGenerator {
             
             if (LOGGER.isDebugEnabled()) {
             	logDetails = new StringBuilder();
-            	logDetails.append("Generating new mapper for (" + classMap.getAType()+", " + classMap.getBType() +")");
+            	String srcName = TypeFactory.nameOf(classMap.getAType(), classMap.getBType());
+            	String dstName = TypeFactory.nameOf(classMap.getBType(), classMap.getAType());
+            	logDetails.append("Generating new mapper for (" + srcName+", " + dstName +")");
             } 
             
             final SourceCodeContext mapperCode = new SourceCodeContext(

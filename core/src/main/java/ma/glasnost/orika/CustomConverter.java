@@ -75,4 +75,12 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     public Type<D> getBType() {
         return destinationType;
     }
+    
+    public boolean equals(Object other) {
+        return other != null && getClass().equals(other.getClass());
+    }
+    
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
