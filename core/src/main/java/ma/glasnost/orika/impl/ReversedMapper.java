@@ -79,6 +79,10 @@ public class ReversedMapper<A, B> implements Mapper<A, B> {
         reversedMapper.setMapperFacade(mapper);
     }
 
+    public boolean isAbstract() {
+        return reversedMapper.isAbstract();
+    }
+    
     /* (non-Javadoc)
      * @see ma.glasnost.orika.Mapper#setUsedMappers(ma.glasnost.orika.Mapper<java.lang.Object,java.lang.Object>[])
      */

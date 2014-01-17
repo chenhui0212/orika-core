@@ -63,7 +63,7 @@ public final class MapperGenerator {
             	String srcName = TypeFactory.nameOf(classMap.getAType(), classMap.getBType());
             	String dstName = TypeFactory.nameOf(classMap.getBType(), classMap.getAType());
             	logDetails.append("Generating new mapper for (" + srcName+", " + dstName +")");
-            } 
+            }
             
             final SourceCodeContext mapperCode = new SourceCodeContext(
                     classMap.getMapperClassName(), GeneratedMapperBase.class, context, logDetails);
@@ -75,7 +75,7 @@ public final class MapperGenerator {
             GeneratedMapperBase instance = mapperCode.getInstance();
             instance.setAType(classMap.getAType());
             instance.setBType(classMap.getBType());
-            
+            instance.setAbstract(classMap.isAbstract());
             
             if (logDetails != null) {
             	LOGGER.debug(logDetails.toString());

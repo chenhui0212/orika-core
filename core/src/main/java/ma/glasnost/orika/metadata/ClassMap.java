@@ -46,6 +46,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
     
     private final Boolean sourcesMappedOnNull;
     private final Boolean destinationsMappedOnNull;
+    private final boolean isAbstract;
     
     /**
      * Constructs a new ClassMap
@@ -59,7 +60,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
      * @param constructorB a description of the parameter names of the constructor to use for type 'B'
      */
     public ClassMap(Type<A> aType, Type<B> bType, Set<FieldMap> fieldsMapping, Mapper<A, B> customizedMapper, Set<MapperKey> usedMappers,
-            String[] constructorA, String[] constructorB, Boolean sourcesMappedOnNull, Boolean destinationsMappedOnNull) {
+            String[] constructorA, String[] constructorB, Boolean sourcesMappedOnNull, Boolean destinationsMappedOnNull, boolean isAbstract) {
         this.aType = aType;
         this.bType = bType;
         
@@ -72,6 +73,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
         
         this.sourcesMappedOnNull = sourcesMappedOnNull;
         this.destinationsMappedOnNull = destinationsMappedOnNull;
+        this.isAbstract = isAbstract;
         
         if (constructorA != null) {
             this.constructorA = constructorA.clone();
@@ -92,7 +94,11 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
         String[] constructorA = this.constructorA == null ? null : this.constructorA.clone();
         String[] constructorB = this.constructorB == null ? null : this.constructorB.clone();
         
-        return new ClassMap<A,B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull);
+        return new ClassMap<A,B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, isAbstract);
+    }
+    
+    public ClassMap<A,B> copyWithUsedMappers(Set<MapperKey> usedMappers) {
+        return new ClassMap<A,B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, isAbstract);
     }
     
     public MapperKey getMapperKey() {
@@ -187,6 +193,15 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
         return destinationsMappedOnNull;
     }
 
+    /**
+     * @return true if this class-map represents an abstract definition, meaning that
+     * the mapper generated from it can contribute as a 'used mapper to other downstream 
+     * mappers, but cannot be used on its own 
+     */
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+    
     @Override
     public int hashCode() {
         int result = 31;

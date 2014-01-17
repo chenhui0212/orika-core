@@ -81,6 +81,10 @@ public abstract class CustomMapper<A, B> implements Mapper<A, B> {
         throw throwShouldNotCalledCustomMapper();
     }
     
+    public boolean isAbstract() {
+        return false;
+    }
+    
     private IllegalStateException throwShouldNotCalledCustomMapper() {
         return new IllegalStateException("Should not be called for a user custom mapper.");
     }

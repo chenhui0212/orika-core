@@ -85,6 +85,10 @@ public abstract class MapperBase<A, B> {
         public void setMapperFacade(MapperFacade mapper) {
             delegate.setMapperFacade(mapper);
         }
+        
+        public boolean isAbstract() {
+            return false;
+        }
     }
 
 }

@@ -33,6 +33,7 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
     private Mapper<Object, Object>[] usedMappers;
     private Type<Object> aType;
     private Type<Object> bType;
+    private boolean isAbstract;
     
     public Type<Object> getAType() {
         return aType;
@@ -85,6 +86,17 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
             mapper.mapAtoB(a, b, context);
         }
     }
+
+    public void setAbstract(boolean isAbstract) {
+        this.isAbstract = isAbstract;
+    }
+    
+    /* (non-Javadoc)
+     * @see ma.glasnost.orika.Mapper#isAbstract()
+     */
+    public boolean isAbstract() {
+        return isAbstract;
+    }
     
     public void mapBtoA(Object b, Object a, MappingContext context) {
         if (usedMappers == null) {
@@ -94,6 +106,7 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
             mapper.mapBtoA(b, a, context);
         }
     }
+    
     
     public String toString() {
     	String aTypeName = TypeFactory.nameOf(aType, bType);

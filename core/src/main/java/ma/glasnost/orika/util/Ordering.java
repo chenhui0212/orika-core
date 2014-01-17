@@ -20,6 +20,7 @@ package ma.glasnost.orika.util;
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Filter;
 import ma.glasnost.orika.Mapper;
+import ma.glasnost.orika.metadata.ClassMap;
 import ma.glasnost.orika.metadata.MapperKey;
 import ma.glasnost.orika.metadata.Type;
 
@@ -66,6 +67,15 @@ public abstract class Ordering<T> {
     public static final Ordering<MapperKey> MAPPER_KEY = new Ordering<MapperKey>() {
         public OrderingRelation order(MapperKey mapper1, MapperKey mapper2) {
             return Ordering.compare(mapper1.getAType(), mapper1.getBType(), mapper2.getAType(), mapper2.getBType(), true);
+        }
+    };
+    
+    /**
+     * An ordering specific to mapper keys
+     */
+    public static final Ordering<ClassMap<?, ?>> CLASSMAP = new Ordering<ClassMap<?, ?>>() {
+        public OrderingRelation order(ClassMap<?, ?> mapper1, ClassMap<?, ?> mapper2) {
+            return Ordering.compare(mapper1.getAType(), mapper1.getBType(), mapper2.getAType(), mapper2.getBType(), false);
         }
     };
     

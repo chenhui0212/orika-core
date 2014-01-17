@@ -85,6 +85,51 @@ public class UsedMappersTestCase {
         Assert.assertEquals(1, target.getNameCalls());
     }
     
+    @Test
+    public void exclusionOnAbstractParent() throws Throwable {
+    	
+    	MapperFactory factory = MappingUtil.getMapperFactory();
+    	
+    	factory.classMap(Throwable.class, RuntimeException.class)
+    		.exclude("stackTrace")
+    		.isAbstract(true)
+    		.byDefault()
+    		.register();
+    	
+    	UserUpdateException src = new UserUpdateException(true);
+    	UserRegistrationModelException dest = factory.getMapperFacade().map(src, UserRegistrationModelException.class);
+    	
+    	Assert.assertEquals(src.isEmailDuplicate(), dest.isEmailDuplicate());
+    }
+    
+    public static class UserUpdateException extends RuntimeException {
+
+		private final boolean emailDuplicate;
+
+		public UserUpdateException(boolean emailDuplicate) {
+			this.emailDuplicate = emailDuplicate;
+		}
+
+		public boolean isEmailDuplicate() {
+			return emailDuplicate;
+		}
+
+	}
+
+	public static class UserRegistrationModelException extends Exception {
+
+		private boolean emailDuplicate;
+
+		public boolean isEmailDuplicate() {
+			return emailDuplicate;
+		}
+
+		public void setEmailDuplicate(final boolean emailDuplicate) {
+			this.emailDuplicate = emailDuplicate;
+		}
+
+	}
+    
     public static abstract class A {
         private String name;
         
