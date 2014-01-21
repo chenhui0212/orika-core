@@ -86,7 +86,7 @@ public abstract class MapperBase<A, B> {
             delegate.setMapperFacade(mapper);
         }
         
-        public boolean isAbstract() {
+        public boolean favorsExtension() {
             return false;
         }
     }

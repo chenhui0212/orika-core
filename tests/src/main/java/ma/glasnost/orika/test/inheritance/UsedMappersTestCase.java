@@ -92,7 +92,7 @@ public class UsedMappersTestCase {
     	
     	factory.classMap(Throwable.class, RuntimeException.class)
     		.exclude("stackTrace")
-    		.isAbstract(true)
+    		.favorExtension(true)
     		.byDefault()
     		.register();
     	

@@ -79,8 +79,8 @@ public class ReversedMapper<A, B> implements Mapper<A, B> {
         reversedMapper.setMapperFacade(mapper);
     }
 
-    public boolean isAbstract() {
-        return reversedMapper.isAbstract();
+    public boolean favorsExtension() {
+        return reversedMapper.favorsExtension();
     }
     
     /* (non-Javadoc)

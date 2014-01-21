@@ -87,7 +87,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     private final DefaultFieldMapper[] defaults;
     private Boolean sourcesMappedOnNull;
     private Boolean destinationsMappedOnNull;
-    private boolean isAbstract;
+    private boolean favorsExtension;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassMapBuilder.class);
     
@@ -683,7 +683,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
         	LOGGER.debug("ClassMap created:\n\t" + describeClassMap());
         }
     	
-        return new ClassMap<A, B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, isAbstract);
+        return new ClassMap<A, B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, favorsExtension);
     }
     
     /**
@@ -713,15 +713,15 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     }
     
     /**
-     * @param isAbstract true|false indicating whether the class-map defined by this
+     * @param favorsExtension true|false indicating whether the class-map defined by this
      * builder should be considered 'abstract', meaning that it is not usable 
      * independently, but can contribute to the definition of mappers that inherit
      * from it based on the mapped types.
      * 
      * @return
      */
-    public ClassMapBuilder<A, B> isAbstract(boolean isAbstract) {
-        this.isAbstract = isAbstract;
+    public ClassMapBuilder<A, B> favorExtension(boolean favorsExtension) {
+        this.favorsExtension = favorsExtension;
         
         return this;
     }

@@ -75,7 +75,7 @@ public final class MapperGenerator {
             GeneratedMapperBase instance = mapperCode.getInstance();
             instance.setAType(classMap.getAType());
             instance.setBType(classMap.getBType());
-            instance.setAbstract(classMap.isAbstract());
+            instance.setFavorsExtension(classMap.favorsExtension());
             
             if (logDetails != null) {
             	LOGGER.debug(logDetails.toString());

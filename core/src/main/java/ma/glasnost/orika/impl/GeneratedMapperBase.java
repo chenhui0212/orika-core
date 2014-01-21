@@ -87,14 +87,14 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
         }
     }
 
-    public void setAbstract(boolean isAbstract) {
+    public void setFavorsExtension(boolean isAbstract) {
         this.isAbstract = isAbstract;
     }
     
     /* (non-Javadoc)
      * @see ma.glasnost.orika.Mapper#isAbstract()
      */
-    public boolean isAbstract() {
+    public boolean favorsExtension() {
         return isAbstract;
     }
     
