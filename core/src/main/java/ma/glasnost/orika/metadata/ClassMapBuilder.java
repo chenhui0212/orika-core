@@ -87,7 +87,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     private final DefaultFieldMapper[] defaults;
     private Boolean sourcesMappedOnNull;
     private Boolean destinationsMappedOnNull;
-    private boolean favorsExtension;
+    private Boolean favorsExtension;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassMapBuilder.class);
     

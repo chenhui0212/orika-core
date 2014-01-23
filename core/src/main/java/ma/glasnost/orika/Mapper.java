@@ -68,5 +68,5 @@ public interface Mapper<A, B> extends MappedTypePair<A, B> {
      * Specifies whether this mapper is abstract, meaning that it can only
      * be used in combination with a non-abstract mapper.
      */
-    boolean favorsExtension();
+    Boolean favorsExtension();
 }

@@ -46,7 +46,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
     
     private final Boolean sourcesMappedOnNull;
     private final Boolean destinationsMappedOnNull;
-    private final boolean favorsExtension;
+    private final Boolean favorsExtension;
     
     /**
      * Constructs a new ClassMap
@@ -63,7 +63,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
      * @param favorsExtension
      */
     public ClassMap(Type<A> aType, Type<B> bType, Set<FieldMap> fieldsMapping, Mapper<A, B> customizedMapper, Set<MapperKey> usedMappers,
-            String[] constructorA, String[] constructorB, Boolean sourcesMappedOnNull, Boolean destinationsMappedOnNull, boolean favorsExtension) {
+            String[] constructorA, String[] constructorB, Boolean sourcesMappedOnNull, Boolean destinationsMappedOnNull, Boolean favorsExtension) {
         this.aType = aType;
         this.bType = bType;
         
@@ -200,9 +200,10 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
      * @return true if this class-map represents a mapping that favors extension; this
      * means that the mapper will be used if the types match exactly, but if an extended
      * mapper can be generated, it will be generated and will inherit the definition
-     * of this class-map.
+     * of this class-map; the value can be null, which indicates that no preference is
+     * specified, and the global default should be used
      */
-    public boolean favorsExtension() {
+    public Boolean favorsExtension() {
         return favorsExtension;
     }
     

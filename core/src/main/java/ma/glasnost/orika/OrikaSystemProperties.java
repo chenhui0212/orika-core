@@ -145,4 +145,12 @@ public final class OrikaSystemProperties {
      * Default value is <code>true</code>
      */
     public static final String DUMP_STATE_ON_EXCEPTION = "ma.glasnost.orika.dumpStateOnException";
+    
+    /**
+     * Specifies a default value for the 'favorExtension' option on registered class-maps
+     * when a value has not been specified.
+     * <p>
+     * Default value is <code>false</code>
+     */
+    public static final String FAVOR_EXTENSION = "ma.glasnost.orika.favorExtension";
 }

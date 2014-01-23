@@ -79,7 +79,7 @@ public class ReversedMapper<A, B> implements Mapper<A, B> {
         reversedMapper.setMapperFacade(mapper);
     }
 
-    public boolean favorsExtension() {
+    public Boolean favorsExtension() {
         return reversedMapper.favorsExtension();
     }
     

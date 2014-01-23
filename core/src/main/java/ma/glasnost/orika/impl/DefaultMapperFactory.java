@@ -21,6 +21,7 @@ package ma.glasnost.orika.impl;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static ma.glasnost.orika.OrikaSystemProperties.DUMP_STATE_ON_EXCEPTION;
+import static ma.glasnost.orika.OrikaSystemProperties.FAVOR_EXTENSION;
 import static ma.glasnost.orika.OrikaSystemProperties.MAP_NULLS;
 import static ma.glasnost.orika.OrikaSystemProperties.USE_AUTO_MAPPING;
 import static ma.glasnost.orika.OrikaSystemProperties.USE_BUILTIN_CONVERTERS;
@@ -46,6 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import ma.glasnost.orika.BoundMapperFacade;
+import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.Filter;
 import ma.glasnost.orika.MapEntry;
@@ -127,6 +129,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     
     private final boolean useAutoMapping;
     private final boolean useBuiltinConverters;
+    private final boolean favorExtension;
     private volatile boolean isBuilt = false;
     private volatile boolean isBuilding = false;
     
@@ -139,7 +142,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      */
     protected DefaultMapperFactory(MapperFactoryBuilder<?, ?> builder) {
         
-        this.converterFactory = builder.converterFactory;
+        this.converterFactory = new ConverterFactoryFacade(builder.converterFactory);
         this.compilerStrategy = builder.compilerStrategy;
         this.classMapRegistry = getConcurrentLinkedHashMap(Integer.MAX_VALUE);
         this.mappersRegistry = new SortedCollection<Mapper<Object, Object>>(Ordering.MAPPER);
@@ -174,6 +177,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         this.mapperGenerator = new MapperGenerator(this, builder.compilerStrategy);
         this.objectFactoryGenerator = new ObjectFactoryGenerator(this, builder.constructorResolverStrategy, builder.compilerStrategy);
         this.useAutoMapping = builder.useAutoMapping;
+        this.favorExtension = builder.favorExtension;
         this.useBuiltinConverters = builder.useBuiltinConverters;
         
         builder.codeGenerationStrategy.setMapperFactory(this);
@@ -285,6 +289,12 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          * objects should be printed on exception
          */
         protected Boolean dumpStateOnException;
+        
+        /**
+         * The configured default value for the 'favorExtension' option on 
+         * registered class-maps (when one has not been explicitly specified).
+         */
+        protected Boolean favorExtension;
         /**
          * Instantiates a new MapperFactoryBuilder
          */
@@ -300,6 +310,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             useAutoMapping = valueOf(getProperty(USE_AUTO_MAPPING, "true"));
             mapNulls = valueOf(getProperty(MAP_NULLS, "true"));
             dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "true"));
+            favorExtension = valueOf(getProperty(FAVOR_EXTENSION, "false"));
         }
         
         /**
@@ -460,6 +471,32 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          */
         public B mapNulls(boolean mapNulls) {
             this.mapNulls = mapNulls;
+            return self();
+        }
+        
+        /**
+         * Configure whether to dump the current state of the mapping
+         * infrastructure objects upon occurrence of an exception while
+         * mapping.
+         * 
+         * @param dumpStateOnException
+         * @return a reference to <code>this</code> MapperFactoryBuilder
+         */
+        public B dumpStateOnException(boolean dumpStateOnException) {
+            this.dumpStateOnException = dumpStateOnException;
+            return self();
+        }
+        
+        /**
+         * Configure whether to favorExtension by default in registered
+         * class-maps (when a value has not been explicitly specified on
+         * the class-map builder).
+         * 
+         * @param favorExtension
+         * @return a reference to <code>this</code> MapperFactoryBuilder
+         */
+        public B favorExtension(boolean favorExtension) {
+            this.favorExtension = favorExtension;
             return self();
         }
         
@@ -717,7 +754,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 return (Mapper<A, B>) mapper;
             } else if ((mapper.getAType().isAssignableFrom(typeA) && mapper.getBType().isAssignableFrom(typeB))
                     || (mapper.getAType().isAssignableFrom(typeB) && mapper.getBType().isAssignableFrom(typeA))) {
-                if (!mapper.favorsExtension() || !canBeExtended(typeA, typeB, mapper)) {
+                if (!favorsExtension(mapper) || !canBeExtended(typeA, typeB, mapper)) {
                     if (includeAutoGeneratedMappers || !(mapper instanceof GeneratedMapperBase)) {
                         return (Mapper<A, B>) mapper;
                     } else if (!((GeneratedMapperBase) mapper).isFromAutoMapping()) {
@@ -727,6 +764,10 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             }
         }
         return null;
+    }
+    
+    private boolean favorsExtension(Mapper<?,?> mapper) {
+        return mapper.favorsExtension() == null ? favorExtension : mapper.favorsExtension();
     }
     
     /**
@@ -780,6 +821,9 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             objectFactoryRegistry.put(destinationType, localCache);
         }
         localCache.put(sourceType, objectFactory);
+        if (isBuilding || isBuilt) {
+            mapperFacade.factoryModified(this);
+        }
     }
     
     @Deprecated
@@ -1066,6 +1110,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 
                 buildObjectFactories(classMap, context);
                 initializeUsedMappers(classMap);
+                mapperFacade.factoryModified(this);
             } finally {
                 contextFactory.release(context);
             }
@@ -1247,6 +1292,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             final Mapper<Object, Object> customizedMapper = (Mapper<Object, Object>) classMap.getCustomizedMapper();
             mapper.setCustomMapper(customizedMapper);
         }
+        mappersRegistry.remove(mapper);
         mappersRegistry.add(mapper);
         classMapRegistry.put(mapperKey, (ClassMap<Object, Object>) classMap);
         
@@ -1351,6 +1397,9 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         mapper.setMapperFacade(this.mapperFacade);
         register(mapper.getAType(), mapper.getBType(), false);
         register(mapper.getBType(), mapper.getAType(), false);
+        if (isBuilding || isBuilt) {
+            mapperFacade.factoryModified(this);
+        }
     }
     
     public <S, D> BoundMapperFacade<S, D> getMapperFacade(Type<S> sourceType, Type<D> destinationType) {
@@ -1365,9 +1414,9 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      * .Type, ma.glasnost.orika.metadata.Type, boolean)
      */
     public <S, D> BoundMapperFacade<S, D> getMapperFacade(Type<S> sourceType, Type<D> destinationType, boolean containsCycles) {
-//        if (!isBuilt && !isBuilding) {
-//            build();
-//        }
+        if (!isBuilt && !isBuilding) {
+            build();
+        }
     	getMapperFacade();
         MappingContextFactory ctxFactory = containsCycles ? contextFactory : nonCyclicContextFactory;
         return new DefaultBoundMapperFacade<S, D>(this, ctxFactory, sourceType, destinationType);
@@ -1444,6 +1493,70 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     		out.append("\n  [").append(entry.getKey())
     			.append("] : ").append(entry.getValue());
     	}
+    }
+    
+    /**
+     * ConverterFactoryFacade is a nested intercepter class for ConverterFactory
+     * that listens for registry of new converters and calls the appropriate
+     * change event on MapperFacade if the factory has already started building.
+     *
+     */
+    private class ConverterFactoryFacade implements ConverterFactory {
+        private ConverterFactory delegate;
+
+        public ConverterFactoryFacade(ConverterFactory delegate) {
+            this.delegate = delegate;
+        }
+
+        public void setMapperFacade(MapperFacade mapperFacade) {
+            delegate.setMapperFacade(mapperFacade);
+        }
+
+        public Converter<Object, Object> getConverter(Type<?> sourceType, Type<?> destinationType) {
+            return delegate.getConverter(sourceType, destinationType);
+        }
+
+        public Converter<Object, Object> getConverter(String converterId) {
+            return delegate.getConverter(converterId);
+        }
+
+        public <S, D> void registerConverter(Converter<S, D> converter) {
+            delegate.registerConverter(converter);
+            if (isBuilding || isBuilt) {
+                mapperFacade.factoryModified(DefaultMapperFactory.this);
+            }
+        }
+
+        public <S, D> void registerConverter(String converterId, Converter<S, D> converter) {
+            delegate.registerConverter(converterId, converter);
+            if (isBuilding || isBuilt) {
+                mapperFacade.factoryModified(DefaultMapperFactory.this);
+            }
+        }
+
+        public boolean hasConverter(String converterId) {
+            return delegate.hasConverter(converterId);
+        }
+
+        public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
+            return delegate.canConvert(sourceType, destinationType);
+        }
+
+        @SuppressWarnings("deprecation")
+        public <S, D> void registerConverter(ma.glasnost.orika.converter.Converter<S, D> converter) {
+            delegate.registerConverter(converter);
+            if (isBuilding || isBuilt) {
+                mapperFacade.factoryModified(DefaultMapperFactory.this);
+            }
+        }
+
+        @SuppressWarnings("deprecation")
+        public <S, D> void registerConverter(String converterId, ma.glasnost.orika.converter.Converter<S, D> converter) {
+            delegate.registerConverter(converterId, converter);
+            if (isBuilding || isBuilt) {
+                mapperFacade.factoryModified(DefaultMapperFactory.this);
+            }
+        }
     }
     
 }

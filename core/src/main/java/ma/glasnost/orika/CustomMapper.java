@@ -81,7 +81,7 @@ public abstract class CustomMapper<A, B> implements Mapper<A, B> {
         throw throwShouldNotCalledCustomMapper();
     }
     
-    public boolean favorsExtension() {
+    public Boolean favorsExtension() {
         return false;
     }
     

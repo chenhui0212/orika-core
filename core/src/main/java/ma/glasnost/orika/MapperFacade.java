@@ -931,4 +931,10 @@ public interface MapperFacade {
     <S, D> MappingStrategy resolveMappingStrategy(final S sourceObject, final java.lang.reflect.Type sourceType,
             final java.lang.reflect.Type destinationType, boolean mapInPlace, final MappingContext context);
     
+    /**
+     * Notifies the MapperFacade that a MapperFactory associated with it has
+     * been modified.
+     */
+    void factoryModified(MapperFactory factory);
+    
 }

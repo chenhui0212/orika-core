@@ -107,8 +107,27 @@ public class SortedCollection<V> implements Collection<V> {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.Collection#remove(java.lang.Object)
+	 * 
+	 * Expensive in this implementation; use sparingly
+	 */
 	public boolean remove(Object o) {
-		throw new UnsupportedOperationException();
+	    boolean result = false;
+	    if (contains(o)) {
+    	    try {
+                rwl.writeLock().lock();
+                List<V> sorted = getSortedItems();
+                nodes.clear();
+                items.clear();
+                sortedItems = null;
+                result = sorted.remove(o);
+                addAll(sorted);
+            } finally {
+                rwl.writeLock().unlock();
+            }
+	    }
+	    return result;
 	}
 
 	public void clear() {
