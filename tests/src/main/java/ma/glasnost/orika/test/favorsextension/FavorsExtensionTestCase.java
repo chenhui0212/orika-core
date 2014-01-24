@@ -77,6 +77,35 @@ public class FavorsExtensionTestCase {
 	}
 	
 	@Test
+	public void favorsExtensionMultiLevel() throws Throwable {
+		
+		MapperFactory factory = new DefaultMapperFactory.Builder().favorExtension(true).build();
+		
+		factory.classMap(Animal.class, AnimalDto.class)
+			.field("category", "type")
+			.field("name", "qualifier")
+			.register();
+		
+		factory.classMap(Reptile.class, ReptileDto.class)
+			.field("weightInKg", "weightKg")
+			.register();
+		
+		MapperFacade mapper = factory.getMapperFacade();
+		
+		Salamander src = new Salamander();
+		src.category = "falcon";
+		src.name = "Falcor";
+		src.tailLengthInCm = 23.0f;
+		src.weightInKg = 12.5f;
+		
+		SalamanderDto dest = mapper.map(src, SalamanderDto.class);
+		Assert.assertEquals(src.category, dest.type);
+		Assert.assertEquals(src.name, dest.qualifier);
+		Assert.assertEquals(src.weightInKg, dest.weightKg, 0.1);
+		Assert.assertEquals(src.tailLengthInCm, dest.tailLengthInCm, 0.1);
+	}
+	
+	@Test
 	public void withoutFavorsExtension() throws Throwable {
 		
 		/*
@@ -142,6 +171,14 @@ public class FavorsExtensionTestCase {
 		public boolean striped;
 	}
 	
+	public static class Reptile extends Animal {
+		public float weightInKg;
+	}
+	
+	public static class Salamander extends Reptile {
+		public float tailLengthInCm;
+	}
+	
 	public static class AnimalDto {
 		public String type;
 		public String qualifier;
@@ -153,6 +190,14 @@ public class FavorsExtensionTestCase {
 	
 	public static class CatDto extends AnimalDto {
 		public boolean striped;
+	}
+	
+	public static class ReptileDto extends AnimalDto {
+		public float weightKg;
+	}
+	
+	public static class SalamanderDto extends ReptileDto {
+		public float tailLengthInCm;
 	}
 	
 }
