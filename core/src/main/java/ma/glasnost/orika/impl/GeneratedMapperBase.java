@@ -29,6 +29,18 @@ import ma.glasnost.orika.metadata.TypeFactory;
 
 public abstract class GeneratedMapperBase extends GeneratedObjectBase implements Mapper<Object, Object> {
     
+    /**
+     * Returns true if <code>usedMapper</code> is found within the usedMapper hierarchy
+     * of <code>ofMapper</code>.
+     * 
+     * @param usedMapper the mapper to look for in the hierarchy
+     * @param ofMapper the mapper whose usedMapper hierarchy is searched
+     * @return
+     */
+    public static boolean isUsedMapperOf(Mapper<Object, Object> usedMapper, Mapper<Object, Object> ofMapper) {
+        return (ofMapper instanceof GeneratedMapperBase && ((GeneratedMapperBase) ofMapper).uses(usedMapper));
+    }
+    
     protected Mapper<Object, Object> customMapper;
     private Mapper<Object, Object>[] usedMappers;
     private Type<Object> aType;
@@ -58,8 +70,28 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
         this.customMapper.setMapperFacade(mapperFacade);
     }
     
-    protected Mapper<Object, Object>[] getUsedMappers() {
+    public Mapper<Object, Object>[] getUsedMappers() {
         return usedMappers;
+    }
+    
+    /**
+     * Returns true if this mapper (or any of it's usedMappers, recursively)
+     * makes use of the specified mapper.
+     * 
+     * @param mapper
+     * @return
+     */
+    public boolean uses(Mapper<Object, Object> mapper) {
+        if (usedMappers != null) {
+            for (Mapper<Object, Object> um : usedMappers) {
+                if (um.equals(mapper)) {
+                    return true;
+                } else if (um instanceof GeneratedMapperBase && ((GeneratedMapperBase) um).uses(mapper)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public void setUsedMappers(Mapper<Object, Object>[] usedMappers) {
@@ -86,12 +118,14 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
             mapper.mapAtoB(a, b, context);
         }
     }
-
+    
     public void setFavorsExtension(Boolean favorsExtension) {
         this.favorsExtension = favorsExtension;
     }
     
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see ma.glasnost.orika.Mapper#isAbstract()
      */
     public Boolean favorsExtension() {
@@ -107,15 +141,12 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
         }
     }
     
-    
     public String toString() {
-    	String aTypeName = TypeFactory.nameOf(aType, bType);
-    	String bTypeName = TypeFactory.nameOf(bType, aType);
-    			
-        return "GeneratedMapper<" + aTypeName + ", " + bTypeName + "> {" +
-        		"usedConverters: " + Arrays.toString(usedConverters) + ", " +
-        		"usedMappers: " + Arrays.toString(usedMappers) + ", " +
-        		"usedMapperFacades: " + Arrays.toString(usedMapperFacades) + ", " +
-        		"usedTypes: " + Arrays.toString(usedTypes) + " }";
+        String aTypeName = TypeFactory.nameOf(aType, bType);
+        String bTypeName = TypeFactory.nameOf(bType, aType);
+        
+        return "GeneratedMapper<" + aTypeName + ", " + bTypeName + "> {" + "usedConverters: " + Arrays.toString(usedConverters) + ", "
+                + "usedMappers: " + Arrays.toString(usedMappers) + ", " + "usedMapperFacades: " + Arrays.toString(usedMapperFacades) + ", "
+                + "usedTypes: " + Arrays.toString(usedTypes) + " }";
     }
 }
