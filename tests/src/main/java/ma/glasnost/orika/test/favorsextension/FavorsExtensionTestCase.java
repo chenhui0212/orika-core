@@ -1,11 +1,6 @@
 package ma.glasnost.orika.test.favorsextension;
 
 import static ma.glasnost.orika.metadata.TypeFactory.valueOf;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;

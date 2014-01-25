@@ -22,6 +22,7 @@ Orika enables the developer to :
  * Handle proxies or enhanced objects (like those of Hibernate, or the various mock frameworks)
  * Apply bi-directional mapping with one configuration
  * Map to instances of an appropriate concrete class for a target abstract class or interface
+ * Map POJO properties to Lists, Arrays, and Maps
  
 How?
 =====
