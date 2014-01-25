@@ -329,6 +329,7 @@ public interface MapperFactory {
      *             MapperFactory instances should automatically be built upon
      *             the first call to {@link #getMapperFacade()}.
      */
+    @Deprecated
     void build();
     
     /**
@@ -347,7 +348,7 @@ public interface MapperFactory {
      *            the Type instance representing the "B" side of the mapping
      * @return a ClassMapBuilder instance for defining mapping between the provided types
      */
-    public <A, B> ClassMapBuilder<A, B> classMap(Type<A> aType, Type<B> bType);
+    <A, B> ClassMapBuilder<A, B> classMap(Type<A> aType, Type<B> bType);
     
     /**
      * Constructs a new ClassMapBuilder instance initialized with the provided
@@ -364,7 +365,7 @@ public interface MapperFactory {
      *            the Type instance representing the "B" side of the mapping
      * @return a ClassMapBuilder instance for defining mapping between the provided types
      */
-    public <A, B> ClassMapBuilder<A, B> classMap(Class<A> aType, Type<B> bType);
+    <A, B> ClassMapBuilder<A, B> classMap(Class<A> aType, Type<B> bType);
     
     /**
      * Constructs a new ClassMapBuilder instance initialized with the provided
@@ -381,7 +382,7 @@ public interface MapperFactory {
      *            the Class instance representing the "B" side of the mapping
      * @return a ClassMapBuilder instance for defining mapping between the provided types
      */
-    public <A, B> ClassMapBuilder<A, B> classMap(Type<A> aType, Class<B> bType);
+    <A, B> ClassMapBuilder<A, B> classMap(Type<A> aType, Class<B> bType);
     
     /**
      * Constructs a new ClassMapBuilder instance initialized with the provided
@@ -398,7 +399,7 @@ public interface MapperFactory {
      *            the Class instance representing the "B" side of the mapping
      * @return a ClassMapBuilder instance for defining mapping between the provided types
      */
-    public <A, B> ClassMapBuilder<A, B> classMap(Class<A> aType, Class<B> bType);
+    <A, B> ClassMapBuilder<A, B> classMap(Class<A> aType, Class<B> bType);
     
     /**
 	 * Returns the {@link UnenhanceStrategy} associated with this MapperFactory,
@@ -406,7 +407,7 @@ public interface MapperFactory {
 	 * 
 	 * @return the {@link UnenhanceStrategy} associated with this MapperFactory.
 	 */
-    public UnenhanceStrategy getUserUnenhanceStrategy();
+    UnenhanceStrategy getUserUnenhanceStrategy();
     
     
     /**
@@ -416,5 +417,6 @@ public interface MapperFactory {
      * 
      * @param filter the filter to be registered
      */
-    public void registerFilter(Filter<?, ?> filter);
+    void registerFilter(Filter<?, ?> filter);
+    
 }

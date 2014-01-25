@@ -397,4 +397,8 @@ public class ConfigurableMapper implements MapperFacade {
     public <A, B> BoundMapperFacade<A, B> dedicatedMapperFor(Class<A> aType, Class<B> bType, boolean containsCycles) {
         return factory.getMapperFacade(aType, bType, containsCycles);
     }
+
+    public void factoryModified(MapperFactory factory) {
+        facade.factoryModified(factory);
+    }
 }

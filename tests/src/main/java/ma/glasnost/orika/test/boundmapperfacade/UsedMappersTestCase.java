@@ -92,7 +92,6 @@ public class UsedMappersTestCase {
         public void setName(String name) {
             this.name = name;
         }
-        
     }
     
     public static class B extends A {

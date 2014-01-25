@@ -136,6 +136,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
     }
     
+    protected synchronized void clearStrategyCache() {
+        strategyCache.clear();
+    }
+    
     /**
      * Get the class for the specified object, accounting for unwrapping
      * 
@@ -1053,6 +1057,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
     }
     
+    public void factoryModified(MapperFactory factory) {
+        strategyCache.clear();
+    }
+    
     /**
      * Prints the current state of this MapperFacade to the supplied
      * StringBuilder instance.
@@ -1072,4 +1080,5 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         out.append(DIVIDER);
         out.append("\nUnenhance strategy: ").append(unenhanceStrategy);
     }
+
 }

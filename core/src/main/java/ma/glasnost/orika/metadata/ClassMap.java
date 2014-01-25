@@ -46,6 +46,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
     
     private final Boolean sourcesMappedOnNull;
     private final Boolean destinationsMappedOnNull;
+    private final Boolean favorsExtension;
     
     /**
      * Constructs a new ClassMap
@@ -57,9 +58,12 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
      * @param usedMappers the set of mappers used by this mapper to map ancestors' fields
      * @param constructorA a description of the parameter names of the constructor to use for type 'A'
      * @param constructorB a description of the parameter names of the constructor to use for type 'B'
+     * @param sourcesMappedOnNull
+     * @param destinationsMappedOnNull
+     * @param favorsExtension
      */
     public ClassMap(Type<A> aType, Type<B> bType, Set<FieldMap> fieldsMapping, Mapper<A, B> customizedMapper, Set<MapperKey> usedMappers,
-            String[] constructorA, String[] constructorB, Boolean sourcesMappedOnNull, Boolean destinationsMappedOnNull) {
+            String[] constructorA, String[] constructorB, Boolean sourcesMappedOnNull, Boolean destinationsMappedOnNull, Boolean favorsExtension) {
         this.aType = aType;
         this.bType = bType;
         
@@ -72,6 +76,7 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
         
         this.sourcesMappedOnNull = sourcesMappedOnNull;
         this.destinationsMappedOnNull = destinationsMappedOnNull;
+        this.favorsExtension = favorsExtension;
         
         if (constructorA != null) {
             this.constructorA = constructorA.clone();
@@ -92,7 +97,11 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
         String[] constructorA = this.constructorA == null ? null : this.constructorA.clone();
         String[] constructorB = this.constructorB == null ? null : this.constructorB.clone();
         
-        return new ClassMap<A,B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull);
+        return new ClassMap<A,B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, favorsExtension);
+    }
+    
+    public ClassMap<A,B> copyWithUsedMappers(Set<MapperKey> usedMappers) {
+        return new ClassMap<A,B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, favorsExtension);
     }
     
     public MapperKey getMapperKey() {
@@ -187,6 +196,17 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
         return destinationsMappedOnNull;
     }
 
+    /**
+     * @return true if this class-map represents a mapping that favors extension; this
+     * means that the mapper will be used if the types match exactly, but if an extended
+     * mapper can be generated, it will be generated and will inherit the definition
+     * of this class-map; the value can be null, which indicates that no preference is
+     * specified, and the global default should be used
+     */
+    public Boolean favorsExtension() {
+        return favorsExtension;
+    }
+    
     @Override
     public int hashCode() {
         int result = 31;
