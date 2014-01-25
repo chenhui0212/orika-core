@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1180,16 +1179,14 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         // prepare a map for classmap (stored as set)
         Map<MapperKey, ClassMap<Object, Object>> classMapsDictionary = new HashMap<MapperKey, ClassMap<Object, Object>>();
         
-        Set<ClassMap<Object, Object>> classMaps = new HashSet<ClassMap<Object, Object>>(classMapRegistry.values());
-        
-        for (final ClassMap<Object, Object> classMap : classMaps) {
+        for (final ClassMap<Object, Object> classMap : classMapRegistry.values()) {
             classMapsDictionary.put(new MapperKey(classMap.getAType(), classMap.getBType()), classMap);
         }
         
-        for (final ClassMap<?, ?> classMap : classMaps) {
+        for (final ClassMap<?, ?> classMap : classMapRegistry.values()) {
             MapperKey key = new MapperKey(classMap.getAType(), classMap.getBType());
             
-            Set<ClassMap<Object, Object>> usedClassMapSet = new HashSet<ClassMap<Object, Object>>();
+            Set<ClassMap<Object, Object>> usedClassMapSet = new LinkedHashSet<ClassMap<Object, Object>>();
             
             for (final MapperKey parentMapperKey : classMap.getUsedMappers()) {
                 ClassMap<Object, Object> usedClassMap = classMapsDictionary.get(parentMapperKey);
@@ -1258,9 +1255,31 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         parentMappers.remove(mapper);
         
         /*
-         * Flip any used mappers which are specified in the wrong direction
+         * De-duplicate used mappers within the hierarchy
+         * TODO: need to find a consistent way to avoid creating
+         * duplication while building the hierarchy, and remove this code
          */
         Mapper<Object, Object>[] usedMappers = parentMappers.toArray(new Mapper[parentMappers.size()]);
+        parentMappers.clear();
+        for (int i=0, len=usedMappers.length; i < len; ++i) {
+            boolean exists = false;
+            for (int j=0; j < len; ++j) {
+                if( i != j && GeneratedMapperBase.isUsedMapperOf(usedMappers[i], usedMappers[j])) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                parentMappers.add(usedMappers[i]);
+            }
+        }
+        if (parentMappers.size() < usedMappers.length) {
+            usedMappers = parentMappers.toArray(new Mapper[parentMappers.size()]);
+        }
+        
+        /*
+         * Flip any used mappers which are specified in the wrong direction
+         */
         for (int i = 0; i < usedMappers.length; ++i) {
             Mapper<Object, Object> usedMapper = usedMappers[i];
             if (usedMapper.getAType().isAssignableFrom(classMap.getBType()) && usedMapper.getBType().isAssignableFrom(classMap.getAType())) {
@@ -1275,25 +1294,12 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         if (parentMapper == null) {
             throw exceptionUtil.newMappingException("Cannot find used mappers for : " + classMap.getMapperClassName());
         }
-        /*
-         * Do not add 'parentMapper' to the set if it is already found somewhere
-         * within the hierarchy
-         */
-        boolean existsInHierarchy = false;
-        for (Mapper<Object, Object> m : parentMappers) {
-            if (m.equals(parentMapper) || GeneratedMapperBase.isUsedMapperOf(parentMapper, m)) {
-                existsInHierarchy = true;
-                break;
-            }
-        }
-        if (!existsInHierarchy) {
-            parentMappers.add(parentMapper);
-            
-            Set<ClassMap<Object, Object>> usedClassMapSet = usedMapperMetadataRegistry.get(parentMapperKey);
-            if (usedClassMapSet != null) {
-                for (ClassMap<Object, Object> cm : usedClassMapSet) {
-                    collectUsedMappers(cm, parentMappers, new MapperKey(cm.getAType(), cm.getBType()));
-                }
+        parentMappers.add(parentMapper);
+        
+        Set<ClassMap<Object, Object>> usedClassMapSet = usedMapperMetadataRegistry.get(parentMapperKey);
+        if (usedClassMapSet != null) {
+            for (ClassMap<Object, Object> cm : usedClassMapSet) {
+                collectUsedMappers(cm, parentMappers, new MapperKey(cm.getAType(), cm.getBType()));
             }
         }
     }
