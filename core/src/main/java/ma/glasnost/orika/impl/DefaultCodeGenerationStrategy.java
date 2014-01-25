@@ -17,8 +17,9 @@
  */
 package ma.glasnost.orika.impl;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.generator.AggregateSpecification;
@@ -48,60 +49,65 @@ import ma.glasnost.orika.impl.generator.specification.UnmappableEnum;
 
 /**
  * @author matt.deboer@gmail.com
- *
+ * 
  */
 public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
-
-    private final ArrayList<Specification> specifications;
-    private final ArrayList<AggregateSpecification> aggregateSpecifications;
+    
+    private final List<Specification> specifications;
+    private final List<AggregateSpecification> aggregateSpecifications;
     
     DefaultCodeGenerationStrategy() {
         
-        this.specifications = new ArrayList<Specification>();
+        this.specifications = new CopyOnWriteArrayList<Specification>(
+                Arrays.asList(
+                        new ConvertArrayOrCollectionToArray(),
+                        new ConvertArrayOrCollectionToCollection(), 
+                        new Convert(), 
+                        new CopyByReference(), 
+                        new ApplyRegisteredMapper(),
+                        new EnumToEnum(), 
+                        new StringToEnum(), 
+                        new UnmappableEnum(), 
+                        new ArrayOrCollectionToArray(),
+                        new ArrayOrCollectionToCollection(), 
+                        new MapToMap(), 
+                        new MapToArray(), 
+                        new MapToCollection(), 
+                        new ArrayOrCollectionToMap(),
+                        new StringToStringConvertible(), 
+                        new AnyTypeToString(), 
+                        new MultiOccurrenceElementToObject(),
+                        new ObjectToMultiOccurrenceElement(), 
+                        new PrimitiveAndObject(), 
+                        new ObjectToObject()));
         
-        specifications.add(new ConvertArrayOrCollectionToArray());
-        specifications.add(new ConvertArrayOrCollectionToCollection());
-        specifications.add(new Convert());
-        specifications.add(new CopyByReference());
-        specifications.add(new ApplyRegisteredMapper());
-        specifications.add(new EnumToEnum());
-        specifications.add(new StringToEnum());
-        specifications.add(new UnmappableEnum());
-        specifications.add(new ArrayOrCollectionToArray());
-        specifications.add(new ArrayOrCollectionToCollection());
-        specifications.add(new MapToMap());
-        specifications.add(new MapToArray());
-        specifications.add(new MapToCollection());
-        specifications.add(new ArrayOrCollectionToMap());
-        specifications.add(new StringToStringConvertible());
-        specifications.add(new AnyTypeToString());
-        specifications.add(new MultiOccurrenceElementToObject());
-        specifications.add(new ObjectToMultiOccurrenceElement());
-        specifications.add(new PrimitiveAndObject());
-        specifications.add(new ObjectToObject());
-        
-        this.aggregateSpecifications = new ArrayList<AggregateSpecification>();
-        
-        aggregateSpecifications.add(new MultiOccurrenceToMultiOccurrence());
+        this.aggregateSpecifications = new CopyOnWriteArrayList<AggregateSpecification>(
+                Arrays.asList(new MultiOccurrenceToMultiOccurrence()));
         
     }
     
     public void setMapperFactory(MapperFactory mapperFactory) {
-        for (Specification spec: this.specifications) {
+        for (Specification spec : this.specifications) {
             spec.setMapperFactory(mapperFactory);
         }
-        for (AggregateSpecification spec: this.aggregateSpecifications) {
+        for (AggregateSpecification spec : this.aggregateSpecifications) {
             spec.setMapperFactory(mapperFactory);
         }
     }
     
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.impl.generator.CodeGenerationStrategy#addSpecification(ma.glasnost.orika.impl.generator.Specification, ma.glasnost.orika.impl.generator.CodeGenerationStrategy.Position, ma.glasnost.orika.impl.generator.Specification)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.impl.generator.CodeGenerationStrategy#addSpecification
+     * (ma.glasnost.orika.impl.generator.Specification,
+     * ma.glasnost.orika.impl.generator.CodeGenerationStrategy.Position,
+     * ma.glasnost.orika.impl.generator.Specification)
      */
     public void addSpecification(Specification spec, Position relativePosition, Class<Specification> relativeSpec) {
         addSpec(this.specifications, spec, relativePosition, relativeSpec);
     }
-
+    
     private static <T> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<T> relativeSpec) {
         
         if (relativePosition == null || relativePosition == Position.LAST) {
@@ -109,10 +115,10 @@ public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
         } else if (relativePosition == Position.FIRST) {
             specifications.add(0, spec);
         } else {
-            for (int i =0, len=specifications.size(); i < len; ++i) { 
+            for (int i = 0, len = specifications.size(); i < len; ++i) {
                 T s = specifications.get(i);
                 if (s.getClass().equals(relativeSpec)) {
-                    switch(relativePosition) {
+                    switch (relativePosition) {
                     case IN_PLACE_OF:
                         specifications.remove(i);
                         break;
@@ -134,22 +140,35 @@ public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
         }
     }
     
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.impl.generator.CodeGenerationStrategy#getSpecifications()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.impl.generator.CodeGenerationStrategy#getSpecifications
+     * ()
      */
     public List<Specification> getSpecifications() {
         return specifications;
     }
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.impl.generator.CodeGenerationStrategy#addAggregateSpecification(ma.glasnost.orika.impl.generator.AggregateSpecification, ma.glasnost.orika.impl.generator.CodeGenerationStrategy.Position, ma.glasnost.orika.impl.generator.AggregateSpecification)
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ma.glasnost.orika.impl.generator.CodeGenerationStrategy#
+     * addAggregateSpecification
+     * (ma.glasnost.orika.impl.generator.AggregateSpecification,
+     * ma.glasnost.orika.impl.generator.CodeGenerationStrategy.Position,
+     * ma.glasnost.orika.impl.generator.AggregateSpecification)
      */
     public void addAggregateSpecification(AggregateSpecification spec, Position relativePosition, Class<AggregateSpecification> relativeSpec) {
         addSpec(this.aggregateSpecifications, spec, relativePosition, relativeSpec);
     }
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.impl.generator.CodeGenerationStrategy#getAggregateSpecifications()
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ma.glasnost.orika.impl.generator.CodeGenerationStrategy#
+     * getAggregateSpecifications()
      */
     public List<AggregateSpecification> getAggregateSpecifications() {
         return aggregateSpecifications;
