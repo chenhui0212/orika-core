@@ -285,16 +285,17 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          */
         protected Boolean mapNulls;
         /**
-         * The configured value of whether the full state of the core Orika mapping
-         * objects should be printed on exception
+         * The configured value of whether the full state of the core Orika
+         * mapping objects should be printed on exception
          */
         protected Boolean dumpStateOnException;
         
         /**
-         * The configured default value for the 'favorExtension' option on 
+         * The configured default value for the 'favorExtension' option on
          * registered class-maps (when one has not been explicitly specified).
          */
         protected Boolean favorExtension;
+        
         /**
          * Instantiates a new MapperFactoryBuilder
          */
@@ -476,8 +477,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         
         /**
          * Configure whether to dump the current state of the mapping
-         * infrastructure objects upon occurrence of an exception while
-         * mapping.
+         * infrastructure objects upon occurrence of an exception while mapping.
          * 
          * @param dumpStateOnException
          * @return a reference to <code>this</code> MapperFactoryBuilder
@@ -489,8 +489,8 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         
         /**
          * Configure whether to favorExtension by default in registered
-         * class-maps (when a value has not been explicitly specified on
-         * the class-map builder).
+         * class-maps (when a value has not been explicitly specified on the
+         * class-map builder).
          * 
          * @param favorExtension
          * @return a reference to <code>this</code> MapperFactoryBuilder
@@ -680,38 +680,42 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         Mapper<?, ?> mapper = getRegisteredMapper(mapperKey.getAType(), mapperKey.getBType(), false);
         if (mapper == null && useAutoMapping) {
             synchronized (this) {
-                try {
-                    /*
-                     * We shouldn't create a mapper for an immutable type;
-                     * although it will succeed in generating an empty mapper,
-                     * it won't actually result in a valid mapping, so it's
-                     * better to throw an exception to indicate more clearly
-                     * that something went wrong. However, there is a
-                     * possibility that a custom ObjectFactory was registered
-                     * for the immutable type, which would be valid.
-                     */
-                    if (ClassUtil.isImmutable(mapperKey.getBType()) && !objectFactoryRegistry.containsKey(mapperKey.getBType())) {
-                        throw new MappingException("No converter registered for conversion from " + mapperKey.getAType() + " to "
-                                + mapperKey.getBType() + ", nor any ObjectFactory which can generate " + mapperKey.getBType() + " from "
-                                + mapperKey.getAType());
+                mapper = getRegisteredMapper(mapperKey.getAType(), mapperKey.getBType(), false);
+                if (mapper == null) {
+                    try {
+                        /*
+                         * We shouldn't create a mapper for an immutable type;
+                         * although it will succeed in generating an empty
+                         * mapper, it won't actually result in a valid mapping,
+                         * so it's better to throw an exception to indicate more
+                         * clearly that something went wrong. However, there is
+                         * a possibility that a custom ObjectFactory was
+                         * registered for the immutable type, which would be
+                         * valid.
+                         */
+                        if (ClassUtil.isImmutable(mapperKey.getBType()) && !objectFactoryRegistry.containsKey(mapperKey.getBType())) {
+                            throw new MappingException("No converter registered for conversion from " + mapperKey.getAType() + " to "
+                                    + mapperKey.getBType() + ", nor any ObjectFactory which can generate " + mapperKey.getBType()
+                                    + " from " + mapperKey.getAType());
+                        }
+                        
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("No mapper registered for " + mapperKey + ": attempting to generate");
+                        }
+                        ClassMapBuilder<?, ?> builder = classMap(mapperKey.getAType(), mapperKey.getBType()).byDefault();
+                        for (MapperKey key : discoverUsedMappers(builder)) {
+                            builder.use(key.getAType(), key.getBType());
+                        }
+                        final ClassMap<?, ?> classMap = builder.toClassMap();
+                        
+                        buildObjectFactories(classMap, context);
+                        mapper = buildMapper(classMap, true, context);
+                        initializeUsedMappers(classMap);
+                    } catch (MappingException e) {
+                        e.setSourceType(mapperKey.getAType());
+                        e.setDestinationType(mapperKey.getBType());
+                        throw exceptionUtil.decorate(e);
                     }
-                    
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("No mapper registered for " + mapperKey + ": attempting to generate");
-                    }
-                    ClassMapBuilder<?,?> builder = classMap(mapperKey.getAType(), mapperKey.getBType()).byDefault();
-                    for (MapperKey key: discoverUsedMappers(builder)) {
-                        builder.use(key.getAType(), key.getBType());
-                    }
-                    final ClassMap<?, ?> classMap = builder.toClassMap();
-                    
-                    buildObjectFactories(classMap, context);
-                    mapper = buildMapper(classMap, true, context);
-                    initializeUsedMappers(classMap);
-                } catch (MappingException e) {
-                    e.setSourceType(mapperKey.getAType());
-                    e.setDestinationType(mapperKey.getBType());
-                    throw exceptionUtil.decorate(e);
                 }
             }
             
@@ -719,8 +723,12 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         return (Mapper<Object, Object>) mapper;
     }
     
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.MapperFactory#existsRegisteredMapper(ma.glasnost.orika.metadata.Type, ma.glasnost.orika.metadata.Type, boolean)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.MapperFactory#existsRegisteredMapper(ma.glasnost.orika
+     * .metadata.Type, ma.glasnost.orika.metadata.Type, boolean)
      */
     public boolean existsRegisteredMapper(Type<?> sourceType, Type<?> destinationType, boolean includeAutoGeneratedMappers) {
         return getRegisteredMapper(sourceType, destinationType, includeAutoGeneratedMappers) != null;
@@ -766,7 +774,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         return null;
     }
     
-    private boolean favorsExtension(Mapper<?,?> mapper) {
+    private boolean favorsExtension(Mapper<?, ?> mapper) {
         return mapper.favorsExtension() == null ? favorExtension : mapper.favorsExtension();
     }
     
@@ -778,7 +786,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      * @param mapper
      * @return
      */
-    private boolean canBeExtended(Type<?> typeA, Type<?> typeB, Mapper<?,?> mapper) {
+    private boolean canBeExtended(Type<?> typeA, Type<?> typeB, Mapper<?, ?> mapper) {
         boolean extensible;
         try {
             compilerStrategy.assureTypeIsAccessible(typeA.getRawType());
@@ -879,8 +887,8 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      * @param destinationType
      * @param sourceType
      * @param context
-     * @return an object factory capable of generating the provided destination type, if
-     * any exists.
+     * @return an object factory capable of generating the provided destination
+     *         type, if any exists.
      */
     @SuppressWarnings("unchecked")
     protected <T, S> ObjectFactory<T> lookupExistingObjectFactory(final Type<T> destinationType, final Type<S> sourceType,
@@ -1213,21 +1221,21 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     private Set<MapperKey> discoverUsedMappers(MappedTypePair<?, ?> classMapBuilder) {
         Set<MapperKey> mappers = new LinkedHashSet<MapperKey>();
         /*
-         * Attempt to auto-determine used mappers for this classmap;
-         * however, we should only add the most-specific of the available
-         * mappers to avoid calling the same mapper multiple times during a
-         * single map request;
+         * Attempt to auto-determine used mappers for this classmap; however, we
+         * should only add the most-specific of the available mappers to avoid
+         * calling the same mapper multiple times during a single map request;
          */
-        for (ClassMap<?,?> map : classMapRegistry.values()) {
+        for (ClassMap<?, ?> map : classMapRegistry.values()) {
             if (map.getAType().isAssignableFrom(classMapBuilder.getAType()) && map.getBType().isAssignableFrom(classMapBuilder.getBType())) {
-                if (!map.getAType().equals(classMapBuilder.getAType()) || 
-                        !map.getBType().equals(classMapBuilder.getBType())) {
-                    mappers.add(new MapperKey(map.getAType(), map.getBType()));
+                if (!map.getAType().equals(classMapBuilder.getAType()) || !map.getBType().equals(classMapBuilder.getBType())) {
+                    MapperKey key = new MapperKey(map.getAType(), map.getBType());
+                    mappers.add(key);
                 }
-            } else if (map.getAType().isAssignableFrom(classMapBuilder.getBType()) && map.getBType().isAssignableFrom(classMapBuilder.getAType())) {
-                if (!map.getAType().equals(classMapBuilder.getBType()) || 
-                        !map.getBType().equals(classMapBuilder.getAType())) {
-                    mappers.add(new MapperKey(map.getBType(), map.getAType()));
+            } else if (map.getAType().isAssignableFrom(classMapBuilder.getBType())
+                    && map.getBType().isAssignableFrom(classMapBuilder.getAType())) {
+                if (!map.getAType().equals(classMapBuilder.getBType()) || !map.getBType().equals(classMapBuilder.getAType())) {
+                    MapperKey key = new MapperKey(map.getBType(), map.getAType());
+                    mappers.add(key);
                 }
             }
         }
@@ -1237,15 +1245,15 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     @SuppressWarnings("unchecked")
     private void initializeUsedMappers(ClassMap<?, ?> classMap) {
         
-    	Mapper<Object, Object> mapper = lookupMapper(new MapperKey(classMap.getAType(), classMap.getBType()));
-    	
+        Mapper<Object, Object> mapper = lookupMapper(new MapperKey(classMap.getAType(), classMap.getBType()));
+        
         Set<Mapper<Object, Object>> parentMappers = new LinkedHashSet<Mapper<Object, Object>>();
         
         if (!classMap.getUsedMappers().isEmpty()) {
             for (MapperKey parentMapperKey : classMap.getUsedMappers()) {
                 collectUsedMappers(classMap, parentMappers, parentMapperKey);
             }
-        } 
+        }
         
         parentMappers.remove(mapper);
         
@@ -1259,7 +1267,6 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 usedMappers[i] = ReversedMapper.reverse(usedMapper);
             }
         }
-        
         mapper.setUsedMappers(usedMappers);
     }
     
@@ -1268,12 +1275,25 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         if (parentMapper == null) {
             throw exceptionUtil.newMappingException("Cannot find used mappers for : " + classMap.getMapperClassName());
         }
-        parentMappers.add(parentMapper);
-        
-        Set<ClassMap<Object, Object>> usedClassMapSet = usedMapperMetadataRegistry.get(parentMapperKey);
-        if (usedClassMapSet != null) {
-            for (ClassMap<Object, Object> cm : usedClassMapSet) {
-                collectUsedMappers(cm, parentMappers, new MapperKey(cm.getAType(), cm.getBType()));
+        /*
+         * Do not add 'parentMapper' to the set if it is already found somewhere
+         * within the hierarchy
+         */
+        boolean existsInHierarchy = false;
+        for (Mapper<Object, Object> m : parentMappers) {
+            if (m.equals(parentMapper) || GeneratedMapperBase.isUsedMapperOf(parentMapper, m)) {
+                existsInHierarchy = true;
+                break;
+            }
+        }
+        if (!existsInHierarchy) {
+            parentMappers.add(parentMapper);
+            
+            Set<ClassMap<Object, Object>> usedClassMapSet = usedMapperMetadataRegistry.get(parentMapperKey);
+            if (usedClassMapSet != null) {
+                for (ClassMap<Object, Object> cm : usedClassMapSet) {
+                    collectUsedMappers(cm, parentMappers, new MapperKey(cm.getAType(), cm.getBType()));
+                }
             }
         }
     }
@@ -1308,14 +1328,14 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      */
     protected <S, D> void register(Type<S> sourceType, Type<D> destinationType, boolean isAutoGenerated) {
         
-    	ConcurrentHashMap<Type<?>, Set<Type<?>>> registry = isAutoGenerated ? dynamicAToBRegistry : explicitAToBRegistry;
+        ConcurrentHashMap<Type<?>, Set<Type<?>>> registry = isAutoGenerated ? dynamicAToBRegistry : explicitAToBRegistry;
         
         Set<Type<?>> destinationSet = registry.get(sourceType);
         if (destinationSet == null) {
             destinationSet = new TreeSet<Type<?>>();
             Set<Type<?>> existing = registry.putIfAbsent(sourceType, destinationSet);
             if (existing != null) {
-            	destinationSet = existing;
+                destinationSet = existing;
             }
         }
         destinationSet.add(destinationType);
@@ -1417,7 +1437,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         if (!isBuilt && !isBuilding) {
             build();
         }
-    	getMapperFacade();
+        getMapperFacade();
         MappingContextFactory ctxFactory = containsCycles ? contextFactory : nonCyclicContextFactory;
         return new DefaultBoundMapperFacade<S, D>(this, ctxFactory, sourceType, destinationType);
     }
@@ -1463,85 +1483,91 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         this.filtersRegistry.add((Filter<Object, Object>) filter);
     }
     
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.StateReporter.Reportable#reportCurrentState(java.lang.StringBuilder)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.StateReporter.Reportable#reportCurrentState(java.lang
+     * .StringBuilder)
      */
     public void reportCurrentState(StringBuilder out) {
-    	out.append(DIVIDER);
-    	out.append("\nRegistered object factories: ").append(objectFactoryRegistry.size())
-    		.append(" (approximate size: ").append(humanReadableSizeInMemory(objectFactoryRegistry))
-    		.append(")");
-    	for (Entry<Type<? extends Object>, ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>> entry: 
-    			objectFactoryRegistry.entrySet()) {
-    		out.append("\n  [").append(entry.getKey())
-			.append("] : ").append(entry.getValue());
-    	}
-    	out.append(DIVIDER);
-    	out.append("\nRegistered mappers: ").append(mappersRegistry.size())
-    		.append(" (approximate size: ").append(humanReadableSizeInMemory(mappersRegistry))
-    		.append(")");
-		int index = 0;
-    	for (Mapper<Object,Object> mapper: mappersRegistry) {
-			out.append("\n  [").append(index++).append("] : ")
-					.append(mapper);
-		}
-    	out.append(DIVIDER);
-    	out.append("\nRegistered concrete types: ").append(concreteTypeRegistry.size())
-    		.append(" (approximate size: ").append(humanReadableSizeInMemory(concreteTypeRegistry))
-    		.append(")");
-    	for (Entry<java.lang.reflect.Type, Type<?>> entry: concreteTypeRegistry.entrySet()) {
-    		out.append("\n  [").append(entry.getKey())
-    			.append("] : ").append(entry.getValue());
-    	}
+        out.append(DIVIDER);
+        out.append("\nRegistered object factories: ")
+                .append(objectFactoryRegistry.size())
+                .append(" (approximate size: ")
+                .append(humanReadableSizeInMemory(objectFactoryRegistry))
+                .append(")");
+        for (Entry<Type<? extends Object>, ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>> entry : objectFactoryRegistry.entrySet()) {
+            out.append("\n  [").append(entry.getKey()).append("] : ").append(entry.getValue());
+        }
+        out.append(DIVIDER);
+        out.append("\nRegistered mappers: ")
+                .append(mappersRegistry.size())
+                .append(" (approximate size: ")
+                .append(humanReadableSizeInMemory(mappersRegistry))
+                .append(")");
+        int index = 0;
+        for (Mapper<Object, Object> mapper : mappersRegistry) {
+            out.append("\n  [").append(index++).append("] : ").append(mapper);
+        }
+        out.append(DIVIDER);
+        out.append("\nRegistered concrete types: ")
+                .append(concreteTypeRegistry.size())
+                .append(" (approximate size: ")
+                .append(humanReadableSizeInMemory(concreteTypeRegistry))
+                .append(")");
+        for (Entry<java.lang.reflect.Type, Type<?>> entry : concreteTypeRegistry.entrySet()) {
+            out.append("\n  [").append(entry.getKey()).append("] : ").append(entry.getValue());
+        }
     }
     
     /**
      * ConverterFactoryFacade is a nested intercepter class for ConverterFactory
      * that listens for registry of new converters and calls the appropriate
      * change event on MapperFacade if the factory has already started building.
-     *
+     * 
      */
     private class ConverterFactoryFacade implements ConverterFactory {
         private ConverterFactory delegate;
-
+        
         public ConverterFactoryFacade(ConverterFactory delegate) {
             this.delegate = delegate;
         }
-
+        
         public void setMapperFacade(MapperFacade mapperFacade) {
             delegate.setMapperFacade(mapperFacade);
         }
-
+        
         public Converter<Object, Object> getConverter(Type<?> sourceType, Type<?> destinationType) {
             return delegate.getConverter(sourceType, destinationType);
         }
-
+        
         public Converter<Object, Object> getConverter(String converterId) {
             return delegate.getConverter(converterId);
         }
-
+        
         public <S, D> void registerConverter(Converter<S, D> converter) {
             delegate.registerConverter(converter);
             if (isBuilding || isBuilt) {
                 mapperFacade.factoryModified(DefaultMapperFactory.this);
             }
         }
-
+        
         public <S, D> void registerConverter(String converterId, Converter<S, D> converter) {
             delegate.registerConverter(converterId, converter);
             if (isBuilding || isBuilt) {
                 mapperFacade.factoryModified(DefaultMapperFactory.this);
             }
         }
-
+        
         public boolean hasConverter(String converterId) {
             return delegate.hasConverter(converterId);
         }
-
+        
         public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
             return delegate.canConvert(sourceType, destinationType);
         }
-
+        
         @SuppressWarnings("deprecation")
         public <S, D> void registerConverter(ma.glasnost.orika.converter.Converter<S, D> converter) {
             delegate.registerConverter(converter);
@@ -1549,7 +1575,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 mapperFacade.factoryModified(DefaultMapperFactory.this);
             }
         }
-
+        
         @SuppressWarnings("deprecation")
         public <S, D> void registerConverter(String converterId, ma.glasnost.orika.converter.Converter<S, D> converter) {
             delegate.registerConverter(converterId, converter);
