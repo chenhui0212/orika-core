@@ -53,7 +53,7 @@ public class MappingContext {
     private boolean capturesFieldContext;
     
     public static enum StackElement {
-        SOURCE_NAME, SOURCE_TYPE, DEST_NAME, DEST_TYPE;
+        SOURCE_NAME, SOURCE_TYPE, SOURCE, DEST_NAME, DEST_TYPE, DEST;
     }
     
     /**
@@ -98,7 +98,7 @@ public class MappingContext {
         this.mapping = new HashMap<Type<?>, Type<?>>();
         this.typeCache = new OpenIntObjectHashMap();
         this.globalProperties = globalProperties;
-        Boolean capture = (Boolean)globalProperties.get(Properties.CAPTURE_FIELD_CONTEXT);
+        Boolean capture = globalProperties != null ? (Boolean)globalProperties.get(Properties.CAPTURE_FIELD_CONTEXT) : null;
         this.capturesFieldContext = capture == null || capture;
     }
     
@@ -290,15 +290,17 @@ public class MappingContext {
      * @param dest
      *            the destination object being mapped into
      */
-    public void beginMappingField(String sourceName, Type<?> sourceType, String destName, Type<?> destType) {
+    public void beginMappingField(String sourceName, Type<?> sourceType, Object source, String destName, Type<?> destType, Object dest) {
         if (fieldMappingStack == null) {
             fieldMappingStack = new ArrayList<Object[]>();
         }
         Object[] stackElement = new Object[StackElement.values().length];
         stackElement[StackElement.SOURCE_NAME.ordinal()] = sourceName;
         stackElement[StackElement.SOURCE_TYPE.ordinal()] = sourceType;
+        stackElement[StackElement.SOURCE.ordinal()] = source;
         stackElement[StackElement.DEST_NAME.ordinal()] = destName;
         stackElement[StackElement.DEST_TYPE.ordinal()] = destType;
+        stackElement[StackElement.DEST.ordinal()] = dest;
         fieldMappingStack.add(stackElement);
     }
     
@@ -336,6 +338,23 @@ public class MappingContext {
         int idx = 0;
         for (Object[] element : fieldMappingStack) {
             path[idx++] = (String) element[StackElement.SOURCE_NAME.ordinal()];
+        }
+        return path;
+    }
+    
+    /**
+     * @return an array of the source object values on the current stack,
+     *         where the last element of the array is the value of the 
+     *         source field being currently mapped
+     */
+    public Object[] getSourceObjects() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        Object[] path = new Object[fieldMappingStack.size()];
+        int idx = 0;
+        for (Object[] element : fieldMappingStack) {
+            path[idx++] = element[StackElement.SOURCE.ordinal()];
         }
         return path;
     }
@@ -388,6 +407,23 @@ public class MappingContext {
         int idx = 0;
         for (Object[] element : fieldMappingStack) {
             path[idx++] = (String) element[StackElement.SOURCE_NAME.ordinal()];
+        }
+        return path;
+    }
+    
+    /**
+     * @return an array of the destination object values on the current stack,
+     *         where the last element of the array is the value of the 
+     *         destination field being currently mapped
+     */
+    public Object[] getDestinationObjects() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        Object[] path = new Object[fieldMappingStack.size()];
+        int idx = 0;
+        for (Object[] element : fieldMappingStack) {
+            path[idx++] = element[StackElement.DEST.ordinal()];
         }
         return path;
     }
