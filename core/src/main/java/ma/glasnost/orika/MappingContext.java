@@ -34,7 +34,7 @@ import ma.glasnost.orika.metadata.Type;
 /**
  * MappingContext provides storage for information shared among the various
  * mapping objects for a given mapping request.
- *
+ * 
  */
 public class MappingContext {
     
@@ -49,6 +49,12 @@ public class MappingContext {
     private Type<?> resolvedSourceType;
     private Type<?> resolvedDestinationType;
     private MappingStrategy resolvedStrategy;
+    private List<Object[]> fieldMappingStack;
+    private boolean capturesFieldContext;
+    
+    public static enum StackElement {
+        SOURCE_NAME, SOURCE_TYPE, DEST_NAME, DEST_TYPE;
+    }
     
     /**
      * Factory constructs instances of the base MappingContext
@@ -83,7 +89,8 @@ public class MappingContext {
     }
     
     /**
-     * Constructs a new MappingContext with the specified (immutable) global properties;
+     * Constructs a new MappingContext with the specified (immutable) global
+     * properties;
      * 
      * @param globalProperties
      */
@@ -91,12 +98,14 @@ public class MappingContext {
         this.mapping = new HashMap<Type<?>, Type<?>>();
         this.typeCache = new OpenIntObjectHashMap();
         this.globalProperties = globalProperties;
+        Boolean capture = (Boolean)globalProperties.get(Properties.CAPTURE_FIELD_CONTEXT);
+        this.capturesFieldContext = capture == null || capture;
     }
     
     /**
-     * Sets whether this MappingContext needs to guard against cycles when mapping
-     * the current object graph; specifying <code>false</code> when applicable can
-     * lend improved performance.
+     * Sets whether this MappingContext needs to guard against cycles when
+     * mapping the current object graph; specifying <code>false</code> when
+     * applicable can lend improved performance.
      * 
      * @param containsCycle
      */
@@ -105,7 +114,8 @@ public class MappingContext {
     }
     
     /**
-     * @return true if this mapping context is watching for cycles in the object graph
+     * @return true if this mapping context is watching for cycles in the object
+     *         graph
      */
     public boolean containsCycle() {
         return containsCycle;
@@ -119,13 +129,13 @@ public class MappingContext {
     }
     
     /**
-     * Searches for a concrete class that has been registered for the given abstract
-     * class or interface within this mapping session.
+     * Searches for a concrete class that has been registered for the given
+     * abstract class or interface within this mapping session.
      * 
      * @param sourceType
      * @param destinationType
      * @return a concrete class that has been registered for the given abstract
-     * class or interface within this mapping session, if any
+     *         class or interface within this mapping session, if any
      */
     @SuppressWarnings("unchecked")
     public <S, D> Type<? extends D> getConcreteClass(Type<S> sourceType, Type<D> destinationType) {
@@ -140,8 +150,8 @@ public class MappingContext {
     }
     
     /**
-     * Registers a concrete class to be used for the given abstract class or interface
-     * within this mapping session only.
+     * Registers a concrete class to be used for the given abstract class or
+     * interface within this mapping session only.
      * 
      * @param subjectClass
      * @param concreteClass
@@ -153,8 +163,8 @@ public class MappingContext {
     
     /**
      * Caches an object instance which has been mapped for a particular source
-     * instance and destination type in this mapping context; this will later
-     * be referenced in avoiding infinite recursion mapping the same object.
+     * instance and destination type in this mapping context; this will later be
+     * referenced in avoiding infinite recursion mapping the same object.
      * 
      * @param source
      * @param destinationType
@@ -172,14 +182,13 @@ public class MappingContext {
             localCache.put(source, destination);
             
             // Quick fix for Issue 68
-            for (Type<Object> t : (Type<Object>[])destinationType.getInterfaces()) {
+            for (Type<Object> t : (Type<Object>[]) destinationType.getInterfaces()) {
                 cacheMappedObject(source, t, destination);
             }
             
             isNew = false;
         }
-    } 
-
+    }
     
     /**
      * Looks for an object which has already been mapped for the source and
@@ -220,7 +229,8 @@ public class MappingContext {
      * Looks up a ClassMap among the mappers generated with this mapping context
      * 
      * @param mapperKey
-     * @return the ClassMap for which a Mapper was generated in this context, if any
+     * @return the ClassMap for which a Mapper was generated in this context, if
+     *         any
      */
     public ClassMap<?, ?> getMapperGeneration(MapperKey mapperKey) {
         ClassMap<?, ?> result = null;
@@ -233,17 +243,19 @@ public class MappingContext {
     
     /**
      * Mark the beginning of a particular mapping
-     *
-     * @deprecated This variant exists for backwards compatibility only; if overriding,
-     *             override {@link #beginMapping(Type, Object, Type, Object)} instead.
+     * 
+     * @deprecated This variant exists for backwards compatibility only; if
+     *             overriding, override
+     *             {@link #beginMapping(Type, Object, Type, Object)} instead.
      */
+    @Deprecated
     public void beginMapping() {
         ++depth;
     }
     
     /**
      * Mark the beginning of a particular mapping
-     *
+     * 
      * @param sourceType
      *            the type of the source object being mapped
      * @param source
@@ -252,9 +264,149 @@ public class MappingContext {
      *            the type of the destination object being mapped into
      * @param dest
      *            the destination object being mapped into
+     * @deprecated This variant exists for backwards compatibility only; if
+     *             overriding, override
+     *             {@link #beginMapping(Type, String, Object, Type, String, Object)}
+     *             instead.
      */
+    @Deprecated
     public void beginMapping(Type<?> sourceType, Object source, Type<?> destType, Object dest) {
         beginMapping();
+    }
+    
+    /**
+     * Mark the start of mapping a particular field
+     * 
+     * @param sourceType
+     *            the type of the source field
+     * @param sourceName
+     *            the name of the source field
+     * @param source
+     *            the source object being mapped
+     * @param destType
+     *            the type of the destination object being mapped into
+     * @param destName
+     *            the name of the destination field
+     * @param dest
+     *            the destination object being mapped into
+     */
+    public void beginMappingField(String sourceName, Type<?> sourceType, String destName, Type<?> destType) {
+        if (fieldMappingStack == null) {
+            fieldMappingStack = new ArrayList<Object[]>();
+        }
+        Object[] stackElement = new Object[StackElement.values().length];
+        stackElement[StackElement.SOURCE_NAME.ordinal()] = sourceName;
+        stackElement[StackElement.SOURCE_TYPE.ordinal()] = sourceType;
+        stackElement[StackElement.DEST_NAME.ordinal()] = destName;
+        stackElement[StackElement.DEST_TYPE.ordinal()] = destType;
+        fieldMappingStack.add(stackElement);
+    }
+    
+    public void endMappingField() {
+        fieldMappingStack.remove(fieldMappingStack.size() - 1);
+    }
+    
+    /**
+     * @return the qualified property expression describing the source field
+     *         currently being mapped
+     */
+    public String getFullyQualifiedSourcePath() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        StringBuilder path = new StringBuilder("source");
+        for (Object[] element : fieldMappingStack) {
+            path.append(".");
+            path.append(element[StackElement.SOURCE_NAME.ordinal()]);
+        }
+        return path.toString();
+    }
+    
+    /**
+     * @return an array of expressions describing the path to the source field
+     *         being currently mapped; each array element contains the
+     *         expression value of the field as referenced within the individual
+     *         class-map.
+     */
+    public String[] getSourceExpressionPaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        String[] path = new String[fieldMappingStack.size()];
+        int idx = 0;
+        for (Object[] element : fieldMappingStack) {
+            path[idx++] = (String) element[StackElement.SOURCE_NAME.ordinal()];
+        }
+        return path;
+    }
+    
+    /**
+     * @return an array of types representing the path to the type of the source
+     *         field being currently mapped; this represents each type in the
+     *         chain of mappers called to map the current field.
+     * 
+     */
+    public java.lang.reflect.Type[] getSourceTypePaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        java.lang.reflect.Type[] path = new java.lang.reflect.Type[fieldMappingStack.size()];
+        int idx = 0;
+        for (Object[] element : fieldMappingStack) {
+            path[idx++] = (java.lang.reflect.Type) element[StackElement.SOURCE_TYPE.ordinal()];
+        }
+        return path;
+    }
+    
+    /**
+     * @return the qualified property expression describing the destination
+     *         field currently being mapped
+     */
+    public String getFullyQualifiedDestinationPath() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        StringBuilder path = new StringBuilder("destination");
+        for (Object[] element : fieldMappingStack) {
+            path.append(".");
+            path.append(element[StackElement.DEST_NAME.ordinal()]);
+        }
+        return path.toString();
+    }
+    
+    /**
+     * @return an array of expressions describing the path to the source field
+     *         being currently mapped; each array element contains the
+     *         expression value of the field as referenced within the individual
+     *         class-map.
+     */
+    public String[] getDestinationExpressionPaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        String[] path = new String[fieldMappingStack.size()];
+        int idx = 0;
+        for (Object[] element : fieldMappingStack) {
+            path[idx++] = (String) element[StackElement.SOURCE_NAME.ordinal()];
+        }
+        return path;
+    }
+    
+    /**
+     * @return an array of types representing the path to the type of the
+     *         destination field being currently mapped; this represents each
+     *         type in the chain of mappers called to map the current field.
+     */
+    public java.lang.reflect.Type[] getDestinationTypePaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
+        java.lang.reflect.Type[] path = new java.lang.reflect.Type[fieldMappingStack.size()];
+        int idx = 0;
+        for (Object[] element : fieldMappingStack) {
+            path[idx++] = (java.lang.reflect.Type) element[StackElement.DEST_TYPE.ordinal()];
+        }
+        return path;
     }
     
     /**
@@ -265,7 +417,8 @@ public class MappingContext {
     }
     
     /**
-     * Resets this context instance, in preparation for use by another mapping request
+     * Resets this context instance, in preparation for use by another mapping
+     * request
      */
     public void reset() {
         mapping.clear();
@@ -275,6 +428,9 @@ public class MappingContext {
         }
         if (mappersSeen != null) {
             mappersSeen.clear();
+        }
+        if (fieldMappingStack != null) {
+            fieldMappingStack.clear();
         }
         resolvedSourceType = null;
         resolvedDestinationType = null;
@@ -298,10 +454,12 @@ public class MappingContext {
     
     /**
      * Get a property set on the current mapping context; individual properties
-     * set on this context instance are checked first, followed by global properties.
+     * set on this context instance are checked first, followed by global
+     * properties.
      * 
      * @param key
-     * @return the object stored under the specified key as a instance or global property.
+     * @return the object stored under the specified key as a instance or global
+     *         property.
      */
     public Object getProperty(Object key) {
         Object result = this.properties != null ? this.properties.get(key) : null;
@@ -340,18 +498,19 @@ public class MappingContext {
     public void setResolvedDestinationType(Type<?> resolvedDestinationType) {
         this.resolvedDestinationType = resolvedDestinationType;
     }
-
-	/**
-	 * @return the resolved strategy in the current context
-	 */
-	public MappingStrategy getResolvedStrategy() {
-		return resolvedStrategy;
-	}
-
-	/**
-	 * @param resolvedStrategy the mapping strategy to set
-	 */
-	public void setResolvedStrategy(MappingStrategy resolvedStrategy) {
-		this.resolvedStrategy = resolvedStrategy;
-	}
+    
+    /**
+     * @return the resolved strategy in the current context
+     */
+    public MappingStrategy getResolvedStrategy() {
+        return resolvedStrategy;
+    }
+    
+    /**
+     * @param resolvedStrategy
+     *            the mapping strategy to set
+     */
+    public void setResolvedStrategy(MappingStrategy resolvedStrategy) {
+        this.resolvedStrategy = resolvedStrategy;
+    }
 }
