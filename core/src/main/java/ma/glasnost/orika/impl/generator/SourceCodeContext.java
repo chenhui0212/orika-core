@@ -779,14 +779,18 @@ public class SourceCodeContext {
     }
     
     private String captureFieldContext(String code, FieldMap fieldMap, VariableRef source, VariableRef dest) {
-        return String.format("mappingContext.beginMappingField(\"%s\", %s, \"%s\", %s);\n"+
+        return String.format("mappingContext.beginMappingField(\"%s\", %s, %s, \"%s\", %s, %s);\n"+
                 "try{\n" +
                 "\t%s\n" +
                 "} finally {\n" +
                 "\tmappingContext.endMappingField();\n" +
                 "}\n", 
-                escapeQuotes(fieldMap.getSource().getExpression()), usedType(fieldMap.getAType()),
-                escapeQuotes(fieldMap.getDestination().getExpression()), usedType(fieldMap.getBType()),
+                escapeQuotes(fieldMap.getSource().getExpression()), 
+                usedType(fieldMap.getAType()),
+                source.asWrapper(),
+                escapeQuotes(fieldMap.getDestination().getExpression()), 
+                usedType(fieldMap.getBType()),
+                dest.asWrapper(),
                 code
                 );
     }
