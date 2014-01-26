@@ -153,4 +153,22 @@ public final class OrikaSystemProperties {
      * Default value is <code>false</code>
      */
     public static final String FAVOR_EXTENSION = "ma.glasnost.orika.favorExtension";
+    
+    /**
+     * Specifies a default value for the 'captureFieldContext' option on the DefaultMapperFactory;
+     * if <code>true</code>, the result is that the following calls will return a meaningful value, relative to
+     * the currently mapped source and destination fields:
+     * <ul>
+     *  <li>{@link MappingContext#getFullyQualifiedSourcePath}
+     *  <li>{@link MappingContext#getFullyQualifiedDestinationPath}
+     *  <li>{@link MappingContext#getSourceExpressionPaths}
+     *  <li>{@link MappingContext#getDestinationExpressionPaths}
+     *  <li>{@link MappingContext#getSourceTypePaths}
+     *  <li>{@link MappingContext#getDestinationTypePaths}
+     *  </ul>
+     * <p><p>
+     * If <code>false</code>, these methods will return <code>null</code>.<p>
+     * Default value is <code>false</code>
+     */
+    public static final String CAPTURE_FIELD_CONTEXT = "ma.glasnost.orika.captureFieldContext";
 }

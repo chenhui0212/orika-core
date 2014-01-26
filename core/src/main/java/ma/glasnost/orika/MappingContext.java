@@ -50,6 +50,7 @@ public class MappingContext {
     private Type<?> resolvedDestinationType;
     private MappingStrategy resolvedStrategy;
     private List<Object[]> fieldMappingStack;
+    private boolean capturesFieldContext;
     
     public static enum StackElement {
         SOURCE_NAME, SOURCE_TYPE, DEST_NAME, DEST_TYPE;
@@ -97,6 +98,8 @@ public class MappingContext {
         this.mapping = new HashMap<Type<?>, Type<?>>();
         this.typeCache = new OpenIntObjectHashMap();
         this.globalProperties = globalProperties;
+        Boolean capture = (Boolean)globalProperties.get(Properties.CAPTURE_FIELD_CONTEXT);
+        this.capturesFieldContext = capture == null || capture;
     }
     
     /**
@@ -308,7 +311,7 @@ public class MappingContext {
      *         currently being mapped
      */
     public String getFullyQualifiedSourcePath() {
-        if (fieldMappingStack == null) {
+        if (!capturesFieldContext || fieldMappingStack == null) {
             return null;
         }
         StringBuilder path = new StringBuilder("source");
@@ -326,6 +329,9 @@ public class MappingContext {
      *         class-map.
      */
     public String[] getSourceExpressionPaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
         String[] path = new String[fieldMappingStack.size()];
         int idx = 0;
         for (Object[] element : fieldMappingStack) {
@@ -341,6 +347,9 @@ public class MappingContext {
      * 
      */
     public java.lang.reflect.Type[] getSourceTypePaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
         java.lang.reflect.Type[] path = new java.lang.reflect.Type[fieldMappingStack.size()];
         int idx = 0;
         for (Object[] element : fieldMappingStack) {
@@ -354,7 +363,7 @@ public class MappingContext {
      *         field currently being mapped
      */
     public String getFullyQualifiedDestinationPath() {
-        if (fieldMappingStack == null) {
+        if (!capturesFieldContext || fieldMappingStack == null) {
             return null;
         }
         StringBuilder path = new StringBuilder("destination");
@@ -372,6 +381,9 @@ public class MappingContext {
      *         class-map.
      */
     public String[] getDestinationExpressionPaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
         String[] path = new String[fieldMappingStack.size()];
         int idx = 0;
         for (Object[] element : fieldMappingStack) {
@@ -386,6 +398,9 @@ public class MappingContext {
      *         type in the chain of mappers called to map the current field.
      */
     public java.lang.reflect.Type[] getDestinationTypePaths() {
+        if (!capturesFieldContext || fieldMappingStack == null) {
+            return null;
+        }
         java.lang.reflect.Type[] path = new java.lang.reflect.Type[fieldMappingStack.size()];
         int idx = 0;
         for (Object[] element : fieldMappingStack) {

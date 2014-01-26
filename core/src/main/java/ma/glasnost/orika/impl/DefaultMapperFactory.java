@@ -20,6 +20,7 @@ package ma.glasnost.orika.impl;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static ma.glasnost.orika.OrikaSystemProperties.CAPTURE_FIELD_CONTEXT;
 import static ma.glasnost.orika.OrikaSystemProperties.DUMP_STATE_ON_EXCEPTION;
 import static ma.glasnost.orika.OrikaSystemProperties.FAVOR_EXTENSION;
 import static ma.glasnost.orika.OrikaSystemProperties.MAP_NULLS;
@@ -189,6 +190,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         props.put(Properties.UNENHANCE_STRATEGY, unenhanceStrategy);
         props.put(Properties.MAPPER_FACTORY, this);
         props.put(Properties.FILTERS, this.filtersRegistry);
+        props.put(Properties.CAPTURE_FIELD_CONTEXT, builder.captureFieldContext);
         
         /*
          * Register default concrete types for common collection types; these
@@ -288,12 +290,16 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          * mapping objects should be printed on exception
          */
         protected Boolean dumpStateOnException;
-        
         /**
          * The configured default value for the 'favorExtension' option on
          * registered class-maps (when one has not been explicitly specified).
          */
         protected Boolean favorExtension;
+        /**
+         * The configured value for whether full field context should be captured
+         * upon mapping of every field.
+         */
+        protected Boolean captureFieldContext;
         
         /**
          * Instantiates a new MapperFactoryBuilder
@@ -311,6 +317,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             mapNulls = valueOf(getProperty(MAP_NULLS, "true"));
             dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "true"));
             favorExtension = valueOf(getProperty(FAVOR_EXTENSION, "false"));
+            captureFieldContext = valueOf(getProperty(CAPTURE_FIELD_CONTEXT, "false"));
         }
         
         /**
@@ -496,6 +503,30 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          */
         public B favorExtension(boolean favorExtension) {
             this.favorExtension = favorExtension;
+            return self();
+        }
+        
+        /**
+         * Specifies whether full field context should be captured by generated mappers.<p>
+         * If <code>true</code>, the result is that the following calls will return a meaningful value, relative to
+         * the currently mapped source and destination fields:
+         * <ul>
+         *  <li>{@link MappingContext#getFullyQualifiedSourcePath}
+         *  <li>{@link MappingContext#getFullyQualifiedDestinationPath}
+         *  <li>{@link MappingContext#getSourceExpressionPaths}
+         *  <li>{@link MappingContext#getDestinationExpressionPaths}
+         *  <li>{@link MappingContext#getSourceTypePaths}
+         *  <li>{@link MappingContext#getDestinationTypePaths}
+         *  </ul>
+         * <p><p>
+         * If <code>false</code>, these methods will return <code>null</code>.<p>
+         * Default value is <code>false</code>
+         * 
+         * @param captureFieldContext
+         * @return a reference to <code>this</code> MapperFactoryBuilder
+         */
+        public B captureFieldContext(boolean captureFieldContext) {
+            this.captureFieldContext = captureFieldContext;
             return self();
         }
         

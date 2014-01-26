@@ -88,6 +88,7 @@ public class SourceCodeContext {
     private final Map<AggregateSpecification, List<FieldMap>> aggregateFieldMaps;
     private final MappingContext mappingContext;
     private final Collection<Filter<Object, Object>> filters;
+    private final boolean shouldCaptureFieldContext;
     
     /**
      * Constructs a new instance of SourceCodeContext
@@ -105,6 +106,7 @@ public class SourceCodeContext {
         this.compilerStrategy = (CompilerStrategy) mappingContext.getProperty(Properties.COMPILER_STRATEGY);
         this.propertyResolver = (PropertyResolverStrategy) mappingContext.getProperty(Properties.PROPERTY_RESOLVER_STRATEGY);
         this.filters = (Collection<Filter<Object, Object>>) mappingContext.getProperty(Properties.FILTERS);
+        this.shouldCaptureFieldContext = (Boolean)mappingContext.getProperty(Properties.CAPTURE_FIELD_CONTEXT);
         
         String safeBaseClassName = baseClassName.replace("[]", "$Array");
         this.sourceBuilder = new StringBuilder();
@@ -763,11 +765,8 @@ public class SourceCodeContext {
                     if (code == null || "".equals(code)) {
                         throw new IllegalStateException("empty code returned for spec " + spec + ", sourceProperty = " + source
                                 + ", destinationProperty = " + destination);
-                    } else {
-                        /*
-                         * Wrap individual mapping of a given field with calls
-                         */
-                        code = beginMappingContext(code, fieldMap, source, destination);
+                    } else if (shouldCaptureFieldContext) {
+                        code = captureFieldContext(code, fieldMap, source, destination);
                     }
                     out.append(code);
                     break;
@@ -779,7 +778,7 @@ public class SourceCodeContext {
         return out.toString();
     }
     
-    private String beginMappingContext(String code, FieldMap fieldMap, VariableRef source, VariableRef dest) {
+    private String captureFieldContext(String code, FieldMap fieldMap, VariableRef source, VariableRef dest) {
         return String.format("mappingContext.beginMappingField(\"%s\", %s, \"%s\", %s);\n"+
                 "try{\n" +
                 "\t%s\n" +
