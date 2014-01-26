@@ -781,9 +781,9 @@ public class SourceCodeContext {
          */
         Filter<Object, Object> filter = getFilter(sourceProperty, destinationProperty);
         if (filter != null) {
-            out.append(format("if (%s.shouldMap(%s, \"%s\", %s, %s, \"%s\", mappingContext)) {", usedFilter(filter),
+            out.append(format("if (%s.shouldMap(%s, \"%s\", %s, %s, \"%s\", %s, mappingContext)) {", usedFilter(filter),
                     usedType(sourceProperty.type()), varPath(sourceProperty), sourceProperty.asWrapper(),
-                    usedType(destinationProperty.type()), varPath(destinationProperty)));
+                    usedType(destinationProperty.type()), varPath(destinationProperty), destinationProperty.asWrapper()));
             
             sourceProperty = getSourceFilter(sourceProperty, destinationProperty, filter);
             destinationProperty = getDestFilter(sourceProperty, destinationProperty, filter);

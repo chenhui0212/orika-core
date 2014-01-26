@@ -81,14 +81,15 @@ public class FilterTestCase {
         }
         
         public <S, D> boolean shouldMap(final Type<S> sourceType, final String sourceName, final S source, final Type<D> destType, final String destName,
-                final MappingContext mappingContext) {
+                final D dest, final MappingContext mappingContext) {
             if ("age".equals(sourceName) || "address.street".equals(sourceName)) {
                 return false;
             }
             return true;
         }
         
-        public <D> D filterDestination(D destinationValue, final Type<?> sourceType, final String sourceName, final Type<D> destType,
+        @SuppressWarnings("unchecked")
+		public <D> D filterDestination(D destinationValue, final Type<?> sourceType, final String sourceName, final Type<D> destType,
                 final String destName, final MappingContext mappingContext) {
             if ("creditCardNumber".equals(sourceName)) {
                 String cardMask = (String) destinationValue;
@@ -96,6 +97,31 @@ public class FilterTestCase {
             }
             return destinationValue;
             
+        }
+    }
+    
+    public static class SecurityFilter2 extends NullFilter<Object, Object> {
+        
+        public boolean filtersDestination() {
+            return true;
+        }
+        
+        public <S, D> boolean shouldMap(final Type<S> sourceType, final String sourceName, final S source, final Type<D> destType, final String destName,
+                final D dest, final MappingContext mappingContext) {
+            if ("age".equals(sourceName) || "address.street".equals(sourceName)) {
+                return false;
+            }
+            return true;
+        }
+        
+        @SuppressWarnings("unchecked")
+		public <D> D filterDestination(D destinationValue, final Type<?> sourceType, final String sourceName, final Type<D> destType,
+                final String destName, final MappingContext mappingContext) {
+            if ("creditCardNumber".equals(sourceName)) {
+                String cardMask = (String) destinationValue;
+                destinationValue = (D) cardMask.replace("*", "-");
+            }
+            return destinationValue;
         }
     }
     
@@ -130,7 +156,8 @@ public class FilterTestCase {
             return true;
         }
     
-        @Override
+        @SuppressWarnings("unchecked")
+		@Override
         public <S extends Number> S filterSource(S sourceValue, final Type<S> sourceType, final String sourceName, final Type<?> destType,
                 final String destName, final MappingContext mappingContext) {
             return (S) new BigDecimal(((Double) sourceValue) * 2);
@@ -176,10 +203,114 @@ public class FilterTestCase {
         Assert.assertNull(dest.infos);
     }
     
+    @Test
+    public void mapDestinationIfNull() throws Throwable {
+    	
+    	MapperFactory factory = MappingUtil.getMapperFactory();
+        factory.classMap(Source.class, Destination.class)
+               .field("address.street", "street")
+               .field("address.city", "city")
+               .byDefault().register();
+        
+        factory.registerFilter(new OverwriteProtectionFilter());
+        factory.registerFilter(new SecurityFilter());
+        
+        MapperFacade mapper = factory.getMapperFacade();
+        
+        Source source = new Source();
+        source.name = new SourceName();
+        source.name.first = "Joe";
+        source.name.last = "Smith";
+        source.id = 2L;
+        source.age = 35;
+        source.cost = 12.34d;
+        source.creditCardNumber = "5432109876543210";
+        source.address = new SourceAddress();
+        source.address.street = "ashbury";
+        source.address.city = "SF";
+        
+        Destination dest = new Destination();
+        dest.city = "NY";
+        dest.creditCardNumber = "************4444";
+        
+        mapper.map(source, dest);
+        
+        /*
+         * We expect that dest.city and dest.creditCardNumber should
+         * not have been changed because they were non-null
+         */
+        
+        Assert.assertEquals(source.name.first, dest.name.first);
+        Assert.assertEquals(source.name.last, dest.name.last);
+        Assert.assertNull(dest.age);
+        Assert.assertEquals(source.cost, dest.cost.doubleValue(), 0.01d);
+        Assert.assertEquals("************4444", dest.creditCardNumber);
+        Assert.assertNull(dest.street);
+        Assert.assertEquals("NY", dest.city);
+    }
+    
+    
+    @Test
+    public void filtersAreAppliedInRegisteredOrder() throws Throwable {
+    	MapperFactory factory = MappingUtil.getMapperFactory();
+        factory.classMap(Source.class, Destination.class)
+               .field("address.street", "street")
+               .field("address.city", "city")
+               .byDefault().register();
+        
+        factory.registerFilter(new SecurityFilter());
+        factory.registerFilter(new SecurityFilter2());
+        
+        MapperFacade mapper = factory.getMapperFacade();
+        
+        Source source = new Source();
+        source.name = new SourceName();
+        source.name.first = "Joe";
+        source.name.last = "Smith";
+        source.id = 2L;
+        source.age = 35;
+        source.cost = 12.34d;
+        source.creditCardNumber = "5432109876543210";
+        source.address = new SourceAddress();
+        source.address.street = "ashbury";
+        source.address.city = "SF";
+        
+        Destination dest = mapper.map(source, Destination.class);
+        
+        Assert.assertEquals(source.name.first, dest.name.first);
+        Assert.assertEquals(source.name.last, dest.name.last);
+        Assert.assertNull(dest.age);
+        Assert.assertEquals(source.cost, dest.cost.doubleValue(), 0.01d);
+        Assert.assertEquals("------------3210", dest.creditCardNumber);
+        Assert.assertNull(dest.street);
+        Assert.assertEquals("SF", dest.city);
+    }
+    
+    /**
+     * OverwriteProtectionFilter is a filter that only allows a mapping to take
+     * place if the destination value is null.
+     */
+    private static class OverwriteProtectionFilter extends NullFilter<Object, Object> {
+
+		@Override
+		public <S, D> boolean shouldMap(Type<S> sourceType, String sourceName,
+				S source, Type<D> destType, String destName, D dest,
+				MappingContext mappingContext) {
+			return dest == null;
+		}
+
+		@Override
+		public boolean appliesTo(Property source, Property destination) {
+			return !destination.isPrimitive();
+		}
+    	
+    }
+    
+    
     private static class InfoFilter extends NullFilter<Map<?, ?>, List<?>> {
         @Override
         public <S extends Map<?, ?>, D extends List<?>> boolean shouldMap(final Type<S> sourceType, final String sourceName, final S source, final Type<D> destType, final String destName,
-                final MappingContext mappingContext) {
+                final D dest, final MappingContext mappingContext) {
             if (sourceName.equals("infoMap")) {
                 return false;
             }
