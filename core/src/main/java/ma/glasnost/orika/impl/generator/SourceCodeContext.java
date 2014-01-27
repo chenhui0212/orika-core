@@ -755,6 +755,10 @@ public class SourceCodeContext {
             Converter<Object, Object> converter = getConverter(fieldMap, fieldMap.getConverterId());
             source.setConverter(converter);
             
+            if (shouldCaptureFieldContext) {
+                beginCaptureFieldContext(out, fieldMap, source, destination);
+            }
+            
             VariableRef[] filteredProperties = applyFilters(source, destination, out, closing);
             source = filteredProperties[0];
             destination = filteredProperties[1];
@@ -765,34 +769,37 @@ public class SourceCodeContext {
                     if (code == null || "".equals(code)) {
                         throw new IllegalStateException("empty code returned for spec " + spec + ", sourceProperty = " + source
                                 + ", destinationProperty = " + destination);
-                    } else if (shouldCaptureFieldContext) {
-                        code = captureFieldContext(code, fieldMap, source, destination);
-                    }
+                    } 
                     out.append(code);
+                    
                     break;
                 }
             }
-            
             out.append(closing.toString());
+            if (shouldCaptureFieldContext) {
+                endCaptureFieldContext(out);
+            }
         }
         return out.toString();
     }
     
-    private String captureFieldContext(String code, FieldMap fieldMap, VariableRef source, VariableRef dest) {
-        return String.format("mappingContext.beginMappingField(\"%s\", %s, %s, \"%s\", %s, %s);\n"+
-                "try{\n" +
-                "\t%s\n" +
-                "} finally {\n" +
-                "\tmappingContext.endMappingField();\n" +
-                "}\n", 
+    private void beginCaptureFieldContext(StringBuilder out, FieldMap fieldMap, VariableRef source, VariableRef dest) {
+        out.append(format("mappingContext.beginMappingField(\"%s\", %s, %s, \"%s\", %s, %s);\n"+
+                "try{\n",
                 escapeQuotes(fieldMap.getSource().getExpression()), 
                 usedType(fieldMap.getAType()),
                 source.asWrapper(),
                 escapeQuotes(fieldMap.getDestination().getExpression()), 
                 usedType(fieldMap.getBType()),
-                dest.asWrapper(),
-                code
-                );
+                dest.asWrapper()
+                ));
+    }
+    
+    private void endCaptureFieldContext(StringBuilder out) {
+        out.append(
+                "} finally {\n" +
+                "\tmappingContext.endMappingField();\n" +
+                "}\n");
     }
     
     private String escapeQuotes(String string) {
