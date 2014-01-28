@@ -88,6 +88,7 @@ public class SourceCodeContext {
     private final Map<AggregateSpecification, List<FieldMap>> aggregateFieldMaps;
     private final MappingContext mappingContext;
     private final Collection<Filter<Object, Object>> filters;
+    private final boolean shouldCaptureFieldContext;
     
     /**
      * Constructs a new instance of SourceCodeContext
@@ -105,6 +106,7 @@ public class SourceCodeContext {
         this.compilerStrategy = (CompilerStrategy) mappingContext.getProperty(Properties.COMPILER_STRATEGY);
         this.propertyResolver = (PropertyResolverStrategy) mappingContext.getProperty(Properties.PROPERTY_RESOLVER_STRATEGY);
         this.filters = (Collection<Filter<Object, Object>>) mappingContext.getProperty(Properties.FILTERS);
+        this.shouldCaptureFieldContext = (Boolean)mappingContext.getProperty(Properties.CAPTURE_FIELD_CONTEXT);
         
         String safeBaseClassName = baseClassName.replace("[]", "$Array");
         this.sourceBuilder = new StringBuilder();
@@ -712,9 +714,9 @@ public class SourceCodeContext {
      * 
      * @param fieldMap
      *            the FieldMap describing fields to be mapped
-     * @param sourceProperty
+     * @param source
      *            a variable reference to the source property
-     * @param destinationProperty
+     * @param destination
      *            a variable reference to the destination property
      * @param destinationType
      *            the destination's type
@@ -722,56 +724,86 @@ public class SourceCodeContext {
      *            a StringBuilder to contain the debug output
      * @return a reference to <code>this</code> CodeSourceBuilder
      */
-    public String mapFields(FieldMap fieldMap, VariableRef sourceProperty, VariableRef destinationProperty, Type<?> destinationType,
+    public String mapFields(FieldMap fieldMap, VariableRef source, VariableRef destination, Type<?> destinationType,
             StringBuilder logDetails) {
         
         StringBuilder out = new StringBuilder();
         StringBuilder closing = new StringBuilder();
         
-        if (destinationProperty.isAssignable() || destinationProperty.type().isMultiOccurrence()
-                || !ClassUtil.isImmutable(destinationProperty.type())) {
+        if (destination.isAssignable() || destination.type().isMultiOccurrence()
+                || !ClassUtil.isImmutable(destination.type())) {
             
-            if (sourceProperty.isNestedProperty()) {
-                out.append(sourceProperty.ifPathNotNull());
+            if (source.isNestedProperty()) {
+                out.append(source.ifPathNotNull());
                 out.append("{ \n");
                 closing.append("\n}");
             }
             
             boolean mapNulls = AbstractSpecification.shouldMapNulls(fieldMap, this);
             
-            if (destinationProperty.isNullPathPossible()) {
-                if (!sourceProperty.isPrimitive()) {
+            if (destination.isNullPathPossible()) {
+                if (!source.isPrimitive()) {
                     if (!mapNulls) {
-                        out.append(sourceProperty.ifNotNull());
+                        out.append(source.ifNotNull());
                         out.append(" {\n");
                         closing.append("\n}");
                     }
                 }
-                out.append(assureInstanceExists(destinationProperty, sourceProperty));
+                out.append(assureInstanceExists(destination, source));
             }
             
             Converter<Object, Object> converter = getConverter(fieldMap, fieldMap.getConverterId());
-            sourceProperty.setConverter(converter);
+            source.setConverter(converter);
             
-            VariableRef[] filteredProperties = applyFilters(sourceProperty, destinationProperty, out, closing);
-            sourceProperty = filteredProperties[0];
-            destinationProperty = filteredProperties[1];
+            if (shouldCaptureFieldContext) {
+                beginCaptureFieldContext(out, fieldMap, source, destination);
+            }
+            
+            VariableRef[] filteredProperties = applyFilters(source, destination, out, closing);
+            source = filteredProperties[0];
+            destination = filteredProperties[1];
             
             for (Specification spec : codeGenerationStrategy.getSpecifications()) {
                 if (spec.appliesTo(fieldMap)) {
-                    String code = spec.generateMappingCode(fieldMap, sourceProperty, destinationProperty, this);
+                    String code = spec.generateMappingCode(fieldMap, source, destination, this);
                     if (code == null || "".equals(code)) {
-                        throw new IllegalStateException("empty code returned for spec " + spec + ", sourceProperty = " + sourceProperty
-                                + ", destinationProperty = " + destinationProperty);
-                    }
+                        throw new IllegalStateException("empty code returned for spec " + spec + ", sourceProperty = " + source
+                                + ", destinationProperty = " + destination);
+                    } 
                     out.append(code);
+                    
                     break;
                 }
             }
-            
             out.append(closing.toString());
+            if (shouldCaptureFieldContext) {
+                endCaptureFieldContext(out);
+            }
         }
         return out.toString();
+    }
+    
+    private void beginCaptureFieldContext(StringBuilder out, FieldMap fieldMap, VariableRef source, VariableRef dest) {
+        out.append(format("mappingContext.beginMappingField(\"%s\", %s, %s, \"%s\", %s, %s);\n"+
+                "try{\n",
+                escapeQuotes(fieldMap.getSource().getExpression()), 
+                usedType(fieldMap.getAType()),
+                source.asWrapper(),
+                escapeQuotes(fieldMap.getDestination().getExpression()), 
+                usedType(fieldMap.getBType()),
+                dest.asWrapper()
+                ));
+    }
+    
+    private void endCaptureFieldContext(StringBuilder out) {
+        out.append(
+                "} finally {\n" +
+                "\tmappingContext.endMappingField();\n" +
+                "}\n");
+    }
+    
+    private String escapeQuotes(String string) {
+        return string.replaceAll("(?<!\\\\)\"", "\\\\\"");
     }
     
     public VariableRef[] applyFilters(VariableRef sourceProperty, VariableRef destinationProperty, StringBuilder out, StringBuilder closing) {

@@ -465,9 +465,16 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
         
         int i = 0;
-        for (final S s : source) {
-            destination[i++] = map(s, sourceType, destinationType);
+        ElementStrategyContext<S, D> elementContext = new ElementStrategyContext<S, D>(context, sourceType, destinationType);
+        for (final S item : source) {
+            if (item == null) {
+                continue;
+            } else {
+                destination[i++] = mapElement(item, elementContext);
+            }
         }
+        
+        
         return destination;
     }
     
@@ -479,9 +486,15 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
         
         int i = 0;
-        for (final S s : source) {
-            destination[i++] = map(s, sourceType, destinationType, context);
+        ElementStrategyContext<S, D> elementContext = new ElementStrategyContext<S, D>(context, sourceType, destinationType);
+        for (final S item : source) {
+            if (item == null) {
+                continue;
+            } else {
+                destination[i++] = mapElement(item, elementContext);
+            }
         }
+        
         return destination;
     }
     
