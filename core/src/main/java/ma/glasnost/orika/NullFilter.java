@@ -46,7 +46,7 @@ public class NullFilter<A, B> extends CustomFilter<A, B> {
      * @return true
      */
     public <S extends A, D extends B> boolean shouldMap(final Type<S> sourceType, final String sourceName, final S source, final Type<D> destType, final String destName,
-            final MappingContext mappingContext) {
+            D dest, final MappingContext mappingContext) {
         return true;
     }
 

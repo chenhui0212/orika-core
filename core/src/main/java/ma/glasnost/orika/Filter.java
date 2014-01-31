@@ -85,20 +85,22 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      *            the type of the destination field
      * @param destName
      *            the name of the destination field
+     * @param dest
+     *            the value of the destination field
      * @param mappingContext
      *            the current mapping context
      * @return true if the fields represented by these types and names
      */
     public <S extends A, D extends B> boolean shouldMap(Type<S> sourceType, String sourceName, S source, Type<D> destType, String destName,
-            MappingContext mappingContext);
+            D dest, MappingContext mappingContext);
     
     /**
-     * This method is called to provide the Filter an opportunity to modify the destination
-     * field's value in some way before it is mapped onto the destination type. 
+     * This method is called to provide the Filter an opportunity to modify the
+     * destination field's value in some way before it is mapped onto the
+     * destination type.
      * <p>
-     * Note that the
-     * return value should still be an instance of the provided destination type, else ClassCastException 
-     * will likely occur. 
+     * Note that the return value should still be an instance of the provided
+     * destination type, else ClassCastException will likely occur.
      * 
      * @param destinationValue
      *            the destination value
@@ -118,13 +120,13 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
             MappingContext mappingContext);
     
     /**
-     * This method is called to provide the Filter an opportunity to replace the source
-     * field value before it is passed into the mapping code which transforms it to the 
-     * destination type. 
+     * This method is called to provide the Filter an opportunity to replace the
+     * source field value before it is passed into the mapping code which
+     * transforms it to the destination type.
      * <p>
-     * It's recommended that the filter should return a new instance if it's necessary to 
-     * modify the source, as a mapping request is not generally expected to have side 
-     * effects on the source.
+     * It's recommended that the filter should return a new instance if it's
+     * necessary to modify the source, as a mapping request is not generally
+     * expected to have side effects on the source.
      * 
      * @param sourceValue
      *            the source value
