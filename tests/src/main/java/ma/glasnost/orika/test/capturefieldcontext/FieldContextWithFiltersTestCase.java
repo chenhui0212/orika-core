@@ -137,8 +137,11 @@ public class FieldContextWithFiltersTestCase {
 	public static class AddressDepthFilter extends NullFilter<Object, Object> {
         
         public <S, D> boolean shouldMap(final Type<S> sourceType, final String sourceName, final S source, final Type<D> destType, final String destName,
-                final MappingContext mappingContext) {
-            return !"address".equals(sourceName) || 
+            final D dest, final MappingContext mappingContext) {
+            /*
+             * Don't map nested addresses
+             */
+        	return !"address".equals(sourceName) || 
             		"source.address".equals(mappingContext.getFullyQualifiedSourcePath());
         }
     }
