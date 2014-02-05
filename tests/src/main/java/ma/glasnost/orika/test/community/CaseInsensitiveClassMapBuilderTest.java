@@ -21,7 +21,6 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.CaseInsensitiveClassMapBuilder;
-import ma.glasnost.orika.metadata.CaseInsensitiveClassMapBuilder2;
 
 import org.junit.Test;
 
