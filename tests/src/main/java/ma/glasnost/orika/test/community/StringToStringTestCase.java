@@ -21,6 +21,7 @@ public class StringToStringTestCase {
         MapperFacade mapperFacade = factory.getMapperFacade();
 
         Class1 class1 = new Class1();
+        class1.setString("");
 
         Class2 class2 = mapperFacade.map(class1, Class2.class);
 
