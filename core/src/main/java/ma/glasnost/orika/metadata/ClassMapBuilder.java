@@ -25,6 +25,7 @@ import static ma.glasnost.orika.impl.Specifications.aOneToManyElementMap;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -153,17 +154,27 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
             toProcess.put("", selfReferenceProperty);
         }
         
+        Set<Property> tracked = new HashSet<Property>(250);
+        
         while (!toProcess.isEmpty()) {
             
+        
             Entry<String, Property> entry = toProcess.entrySet().iterator().next();
             if (!entry.getKey().equals("class")) {
                 Property owningProperty = entry.getValue();
                 Type<?> propertyType = owningProperty.getType();
+                if(tracked.contains(owningProperty)) {
+                	toProcess.remove(entry.getKey());
+                	continue;
+                }
+                tracked.add(owningProperty);
                 if (!ClassUtil.isImmutable(propertyType)) {
                     Map<String, Property> props = propertyResolver.getProperties(propertyType);
                     if (propertyType.isMap()) {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getNestedType(1));
                         for (Entry<String, Property> prop: valueProperties.entrySet()) {
+                        	if (tracked.contains(prop.getValue()))
+                        		continue;
                             Property elementProp = new NestedElementProperty(entry.getValue(), prop.getValue(), propertyResolver);
                             String key = entry.getKey() + PropertyResolver.ELEMENT_PROPERT_PREFIX + prop.getKey() + PropertyResolver.ELEMENT_PROPERT_SUFFIX;
                             toProcess.put(key, elementProp);
@@ -171,6 +182,8 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
                     } else if (propertyType.isList()) {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getNestedType(0));
                         for (Entry<String, Property> prop: valueProperties.entrySet()) {
+                        	if (tracked.contains(prop.getValue()))
+                        		continue;
                             Property elementProp = new NestedElementProperty(owningProperty, prop.getValue(), propertyResolver);
                             String key = entry.getKey() + PropertyResolver.ELEMENT_PROPERT_PREFIX + prop.getValue().getExpression() + PropertyResolver.ELEMENT_PROPERT_SUFFIX;
                             toProcess.put(key, elementProp);
@@ -178,13 +191,17 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
                     } else if (propertyType.isArray()) {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getComponentType());
                         for (Entry<String, Property> prop: valueProperties.entrySet()) {
+                        	
+                        	if (tracked.contains(prop.getValue()))
+                        		continue;
+                        	
                             Property elementProp = new NestedElementProperty(entry.getValue(), prop.getValue(), propertyResolver);
                             String key = entry.getKey() + PropertyResolver.ELEMENT_PROPERT_PREFIX + prop.getKey() + PropertyResolver.ELEMENT_PROPERT_SUFFIX;
                             toProcess.put(key, elementProp);
                         }
                     } else if (!props.isEmpty()) {
                         for (Entry<String, Property> property : props.entrySet()) {
-                            if (!property.getKey().equals("class")) {
+                            if (!property.getKey().equals("class") && !tracked.contains(property.getValue())) {
                                 String expression = entry.getKey() + "." + property.getKey();
                                 toProcess.put(expression, resolveProperty(type, expression));
                             }

@@ -317,7 +317,7 @@ public class Property {
     
     @Override
     public int hashCode() {
-        int result = name.hashCode();
+        int result = expression.hashCode();
         result = 31 * result + (getter != null ? getter.hashCode() : 0);
         result = 31 * result + (setter != null ? setter.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
@@ -742,5 +742,6 @@ public class Property {
         }
         
     }
+    
     
 }
