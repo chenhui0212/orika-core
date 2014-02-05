@@ -369,7 +369,6 @@ public class VariableRef {
     protected static String cast(VariableRef value, Type<?> type) {
         String castValue = value.toString();
         String typeName = type.getCanonicalName();
-        
         if (type.isPrimitive()) {
             if (value.isWrapper()) {
                 castValue = format("%s.%sValue()", castValue, type);
@@ -381,7 +380,7 @@ public class VariableRef {
         } else if (type.isPrimitiveWrapper() && value.isPrimitive()) {
             castValue = format("%s.valueOf(%s)", type.getCanonicalName(), castValue);
         } else if (type.isString() && !value.type().isString()) {
-            castValue = "\"\" + " + castValue;
+            castValue = "null".equals(castValue) ? castValue:  "\"\" + " + castValue;
         } else if (!castValue.replace("(", "").startsWith(typeName)){
             castValue = "((" + typeName + ")" + castValue + ")";
         }
