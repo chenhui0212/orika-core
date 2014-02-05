@@ -351,7 +351,7 @@ public class VariableRef {
                  * detect and avoid the case where we're applying this to a
                  * 'castValue' that is already a String ?
                  */
-                castValue = "\"\" + " + castValue;
+                castValue = format("(%s) ", typeName) + castValue;
             } else if (!value.startsWith("(" + typeName + ")") && !value.startsWith("((" + typeName + ")")) {
                 castValue = "((" + typeName + ")" + castValue + ")";
             }
