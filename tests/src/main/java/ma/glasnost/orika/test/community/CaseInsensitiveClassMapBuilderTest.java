@@ -24,9 +24,11 @@ import ma.glasnost.orika.metadata.CaseInsensitiveClassMapBuilder;
 
 import org.junit.Test;
 
+import java.util.List;
+
 public class CaseInsensitiveClassMapBuilderTest {
     public static class Source {
-        public Destination destination;
+        public List<Destination> destination;
     }
 
     public static class Destination {

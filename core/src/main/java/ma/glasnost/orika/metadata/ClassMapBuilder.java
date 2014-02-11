@@ -154,7 +154,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
             toProcess.put("", selfReferenceProperty);
         }
         
-        Set<Property> tracked = new HashSet<Property>(250);
+        Tracker tracker = Tracker.current();
         
         while (!toProcess.isEmpty()) {
             
@@ -163,17 +163,18 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
             if (!entry.getKey().equals("class")) {
                 Property owningProperty = entry.getValue();
                 Type<?> propertyType = owningProperty.getType();
-                if(tracked.contains(owningProperty)) {
+                if(tracker.has(owningProperty, type)) {
                 	toProcess.remove(entry.getKey());
                 	continue;
                 }
-                tracked.add(owningProperty);
+                tracker.track(owningProperty, type);
+                
                 if (!ClassUtil.isImmutable(propertyType)) {
                     Map<String, Property> props = propertyResolver.getProperties(propertyType);
                     if (propertyType.isMap()) {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getNestedType(1));
                         for (Entry<String, Property> prop: valueProperties.entrySet()) {
-                        	if (tracked.contains(prop.getValue()))
+                        	if (tracker.has(prop.getValue(), propertyType))
                         		continue;
                             Property elementProp = new NestedElementProperty(entry.getValue(), prop.getValue(), propertyResolver);
                             String key = entry.getKey() + PropertyResolver.ELEMENT_PROPERT_PREFIX + prop.getKey() + PropertyResolver.ELEMENT_PROPERT_SUFFIX;
@@ -182,7 +183,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
                     } else if (propertyType.isList()) {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getNestedType(0));
                         for (Entry<String, Property> prop: valueProperties.entrySet()) {
-                        	if (tracked.contains(prop.getValue()))
+                        	if (tracker.has(prop.getValue(), propertyType))
                         		continue;
                             Property elementProp = new NestedElementProperty(owningProperty, prop.getValue(), propertyResolver);
                             String key = entry.getKey() + PropertyResolver.ELEMENT_PROPERT_PREFIX + prop.getValue().getExpression() + PropertyResolver.ELEMENT_PROPERT_SUFFIX;
@@ -192,7 +193,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getComponentType());
                         for (Entry<String, Property> prop: valueProperties.entrySet()) {
                         	
-                        	if (tracked.contains(prop.getValue()))
+                        	if (tracker.has(prop.getValue(), propertyType))
                         		continue;
                         	
                             Property elementProp = new NestedElementProperty(entry.getValue(), prop.getValue(), propertyResolver);
@@ -201,7 +202,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
                         }
                     } else if (!props.isEmpty()) {
                         for (Entry<String, Property> property : props.entrySet()) {
-                            if (!property.getKey().equals("class") && !tracked.contains(property.getValue())) {
+                            if (!property.getKey().equals("class") && !tracker.has(property.getValue(), propertyType)) {
                                 String expression = entry.getKey() + "." + property.getKey();
                                 toProcess.put(expression, resolveProperty(type, expression));
                             }
