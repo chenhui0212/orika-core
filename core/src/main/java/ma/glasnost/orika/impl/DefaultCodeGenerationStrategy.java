@@ -56,7 +56,7 @@ public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
     private final List<Specification> specifications;
     private final List<AggregateSpecification> aggregateSpecifications;
     
-    DefaultCodeGenerationStrategy() {
+    public DefaultCodeGenerationStrategy() {
         
         this.specifications = new CopyOnWriteArrayList<Specification>(
                 Arrays.asList(
@@ -108,7 +108,7 @@ public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
         addSpec(this.specifications, spec, relativePosition, relativeSpec);
     }
     
-    private static <T> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<T> relativeSpec) {
+    protected static <T> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<T> relativeSpec) {
         
         if (relativePosition == null || relativePosition == Position.LAST) {
             specifications.add(spec);

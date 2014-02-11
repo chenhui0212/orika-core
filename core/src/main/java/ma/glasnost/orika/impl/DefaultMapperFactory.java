@@ -268,7 +268,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         /**
          * The CodeGenerationStrategy configured for the MapperFactory
          */
-        protected CodeGenerationStrategy codeGenerationStrategy = new DefaultCodeGenerationStrategy();
+        protected CodeGenerationStrategy codeGenerationStrategy;
         /**
          * The configured value of whether or not to use built-in converters for
          * the MapperFactory
@@ -318,6 +318,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "true"));
             favorExtension = valueOf(getProperty(FAVOR_EXTENSION, "false"));
             captureFieldContext = valueOf(getProperty(CAPTURE_FIELD_CONTEXT, "false"));
+            codeGenerationStrategy = new DefaultCodeGenerationStrategy();
         }
         
         /**
@@ -541,6 +542,20 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          */
         public CodeGenerationStrategy getCodeGenerationStrategy() {
             return codeGenerationStrategy;
+        }
+        
+        /**
+         * Configure  a CodeGenerationStrategy with this
+         * MapperFactory, which may be used to configure/customize the
+         * individual mapping Specifications that are used to generate code for
+         * the various mapping scenarios.
+         *
+         * @param codeGenerationStrategy
+         * @return a reference to <code>this</code> MapperFactoryBuilder
+         */
+        public B codeGenerationStrategy(CodeGenerationStrategy codeGenerationStrategy) {
+            this.codeGenerationStrategy  = codeGenerationStrategy ;
+            return self();
         }
         
         /**
