@@ -257,8 +257,8 @@ public class ScoringClassMapBuilder<A, B> extends ClassMapBuilder<A, B> {
          */
         PriorityQueue<FieldMatchScore> matchScores = new PriorityQueue<FieldMatchScore>();
         
-        Map<String, Property> propertiesForA = getPropertyExpressions(getAType());
-        Map<String, Property> propertiesForB = getPropertyExpressions(getBType());
+        Map<String, Property> propertiesForA = getPropertyExpressions(getAType(), new PropertyTracker());
+        Map<String, Property> propertiesForB = getPropertyExpressions(getBType(), new PropertyTracker());
         
         for (final Entry<String, Property> propertyA : propertiesForA.entrySet()) {
             if (!propertyA.getValue().getName().equals("class")) {

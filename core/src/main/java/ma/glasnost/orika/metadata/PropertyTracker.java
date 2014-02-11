@@ -2,9 +2,17 @@ package ma.glasnost.orika.metadata;
 
 import java.util.HashSet;
 
-public class Tracker {
+public class PropertyTracker {
 
-	private HashSet<TypePropertyKey> tracked = new HashSet<TypePropertyKey>();
+	private HashSet<TypePropertyKey> tracked;
+
+	/**
+	 * 
+	 */
+	public PropertyTracker() {
+		super();
+		tracked = new HashSet<TypePropertyKey>();
+	}
 
 	public void track(Property p, Type<?> owner) {
 		TypePropertyKey e = new TypePropertyKey(p, owner);
@@ -80,14 +88,5 @@ public class Tracker {
 				return false;
 			return true;
 		}
-	}
-	
-	private static ThreadLocal<Tracker> current = new ThreadLocal<Tracker>();
-
-	public static Tracker current() {
-		if(current.get() == null) {
-			current.set(new Tracker());
-		}
-		return current.get();
 	}
 }

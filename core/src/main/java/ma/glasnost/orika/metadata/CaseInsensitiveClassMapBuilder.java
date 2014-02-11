@@ -72,12 +72,14 @@ public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
         super(aType, bType, mapperFactory, propertyResolver, defaults);
         
         lowercasePropertiesForA = new LinkedHashMap<String, String>();
-        for (String prop: this.getPropertyExpressions(getAType()).keySet()) {
+        Map<String, Property> propertyExpressions = this.getPropertyExpressions(getAType(), new PropertyTracker());
+		for (String prop: propertyExpressions.keySet()) {
             lowercasePropertiesForA.put(prop.toLowerCase(), prop);
         }
         
         lowercasePropertiesForB = new LinkedHashMap<String, String>();
-        for (String prop: this.getPropertyExpressions(getBType()).keySet()) {
+        propertyExpressions = this.getPropertyExpressions(getBType(), new PropertyTracker());
+		for (String prop: propertyExpressions.keySet()) {
             lowercasePropertiesForB.put(prop.toLowerCase(), prop);
         }
         initialized = true;
