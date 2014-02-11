@@ -25,7 +25,6 @@ import org.junit.Assert;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
@@ -38,7 +37,7 @@ public class MixConversionMappingTestCase {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
         
-        factory.registerClassMap(ClassMapBuilder.map(B.class, D.class).fieldMap("instanceSet").add().byDefault().toClassMap());
+        factory.classMap(B.class, D.class).fieldMap("instanceSet").add().byDefault().register();
         
         factory.getConverterFactory().registerConverter(new CustomConverter<Set<A>, Set<C>>() {
             

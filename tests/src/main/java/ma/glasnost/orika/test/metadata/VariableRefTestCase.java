@@ -21,12 +21,10 @@ package ma.glasnost.orika.test.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-
 import ma.glasnost.orika.impl.UtilityResolver;
 import ma.glasnost.orika.metadata.Property;
-import ma.glasnost.orika.property.IntrospectorPropertyResolver;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class VariableRefTestCase {

@@ -35,7 +35,7 @@ public class InverseMappingTestCase {
     public void testInverseOneToOneMapping() {
         MapperFactory mapperFactory = MappingUtil.getMapperFactory();
         
-        ClassMapBuilder<PersonDTO, Person> classMapBuilder = ClassMapBuilder.map(PersonDTO.class, Person.class);
+        ClassMapBuilder<PersonDTO, Person> classMapBuilder = mapperFactory.classMap(PersonDTO.class, Person.class);
         classMapBuilder.fieldMap("address").bInverse("person").add();
         mapperFactory.registerClassMap(classMapBuilder.byDefault().toClassMap());
         
@@ -62,11 +62,9 @@ public class InverseMappingTestCase {
     public void testInverseOneToManyMapping() {
         MapperFactory mapperFactory = MappingUtil.getMapperFactory();
         
-        ClassMapBuilder<PublisherDTO, Publisher> classMapBuilder = ClassMapBuilder.map(PublisherDTO.class, Publisher.class);
+        ClassMapBuilder<PublisherDTO, Publisher> classMapBuilder =mapperFactory.classMap(PublisherDTO.class, Publisher.class);
         classMapBuilder.fieldMap("books").bInverse("publisher").add();
         mapperFactory.registerClassMap(classMapBuilder.byDefault().toClassMap());
-        
-        mapperFactory.build();
         
         MapperFacade mapper = mapperFactory.getMapperFacade();
         
@@ -90,11 +88,9 @@ public class InverseMappingTestCase {
     public void testInverseManyToOneMapping() {
         MapperFactory mapperFactory = MappingUtil.getMapperFactory();
         
-        ClassMapBuilder<BookDTO, Book> classMapBuilder = ClassMapBuilder.map(BookDTO.class, Book.class);
+        ClassMapBuilder<BookDTO, Book> classMapBuilder = mapperFactory.classMap(BookDTO.class, Book.class);
         classMapBuilder.fieldMap("author").bInverse("books").add();
         mapperFactory.registerClassMap(classMapBuilder.byDefault().toClassMap());
-        
-        mapperFactory.build();
         
         MapperFacade mapper = mapperFactory.getMapperFacade();
         
@@ -115,11 +111,10 @@ public class InverseMappingTestCase {
     public void testInverseManyToManyMapping() {
         MapperFactory mapperFactory = MappingUtil.getMapperFactory();
         
-        ClassMapBuilder<ReaderDTO, Reader> classMapBuilder = ClassMapBuilder.map(ReaderDTO.class, Reader.class);
+        ClassMapBuilder<ReaderDTO, Reader> classMapBuilder = mapperFactory.classMap(ReaderDTO.class, Reader.class);
         classMapBuilder.fieldMap("books").bInverse("readers").add();
         mapperFactory.registerClassMap(classMapBuilder.byDefault().toClassMap());
         
-        mapperFactory.build();
         
         MapperFacade mapper = mapperFactory.getMapperFacade();
         
