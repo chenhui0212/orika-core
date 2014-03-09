@@ -345,13 +345,6 @@ public class VariableRef {
                 }
             } else if (type.isPrimitiveWrapper() && isPrimitiveLiteral(castValue, type)) {
                 castValue = format("%s.valueOf(%s)", type.getWrapperType().getCanonicalName(), castValue);
-            } else if (type.isString()) {
-                /*
-                 * This case should be avoided if at all possible; how can we
-                 * detect and avoid the case where we're applying this to a
-                 * 'castValue' that is already a String ?
-                 */
-                castValue = "\"\" + " + castValue;
             } else if (!value.startsWith("(" + typeName + ")") && !value.startsWith("((" + typeName + ")")) {
                 castValue = "((" + typeName + ")" + castValue + ")";
             }
