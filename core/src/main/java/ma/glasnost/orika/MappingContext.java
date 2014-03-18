@@ -406,7 +406,7 @@ public class MappingContext {
         String[] path = new String[fieldMappingStack.size()];
         int idx = 0;
         for (Object[] element : fieldMappingStack) {
-            path[idx++] = (String) element[StackElement.SOURCE_NAME.ordinal()];
+            path[idx++] = (String) element[StackElement.DEST_NAME.ordinal()];
         }
         return path;
     }

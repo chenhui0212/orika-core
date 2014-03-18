@@ -1,6 +1,7 @@
 package ma.glasnost.orika.test.capturefieldcontext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -51,7 +52,7 @@ public class FieldContextWithFiltersTestCase {
 		public String street;
 		public String city;
 		public String state;
-		public String postalCode;
+		public String zipCode;
 		public String country;
 	}
 	
@@ -69,6 +70,11 @@ public class FieldContextWithFiltersTestCase {
         factory.classMap(Person.class, PersonDto.class)
                .byDefault()
                .register();
+
+        factory.classMap(Address.class, AddressDto.class)
+                .field("postalCode", "zipCode")
+                .byDefault()
+                .register();
         
         factory.registerFilter(new AddressDepthFilter());
         
@@ -120,7 +126,7 @@ public class FieldContextWithFiltersTestCase {
         Assert.assertEquals(source.name.last, dest.name.last);
         Assert.assertEquals(source.address.city, dest.address.city);
         Assert.assertEquals(source.address.state, dest.address.state);
-        Assert.assertEquals(source.address.postalCode, dest.address.postalCode);
+        Assert.assertEquals(source.address.postalCode, dest.address.zipCode);
         Assert.assertEquals(source.address.street, dest.address.street);
         Assert.assertEquals(source.address.country, dest.address.country);
         
@@ -141,7 +147,10 @@ public class FieldContextWithFiltersTestCase {
             /*
              * Don't map nested addresses
              */
-        	return !"address".equals(sourceName) || 
+            if ("postalCode".equals(sourceName)) {
+                Assert.assertTrue(Arrays.equals(mappingContext.getDestinationExpressionPaths(), new String[]{"address", "zipCode"}));
+            }
+        	return !"address".equals(sourceName) ||
             		"source.address".equals(mappingContext.getFullyQualifiedSourcePath());
         }
     }
