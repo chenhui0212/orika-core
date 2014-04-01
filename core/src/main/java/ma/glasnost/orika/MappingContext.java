@@ -38,19 +38,19 @@ import ma.glasnost.orika.metadata.Type;
  */
 public class MappingContext {
     
-    private final Map<Type<?>, Type<?>> mapping;
-    private final OpenIntObjectHashMap typeCache;
-    private List<Map<MapperKey, ClassMap<?, ?>>> mappersSeen;
-    private Map<Object, Object> properties;
-    private Map<Object, Object> globalProperties;
-    private boolean isNew = true;
-    private boolean containsCycle = true;
-    private int depth;
-    private Type<?> resolvedSourceType;
-    private Type<?> resolvedDestinationType;
-    private MappingStrategy resolvedStrategy;
-    private List<Object[]> fieldMappingStack;
-    private boolean capturesFieldContext;
+    protected final Map<Type<?>, Type<?>> mapping;
+    protected final OpenIntObjectHashMap typeCache;
+    protected List<Map<MapperKey, ClassMap<?, ?>>> mappersSeen;
+    protected Map<Object, Object> properties;
+    protected Map<Object, Object> globalProperties;
+    protected boolean isNew = true;
+    protected boolean containsCycle = true;
+    protected int depth;
+    protected Type<?> resolvedSourceType;
+    protected Type<?> resolvedDestinationType;
+    protected MappingStrategy resolvedStrategy;
+    protected List<Object[]> fieldMappingStack;
+    protected boolean capturesFieldContext;
     
     public static enum StackElement {
         SOURCE_NAME, SOURCE_TYPE, SOURCE, DEST_NAME, DEST_TYPE, DEST;

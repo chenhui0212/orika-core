@@ -103,37 +103,37 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 public class DefaultMapperFactory implements MapperFactory, Reportable {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMapperFactory.class);
-    
-    private final MapperFacade mapperFacade;
-    private final MapperGenerator mapperGenerator;
-    private final ObjectFactoryGenerator objectFactoryGenerator;
-    
-    private final ConcurrentLinkedHashMap<MapperKey, ClassMap<Object, Object>> classMapRegistry;
-    private final SortedCollection<Mapper<Object, Object>> mappersRegistry;
-    private final SortedCollection<Filter<Object, Object>> filtersRegistry;
-    private final MappingContextFactory contextFactory;
-    private final MappingContextFactory nonCyclicContextFactory;
-    private final ConcurrentHashMap<Type<? extends Object>, ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>> objectFactoryRegistry;
-    private final ConcurrentHashMap<Type<?>, Set<Type<?>>> explicitAToBRegistry;
-    private final ConcurrentHashMap<Type<?>, Set<Type<?>>> dynamicAToBRegistry;
-    private final List<DefaultFieldMapper> defaultFieldMappers;
-    private final UnenhanceStrategy unenhanceStrategy;
-    private final UnenhanceStrategy userUnenahanceStrategy;
-    private final ConverterFactory converterFactory;
-    private final CompilerStrategy compilerStrategy;
-    private final PropertyResolverStrategy propertyResolverStrategy;
-    private final Map<java.lang.reflect.Type, Type<?>> concreteTypeRegistry;
-    private final ClassMapBuilderFactory classMapBuilderFactory;
-    private ClassMapBuilderFactory chainClassMapBuilderFactory;
-    private final Map<MapperKey, Set<ClassMap<Object, Object>>> usedMapperMetadataRegistry;
-    
-    private final boolean useAutoMapping;
-    private final boolean useBuiltinConverters;
-    private final boolean favorExtension;
-    private volatile boolean isBuilt = false;
-    private volatile boolean isBuilding = false;
-    
-    private final ExceptionUtility exceptionUtil;
+
+    protected final MapperFacade mapperFacade;
+    protected final MapperGenerator mapperGenerator;
+    protected final ObjectFactoryGenerator objectFactoryGenerator;
+
+    protected final ConcurrentLinkedHashMap<MapperKey, ClassMap<Object, Object>> classMapRegistry;
+    protected final SortedCollection<Mapper<Object, Object>> mappersRegistry;
+    protected final SortedCollection<Filter<Object, Object>> filtersRegistry;
+    protected final MappingContextFactory contextFactory;
+    protected final MappingContextFactory nonCyclicContextFactory;
+    protected final ConcurrentHashMap<Type<? extends Object>, ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>> objectFactoryRegistry;
+    protected final ConcurrentHashMap<Type<?>, Set<Type<?>>> explicitAToBRegistry;
+    protected final ConcurrentHashMap<Type<?>, Set<Type<?>>> dynamicAToBRegistry;
+    protected final List<DefaultFieldMapper> defaultFieldMappers;
+    protected final UnenhanceStrategy unenhanceStrategy;
+    protected final UnenhanceStrategy userUnenahanceStrategy;
+    protected final ConverterFactory converterFactory;
+    protected final CompilerStrategy compilerStrategy;
+    protected final PropertyResolverStrategy propertyResolverStrategy;
+    protected final Map<java.lang.reflect.Type, Type<?>> concreteTypeRegistry;
+    protected final ClassMapBuilderFactory classMapBuilderFactory;
+    protected ClassMapBuilderFactory chainClassMapBuilderFactory;
+    protected final Map<MapperKey, Set<ClassMap<Object, Object>>> usedMapperMetadataRegistry;
+
+    protected final boolean useAutoMapping;
+    protected final boolean useBuiltinConverters;
+    protected final boolean favorExtension;
+    protected volatile boolean isBuilt = false;
+    protected volatile boolean isBuilding = false;
+
+    protected final ExceptionUtility exceptionUtil;
     
     /**
      * Constructs a new instance of DefaultMapperFactory

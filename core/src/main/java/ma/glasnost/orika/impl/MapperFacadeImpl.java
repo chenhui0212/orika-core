@@ -61,14 +61,14 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * MapperFacadeImpl is the base implementation of MapperFacade
  */
 public class MapperFacadeImpl implements MapperFacade, Reportable {
-    
-    private final MapperFactory mapperFactory;
-    private final MappingContextFactory contextFactory;
-    private final UnenhanceStrategy unenhanceStrategy;
-    private final UnenhanceStrategy userUnenhanceStrategy;
-    private final ConcurrentLinkedHashMap<Key, MappingStrategy> strategyCache = getConcurrentLinkedHashMap(500);
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final ExceptionUtility exceptionUtil;
+
+    protected final MapperFactory mapperFactory;
+    protected final MappingContextFactory contextFactory;
+    protected final UnenhanceStrategy unenhanceStrategy;
+    protected final UnenhanceStrategy userUnenhanceStrategy;
+    protected final ConcurrentLinkedHashMap<Key, MappingStrategy> strategyCache = getConcurrentLinkedHashMap(500);
+    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final ExceptionUtility exceptionUtil;
     
     /**
      * Constructs a new MapperFacadeImpl
