@@ -72,6 +72,8 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
         
         this.classPool = new ClassPool();
         this.classPool.appendSystemPath();
+        
+        this.classPool.insertClassPath(new ClassClassPath(this.getClass()));
     }
     
     /**
@@ -256,7 +258,8 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
                 }
                 
             }
-            compiledClass = byteCodeClass.toClass();
+            compiledClass = byteCodeClass.toClass(this.getClass().getClassLoader(), this.getClass().getProtectionDomain());
+            
             
             writeClassFile(sourceCode, byteCodeClass);
             
