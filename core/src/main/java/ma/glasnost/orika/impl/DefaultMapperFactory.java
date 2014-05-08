@@ -1186,15 +1186,19 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 }
                 converterFactory.setMapperFacade(mapperFacade);
                 
-                buildClassMapRegistry();
-                
-                for (ClassMap<?, ?> classMap : classMapRegistry.values()) {
+                for (Map.Entry<MapperKey, ClassMap<Object, Object>> classMapEntry : classMapRegistry.entrySet()) {
+                    ClassMap<Object, Object> classMap = classMapEntry.getValue();
                     if (classMap.getUsedMappers().isEmpty()) {
-                        classMap = classMap.copyWithUsedMappers(discoverUsedMappers(classMap));
+                        classMapEntry.setValue(classMap.copyWithUsedMappers(discoverUsedMappers(classMap)));
                     }
+                }
+
+                buildClassMapRegistry();
+
+                for (ClassMap<?, ?> classMap : classMapRegistry.values()) {
                     buildMapper(classMap, false, context);
                 }
-                
+  
                 for (final ClassMap<?, ?> classMap : classMapRegistry.values()) {
                     buildObjectFactories(classMap, context);
                     initializeUsedMappers(classMap);
