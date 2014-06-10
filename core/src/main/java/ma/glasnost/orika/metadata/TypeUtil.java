@@ -91,7 +91,11 @@ abstract class TypeUtil {
                         }
                     } else {
                         Type<?> typeFromArgument = TypeFactory.valueOf(typeArg);
-                        defaultTypeArguments[i] = getMostSpecificType(typeFromReference, typeFromArgument, IGNORED_TYPES);
+                        try {
+                            defaultTypeArguments[i] = getMostSpecificType(typeFromReference, typeFromArgument, IGNORED_TYPES);
+                        } catch (IllegalArgumentException e) {
+                            defaultTypeArguments[i] = typeFromArgument;
+                        }
                         hasUnresolvedTypes = true;
                     }
                 }

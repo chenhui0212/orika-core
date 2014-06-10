@@ -260,7 +260,14 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 if (strategy == null) {
                     strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, false, context);
                 }
-                existingResult = (D) strategy.map(sourceObject, null, context);
+                if (strategy.getBType()  != null && !strategy.getBType().equals(destinationType)) {
+                    existingResult = (D) context.getMappedObject(sourceObject, strategy.getBType());
+                    if (existingResult == null) {
+                        existingResult = (D) strategy.map(sourceObject, null, context);
+                    }
+                } else {
+                    existingResult = (D) strategy.map(sourceObject, null, context);
+                }
             }
             return existingResult;
             
