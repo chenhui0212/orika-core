@@ -40,6 +40,16 @@ public abstract class GeneratedMapperBase extends GeneratedObjectBase implements
     public static boolean isUsedMapperOf(Mapper<Object, Object> usedMapper, Mapper<Object, Object> ofMapper) {
         return (ofMapper instanceof GeneratedMapperBase && ((GeneratedMapperBase) ofMapper).uses(usedMapper));
     }
+
+    /**
+     * Returns true if the <code>usedMappers</code>-array of the given mapper is initialized.
+     *
+     * @param mapper the mapper to check
+     * @return
+     */
+    public static boolean isUsedMappersInitialized(Mapper<Object, Object> mapper) {
+        return (mapper instanceof GeneratedMapperBase && ((GeneratedMapperBase) mapper).getUsedMappers() != null);
+    }
     
     protected Mapper<Object, Object> customMapper;
     private Mapper<Object, Object>[] usedMappers;
