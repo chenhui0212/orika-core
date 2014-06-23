@@ -1304,6 +1304,14 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         
         parentMappers.remove(mapper);
         
+        for (Mapper<Object, Object> curParrentMapper : parentMappers) {
+            if (!GeneratedMapperBase.isUsedMappersInitialized(curParrentMapper)) {
+                initializeUsedMappers(getClassMap(new MapperKey(
+                        curParrentMapper.getAType(),
+                        curParrentMapper.getBType())));
+            }
+        }
+
         /*
          * De-duplicate used mappers within the hierarchy
          * TODO: need to find a consistent way to avoid creating
