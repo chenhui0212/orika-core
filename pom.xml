@@ -54,7 +54,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<javassist.version>3.16.1-GA</javassist.version>
+		<javassist.version>3.18.2-GA</javassist.version>
 		<springframework.version>3.1.1.RELEASE</springframework.version>
 		<hibernate.version>3.3.2.GA</hibernate.version>
 		<junit.version>4.11</junit.version>
@@ -214,39 +214,24 @@
 
 			<!-- Dependencies for optional eclipse jdt/formatter -->
 			<dependency>
-				<groupId>org.eclipse.core</groupId>
-				<artifactId>commands</artifactId>
-				<version>3.3.0-I20070605-0010</version>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>org.eclipse.jdt.core</artifactId>
+				<version>3.10.0.v20140604-1726</version>
 			</dependency>
 			<dependency>
-				<groupId>org.eclipse</groupId>
-				<artifactId>osgi</artifactId>
-				<version>3.3.0-v20070530</version>
+				<groupId>org.eclipse.text</groupId>
+				<artifactId>org.eclipse.text</artifactId>
+				<version>3.5.101</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.core</groupId>
+				<artifactId>commands</artifactId>
+				<version>3.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.equinox</groupId>
 				<artifactId>common</artifactId>
-				<version>3.3.0-v20070426</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.core</groupId>
-				<artifactId>jobs</artifactId>
-				<version>3.3.0-v20070423</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.equinox</groupId>
-				<artifactId>registry</artifactId>
-				<version>3.3.0-v20070522</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.equinox</groupId>
-				<artifactId>preferences</artifactId>
-				<version>3.2.100-v20070522</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.core</groupId>
-				<artifactId>contenttype</artifactId>
-				<version>3.2.100-v20070319</version>
+				<version>3.6.200-v20130402-1505</version>
 			</dependency>
 			<!-- END Eclipse Test dependencies -->
 
