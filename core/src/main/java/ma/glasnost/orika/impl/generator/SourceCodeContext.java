@@ -758,8 +758,8 @@ public class SourceCodeContext {
             if (shouldCaptureFieldContext) {
                 beginCaptureFieldContext(out, fieldMap, source, destination);
             }
-            
-            VariableRef[] filteredProperties = applyFilters(source, destination, out, closing);
+            StringBuilder filterClosing = new StringBuilder();
+            VariableRef[] filteredProperties = applyFilters(source, destination, out, filterClosing);
             source = filteredProperties[0];
             destination = filteredProperties[1];
             
@@ -775,10 +775,11 @@ public class SourceCodeContext {
                     break;
                 }
             }
-            out.append(closing.toString());
+            out.append(filterClosing);
             if (shouldCaptureFieldContext) {
                 endCaptureFieldContext(out);
             }
+            out.append(closing.toString());
         }
         return out.toString();
     }
