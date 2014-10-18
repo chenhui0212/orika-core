@@ -31,7 +31,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingHint;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompiler;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
@@ -261,9 +260,7 @@ public class SuperTypeMappingTestCase {
         MapperFactory factory = MappingUtil.getMapperFactory();
         
         factory.getConverterFactory().registerConverter(new XMLGregorianCalendarToDateConverter());
-        
-        factory.build();
-        
+
         A a = new A();
         Date date = new Date();
         GregorianCalendar c = new GregorianCalendar();

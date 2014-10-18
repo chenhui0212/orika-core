@@ -53,8 +53,7 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
     @Override
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
         
-        return super.canConvert(sourceType, destinationType) || this.destinationType.isAssignableFrom(sourceType)
-                && this.sourceType.equals(destinationType);
+        return super.canConvert(sourceType, destinationType) || super.canConvert(destinationType, sourceType);
     }
     
     public String toString() {

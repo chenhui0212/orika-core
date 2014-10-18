@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.MapperFacade;
@@ -61,8 +62,7 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
 			Set<Converter<Object, Object>> converters) {
 		super();
 		this.converterCache = converterCache;
-		this.converters = new SortedCollection<Converter<Object, Object>>(converters,
-		        Ordering.CONVERTER);
+		this.converters = new CopyOnWriteArrayList<Converter<Object, Object>>();
 		this.convertersMap = new ConcurrentHashMap<String, Converter<Object, Object>>();
 	}
 
@@ -147,7 +147,6 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
 		}
 		if (converter != null)
 			return converter;
-
 		return null;
 	}
 
@@ -216,44 +215,6 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
 					"Cannot register converters after MapperFacade has been initialized");
 		}
 		convertersMap.put(converterId, (Converter<Object, Object>) converter);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ma.glasnost.orika.converter.ConverterFactory#registerConverter(ma.glasnost
-	 * .orika.Converter)
-	 */
-	@Deprecated
-	public <S, D> void registerConverter(
-			ma.glasnost.orika.converter.Converter<S, D> converter) {
-		if (mapperFacade != null) {
-			throw new IllegalStateException(
-					"Cannot register converters after MapperFactory begins building");
-		}
-		registerConverter(new ma.glasnost.orika.converter.Converter.LegacyConverter<S, D>(
-				converter));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ma.glasnost.orika.converter.ConverterFactory#registerConverter(java.lang
-	 * .String, ma.glasnost.orika.Converter)
-	 */
-	@Deprecated
-	public <S, D> void registerConverter(String converterId,
-			ma.glasnost.orika.converter.Converter<S, D> converter) {
-		if (mapperFacade != null) {
-			throw new IllegalStateException(
-					"Cannot register converters after MapperFactory begins building");
-		}
-		registerConverter(
-				converterId,
-				new ma.glasnost.orika.converter.Converter.LegacyConverter<S, D>(
-						converter));
 	}
 
 	/*

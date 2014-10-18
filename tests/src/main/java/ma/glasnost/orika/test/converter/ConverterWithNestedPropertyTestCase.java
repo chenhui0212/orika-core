@@ -18,14 +18,14 @@
 
 package ma.glasnost.orika.test.converter;
 
+import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.converter.TypeConverter;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
+import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 public class ConverterWithNestedPropertyTestCase {
     
@@ -33,8 +33,8 @@ public class ConverterWithNestedPropertyTestCase {
     public void testConverterWithNestedProperty() {
         MapperFactory mapperFactory = MappingUtil.getMapperFactory();
         
-        mapperFactory.getConverterFactory().registerConverter(new TypeConverter<Address, String>() {
-            public String convert(Address source, Class<? extends String> destinationClass) {
+        mapperFactory.getConverterFactory().registerConverter(new CustomConverter<Address, String>() {
+            public String convert(Address source, Type<? extends String> destinationClass) {
                 return source.getLine1() + " " + source.getLine2();
             }
         });

@@ -57,16 +57,7 @@ public interface ConverterFactory {
      */
     <S, D> void registerConverter(Converter<S, D> converter);
     
-    /**
-     * Register an identified converter
-     * 
-     * @param converterId
-     * @param converter
-     * @deprecated use {@link #registerConverter(Converter)} instead
-     */
-    @Deprecated
-    <S, D> void registerConverter(ma.glasnost.orika.converter.Converter<S, D> converter);
-    
+   
     /**
      * Register an identified converter
      * 
@@ -75,16 +66,6 @@ public interface ConverterFactory {
      * 
      */
     <S, D> void registerConverter(String converterId, Converter<S, D> converter);
-    
-    /**
-     * Register an identified converter
-     * 
-     * @param converterId
-     * @param converter
-     * @deprecated use {@link #registerConverter(String, Converter)} instead
-     */
-    @Deprecated
-    <S, D> void registerConverter(String converterId, ma.glasnost.orika.converter.Converter<S, D> converter);
     
     /**
      * Check if an identified converter exists

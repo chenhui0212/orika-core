@@ -28,6 +28,7 @@ import ma.glasnost.orika.metadata.TypeFactory;
  * 
  * It is recommend to extend this class to create your own custom converters.
  * 
+ * @author elaatifi@gmail.com
  * @author matt.deboer@gmail.com
  *
  * @param <S> the source type
@@ -35,8 +36,8 @@ import ma.glasnost.orika.metadata.TypeFactory;
  */
 public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Converter<S, D> {
     
-    protected final Type<S> sourceType;
-    protected final Type<D> destinationType;
+    protected Type<S> sourceType;
+    protected Type<D> destinationType;
     protected MapperFacade mapperFacade;
     
     public CustomConverter() {
@@ -54,7 +55,7 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     }
     
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
-        return this.sourceType.isAssignableFrom(sourceType) && this.destinationType.equals(destinationType);
+        return this.sourceType.equals(sourceType) && destinationType.equals(this.destinationType);
     }
     
     public void setMapperFacade(MapperFacade mapper) {
