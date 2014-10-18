@@ -21,14 +21,14 @@ package ma.glasnost.orika.test.community;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Assert;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class MixConversionMappingTestCase {
@@ -38,11 +38,11 @@ public class MixConversionMappingTestCase {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
         
-        factory.registerClassMap(ClassMapBuilder.map(B.class, D.class).fieldMap("instanceSet").add().byDefault().toClassMap());
+        factory.classMap(B.class, D.class).fieldMap("instanceSet").add().byDefault().register();
         
         factory.getConverterFactory().registerConverter(new CustomConverter<Set<A>, Set<C>>() {
             
-            public Set<C> convert(Set<A> source, Type<? extends Set<C>> destinationType) {
+            public Set<C> convert(Set<A> source, Type<? extends Set<C>> destinationType, MappingContext context) {
                 
                 C c = new C();
                 c.message = source.iterator().next().message + "-converted";

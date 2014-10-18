@@ -20,40 +20,41 @@ package ma.glasnost.orika.test.community;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.junit.Assert;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class Issue14TestCase {
     
     public static class Product {
-
+        
         private Date tempCal;
-
+        
         public Date getTempCal() {
             return tempCal;
         }
-
+        
         public void setTempCal(Date tempCal) {
             this.tempCal = tempCal;
         }
-
+        
     }
-
+    
     public static class ProductDTO {
-
+        
         private Calendar tempCal;
-
+        
         public Calendar getTempCal() {
             return tempCal;
         }
-
+        
         public void setTempCal(Calendar tempCal) {
             this.tempCal = tempCal;
         }
@@ -64,17 +65,17 @@ public class Issue14TestCase {
     public void testMapDateToCalendar() {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.getConverterFactory().registerConverter(new BidirectionalConverter<Date,Calendar>() {
-
+        factory.getConverterFactory().registerConverter(new BidirectionalConverter<Date, Calendar>() {
+            
             @Override
-            public Calendar convertTo(Date source, Type<Calendar> destinationType) {
+            public Calendar convertTo(Date source, Type<Calendar> destinationType, MappingContext context) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(source);
                 return cal;
             }
-
+            
             @Override
-            public Date convertFrom(Calendar source, Type<Date> destinationType) {
+            public Date convertFrom(Calendar source, Type<Date> destinationType, MappingContext context) {
                 return source.getTime();
             }
             
@@ -91,8 +92,7 @@ public class Issue14TestCase {
     
     @Test
     public void testMapDateToCalendar_usingBuiltinConverters() {
-        MapperFactory factory = new DefaultMapperFactory.Builder()
-                .useBuiltinConverters(true).build();
+        MapperFactory factory = new DefaultMapperFactory.Builder().useBuiltinConverters(true).build();
         MapperFacade mapper = factory.getMapperFacade();
         
         Product p = new Product();

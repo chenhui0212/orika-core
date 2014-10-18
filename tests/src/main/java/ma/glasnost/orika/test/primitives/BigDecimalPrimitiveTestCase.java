@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
@@ -36,7 +37,7 @@ public class BigDecimalPrimitiveTestCase {
         MapperFactory factory = MappingUtil.getMapperFactory();
         factory.getConverterFactory().registerConverter(new CustomConverter<BigDecimal, Double>() {
             
-            public Double convert(BigDecimal source, Type<? extends Double> destinationType) {
+            public Double convert(BigDecimal source, Type<? extends Double> destinationType, MappingContext context) {
                 return new Double(source.doubleValue());
             }
             

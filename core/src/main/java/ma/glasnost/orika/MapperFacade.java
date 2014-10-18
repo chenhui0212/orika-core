@@ -699,7 +699,7 @@ public interface MapperFacade {
      *            global converter is used
      * @return an instance of the converted destination type
      */
-    <S, D> D convert(S source, Class<D> destinationClass, String converterId);
+    <S, D> D convert(S source, Class<D> destinationClass, String converterId, MappingContext mappingContext);
     
     /**
      * Convert the source object into the appropriate destination type
@@ -715,7 +715,7 @@ public interface MapperFacade {
      *            global converter is used
      * @return an instance of the converted destination type
      */
-    <S, D> D convert(S source, Type<S> sourceType, Type<D> destinationType, String converterId);
+    <S, D> D convert(S source, Type<S> sourceType, Type<D> destinationType, String converterId, MappingContext mappingContext);
     
     /**
      * Map from one instance of java.util.Map to another.

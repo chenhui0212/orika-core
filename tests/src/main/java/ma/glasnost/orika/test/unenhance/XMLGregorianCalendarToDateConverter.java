@@ -22,11 +22,12 @@ import java.util.Date;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 
 public class XMLGregorianCalendarToDateConverter extends CustomConverter<XMLGregorianCalendar, Date> {
     
-    public Date convert(XMLGregorianCalendar source, Type<? extends Date> destinationClass) {
+    public Date convert(XMLGregorianCalendar source, Type<? extends Date> destinationClass, MappingContext context) {
         Date target = null;
         if (source != null) {
             target = source.toGregorianCalendar().getTime();

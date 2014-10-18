@@ -17,8 +17,8 @@
  */
 package ma.glasnost.orika.converter.builtin;
 
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
-
 
 /**
  * FromStringConverter provides conversion from String to one of the following
@@ -30,72 +30,71 @@ import ma.glasnost.orika.metadata.Type;
  * </ul>
  * 
  * @author matt.deboer@gmail.com
- *
+ * @author elaatifi@gmail.com
  */
 public class FromStringConverter extends BuiltinCustomConverter<Object, Object> {
-
-	
-	public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
-		return String.class == sourceType.getRawType() && destinationType.isConvertibleFromString();
-	}
-	
-	public Object convert(Object source, Type<? extends Object> destinationType) {
-		if (destinationType.isEnum()) {
-			return convertToEnum((String)source, destinationType);
-		} else if (destinationType.isPrimitive()) {
-			return convertToPrimitive((String)source, destinationType);
-		} else {
-			return convertToWrapper((String)source, destinationType);
-		} 
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Object convertToEnum(String source, Type<? extends Object> destinationType) {
-		return Enum.valueOf((Class<Enum>)destinationType.getRawType(), source.toString());
-	}
-	
-	private Object convertToPrimitive(String source, Type<? extends Object> destinationType) {
-		
-		if (Character.TYPE == destinationType.getRawType()) {
-			return source.charAt(0);
-		} else if (Byte.TYPE == destinationType.getRawType()) {
-			return Byte.parseByte(source);
-		} else if (Short.TYPE == destinationType.getRawType()) {
-			return Short.parseShort(source);	
-		} else if (Integer.TYPE == destinationType.getRawType()) {
-			return Integer.parseInt(source);
-		} else if (Long.TYPE == destinationType.getRawType()) {
-			return Long.parseLong(source);
-		} else if (Float.TYPE == destinationType.getRawType()) {
-			return Float.parseFloat(source);
-		} else if (Double.TYPE == destinationType.getRawType()) {
-			return Double.parseDouble(source);
-		} else if (Boolean.TYPE == destinationType.getRawType()) {
-			return Boolean.parseBoolean(source);
-		}
-		return null;
-	}
-	
-	private Object convertToWrapper(String source, Type<? extends Object> destinationType) {
-		
-		if (Character.class == destinationType.getRawType()) {
-			return Character.valueOf(source.charAt(0));
-		} else if (Byte.class == destinationType.getRawType()) {
-			return Byte.valueOf(source);
-		} else if (Short.class == destinationType.getRawType()) {
-			return Short.valueOf(source);	
-		} else if (Integer.class == destinationType.getRawType()) {
-			return Integer.valueOf(source);
-		} else if (Long.class == destinationType.getRawType()) {
-			return Long.valueOf(source);
-		} else if (Float.class == destinationType.getRawType()) {
-			return Float.valueOf(source);
-		} else if (Double.class == destinationType.getRawType()) {
-			return Double.valueOf(source);
-		} else if (Boolean.class == destinationType.getRawType()) {
-			return Boolean.valueOf(source);
-		}
-		return null;
-	}
-	
+    
+    public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
+        return String.class == sourceType.getRawType() && destinationType.isConvertibleFromString();
+    }
+    
+    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
+        if (destinationType.isEnum()) {
+            return convertToEnum((String) source, destinationType);
+        } else if (destinationType.isPrimitive()) {
+            return convertToPrimitive((String) source, destinationType);
+        } else {
+            return convertToWrapper((String) source, destinationType);
+        }
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private Object convertToEnum(String source, Type<? extends Object> destinationType) {
+        return Enum.valueOf((Class<Enum>) destinationType.getRawType(), source.toString());
+    }
+    
+    private Object convertToPrimitive(String source, Type<? extends Object> destinationType) {
+        
+        if (Character.TYPE == destinationType.getRawType()) {
+            return source.charAt(0);
+        } else if (Byte.TYPE == destinationType.getRawType()) {
+            return Byte.parseByte(source);
+        } else if (Short.TYPE == destinationType.getRawType()) {
+            return Short.parseShort(source);
+        } else if (Integer.TYPE == destinationType.getRawType()) {
+            return Integer.parseInt(source);
+        } else if (Long.TYPE == destinationType.getRawType()) {
+            return Long.parseLong(source);
+        } else if (Float.TYPE == destinationType.getRawType()) {
+            return Float.parseFloat(source);
+        } else if (Double.TYPE == destinationType.getRawType()) {
+            return Double.parseDouble(source);
+        } else if (Boolean.TYPE == destinationType.getRawType()) {
+            return Boolean.parseBoolean(source);
+        }
+        return null;
+    }
+    
+    private Object convertToWrapper(String source, Type<? extends Object> destinationType) {
+        
+        if (Character.class == destinationType.getRawType()) {
+            return Character.valueOf(source.charAt(0));
+        } else if (Byte.class == destinationType.getRawType()) {
+            return Byte.valueOf(source);
+        } else if (Short.class == destinationType.getRawType()) {
+            return Short.valueOf(source);
+        } else if (Integer.class == destinationType.getRawType()) {
+            return Integer.valueOf(source);
+        } else if (Long.class == destinationType.getRawType()) {
+            return Long.valueOf(source);
+        } else if (Float.class == destinationType.getRawType()) {
+            return Float.valueOf(source);
+        } else if (Double.class == destinationType.getRawType()) {
+            return Double.valueOf(source);
+        } else if (Boolean.class == destinationType.getRawType()) {
+            return Boolean.valueOf(source);
+        }
+        return null;
+    }
+    
 }

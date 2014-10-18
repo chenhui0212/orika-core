@@ -61,7 +61,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * MapperFacadeImpl is the base implementation of MapperFacade
  */
 public class MapperFacadeImpl implements MapperFacade, Reportable {
-
+    
     protected final MapperFactory mapperFactory;
     protected final MappingContextFactory contextFactory;
     protected final UnenhanceStrategy unenhanceStrategy;
@@ -241,11 +241,12 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     
     public <S, D> D map(final S sourceObject, final Type<S> sourceType, final Type<D> destinationType, final MappingContext context) {
         return map(sourceObject, sourceType, destinationType, context, null);
-    }        
-
+    }
+    
     @SuppressWarnings("unchecked")
-    public <S, D> D map(final S sourceObject, final Type<S> sourceType, final Type<D> destinationType, final MappingContext context, final MappingStrategy suggestedStrategy) {
-            
+    public <S, D> D map(final S sourceObject, final Type<S> sourceType, final Type<D> destinationType, final MappingContext context,
+            final MappingStrategy suggestedStrategy) {
+        
         MappingStrategy strategy = suggestedStrategy;
         try {
             if (destinationType == null) {
@@ -260,7 +261,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 if (strategy == null) {
                     strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, false, context);
                 }
-                if (strategy.getBType()  != null && !strategy.getBType().equals(destinationType)) {
+                if (strategy.getBType() != null && !strategy.getBType().equals(destinationType)) {
                     existingResult = (D) context.getMappedObject(sourceObject, strategy.getBType());
                     if (existingResult == null) {
                         existingResult = (D) strategy.map(sourceObject, null, context);
@@ -317,7 +318,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     
     public <S, D> void map(final S sourceObject, final D destinationObject, final Type<S> sourceType, final Type<D> destinationType,
             final MappingContext context) {
-        map(sourceObject,destinationObject, sourceType, destinationType, context, null);
+        map(sourceObject, destinationObject, sourceType, destinationType, context, null);
     }
     
     private <S, D> void map(final S sourceObject, final D destinationObject, final Type<S> sourceType, final Type<D> destinationType,
@@ -374,7 +375,8 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         map(sourceObject, destinationObject, context, null);
     }
     
-    private <S, D> void map(final S sourceObject, final D destinationObject, final MappingContext context, final MappingStrategy suggestedStrategy) {
+    private <S, D> void map(final S sourceObject, final D destinationObject, final MappingContext context,
+            final MappingStrategy suggestedStrategy) {
         
         MappingStrategy strategy = suggestedStrategy;
         try {
@@ -480,7 +482,6 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 destination[i++] = mapElement(item, elementContext);
             }
         }
-        
         
         return destination;
     }
@@ -697,7 +698,8 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     }
     
     @SuppressWarnings("unchecked")
-    public <S, D> D convert(final S source, final Type<S> sourceType, final Type<D> destinationType, final String converterId) {
+    public <S, D> D convert(final S source, final Type<S> sourceType, final Type<D> destinationType, final String converterId,
+            MappingContext context) {
         
         Converter<S, D> converter;
         ConverterFactory converterFactory = mapperFactory.getConverterFactory();
@@ -708,7 +710,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             converter = (Converter<S, D>) converterFactory.getConverter(converterId);
         }
         
-        return converter.convert(source, destinationType);
+        return converter.convert(source, destinationType, context);
     }
     
     private <S, D> boolean canConvert(final Type<S> sourceType, final Type<D> destinationType) {
@@ -806,8 +808,8 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         return mapAsArray(destination, source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
-    public <S, D> D convert(final S source, final Class<D> destinationClass, final String converterId) {
-        return convert(source, TypeFactory.typeOf(source), TypeFactory.<D> valueOf(destinationClass), converterId);
+    public <S, D> D convert(final S source, final Class<D> destinationClass, final String converterId, MappingContext context) {
+        return convert(source, TypeFactory.typeOf(source), TypeFactory.<D> valueOf(destinationClass), converterId, context);
     }
     
     public <Sk, Sv, Dk, Dv> Map<Dk, Dv> mapAsMap(final Map<Sk, Sv> source, final Type<? extends Map<Sk, Sv>> sourceType,
@@ -827,7 +829,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
      * @param <S>
      * @param <D>
      */
-    private static class ElementStrategyContext<S,D> {
+    private static class ElementStrategyContext<S, D> {
         
         public ElementStrategyContext(MappingContext mappingContext, Type<S> sourceType, Type<D> destinationType) {
             super();
@@ -846,24 +848,24 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     /**
      * Provides mapping specific to elements of a multi-occurrence object, such
      * as an array, collection, or map. Hadles caching of the resolved strategy
-     * based on the class type of the source object using the ElementStrategyContext. 
+     * based on the class type of the source object using the
+     * ElementStrategyContext.
      * <p>
-     * Additionally, ensures that the MappingContext instance associated has source,
-     * destination, and strategy consistently set.
+     * Additionally, ensures that the MappingContext instance associated has
+     * source, destination, and strategy consistently set.
      * 
      * @param source
      * @param context
      * @return
      */
-    private <S,D> D mapElement(S source, ElementStrategyContext<S,D> context) {
+    private <S, D> D mapElement(S source, ElementStrategyContext<S, D> context) {
         if (context.strategy == null || !source.getClass().equals(context.sourceClass)) {
-            context.strategy = resolveMappingStrategy(source, context.sourceType,
-                    context.destinationType, false, context.mappingContext);
+            context.strategy = resolveMappingStrategy(source, context.sourceType, context.destinationType, false, context.mappingContext);
             context.sourceClass = source.getClass();
         } else {
-           context.mappingContext.setResolvedSourceType(context.sourceType);
-           context.mappingContext.setResolvedDestinationType(context.destinationType);
-           context.mappingContext.setResolvedStrategy(context.strategy);
+            context.mappingContext.setResolvedSourceType(context.sourceType);
+            context.mappingContext.setResolvedDestinationType(context.destinationType);
+            context.mappingContext.setResolvedStrategy(context.strategy);
         }
         return map(source, context.sourceType, context.destinationType, context.mappingContext, context.strategy);
     }
@@ -884,8 +886,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
          * us to process a homogeneous key/value typed map as quickly as
          * possible
          */
-        ElementStrategyContext<Sk, Dk> keyContext = new ElementStrategyContext<Sk, Dk>(context, sourceType.<Sk> getNestedType(0), destinationType.<Dk> getNestedType(0));
-        ElementStrategyContext<Sv, Dv> valContext = new ElementStrategyContext<Sv, Dv>(context, sourceType.<Sv> getNestedType(1), destinationType.<Dv> getNestedType(1));
+        ElementStrategyContext<Sk, Dk> keyContext = new ElementStrategyContext<Sk, Dk>(context, sourceType.<Sk> getNestedType(0),
+                destinationType.<Dk> getNestedType(0));
+        ElementStrategyContext<Sv, Dv> valContext = new ElementStrategyContext<Sv, Dv>(context, sourceType.<Sv> getNestedType(1),
+                destinationType.<Dv> getNestedType(1));
         
         for (Entry<Sk, Sv> entry : source.entrySet()) {
             Dk key;
@@ -922,9 +926,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             final Type<? extends Map<Dk, Dv>> destinationType, final MappingContext context) {
         
         Map<Dk, Dv> destination = new HashMap<Dk, Dv>();
-
+        
         Type<?> entryType = TypeFactory.valueOf(Entry.class, destinationType.getNestedType(0), destinationType.getNestedType(1));
-        ElementStrategyContext<S, Entry<Dk, Dv>> elementContext = new ElementStrategyContext<S, Entry<Dk, Dv>>(context, sourceType, (Type<Entry<Dk, Dv>>) entryType);
+        ElementStrategyContext<S, Entry<Dk, Dv>> elementContext = new ElementStrategyContext<S, Entry<Dk, Dv>>(context, sourceType,
+                (Type<Entry<Dk, Dv>>) entryType);
         
         for (S element : source) {
             if (element == null) {
@@ -952,7 +957,8 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         
         Map<Dk, Dv> destination = new HashMap<Dk, Dv>();
         Type<MapEntry<Dk, Dv>> entryType = MapEntry.concreteEntryType(destinationType);
-        ElementStrategyContext<S, MapEntry<Dk, Dv>> elementContext = new ElementStrategyContext<S, MapEntry<Dk, Dv>>(context, sourceType, entryType);
+        ElementStrategyContext<S, MapEntry<Dk, Dv>> elementContext = new ElementStrategyContext<S, MapEntry<Dk, Dv>>(context, sourceType,
+                entryType);
         
         for (S element : source) {
             if (element == null) {
@@ -1100,5 +1106,5 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         out.append(DIVIDER);
         out.append("\nUnenhance strategy: ").append(unenhanceStrategy);
     }
-
+    
 }

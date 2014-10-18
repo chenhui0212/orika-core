@@ -18,45 +18,55 @@
 package ma.glasnost.orika.converter.builtin;
 
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 
-
 /**
+ * Provides wrapper to primitives conversion
+ * 
+ * @author elaatifi@gmail.com
  * @author matt.deboer@gmail.com
  *
  */
-public class WrapperToPrimitiveConverter extends CustomConverter<Object, Object>{
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.CustomConverter#canConvert(ma.glasnost.orika.metadata.Type, ma.glasnost.orika.metadata.Type)
+public class WrapperToPrimitiveConverter extends CustomConverter<Object, Object> {
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.CustomConverter#canConvert(ma.glasnost.orika.metadata
+     * .Type, ma.glasnost.orika.metadata.Type)
      */
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
         return sourceType.isWrapperFor(destinationType);
     }
     
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ma.glasnost.orika.Converter#convert(java.lang.Object,
+     * ma.glasnost.orika.metadata.Type)
      */
-    public Object convert(Object source, Type<? extends Object> destinationType) {
-            
-            if (Character.TYPE == destinationType.getRawType()) {
-                return ((Character)source).charValue();
-            } else if (Byte.TYPE == destinationType.getRawType()) {
-                return ((Byte)source).byteValue();
-            } else if (Short.TYPE == destinationType.getRawType()) {
-                return ((Short)source).shortValue();
-            } else if (Integer.TYPE == destinationType.getRawType()) {
-                return ((Integer)source).intValue();
-            } else if (Long.TYPE == destinationType.getRawType()) {
-                return ((Long)source).longValue();
-            } else if (Float.TYPE == destinationType.getRawType()) {
-                return ((Float)source).floatValue();
-            } else if (Double.TYPE == destinationType.getRawType()) {
-                return ((Double)source).doubleValue();
-            } else if (Boolean.TYPE == destinationType.getRawType()) {
-                return ((Boolean)source).booleanValue();
-            }
-            return null;
+    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
+        
+        if (Character.TYPE == destinationType.getRawType()) {
+            return ((Character) source).charValue();
+        } else if (Byte.TYPE == destinationType.getRawType()) {
+            return ((Byte) source).byteValue();
+        } else if (Short.TYPE == destinationType.getRawType()) {
+            return ((Short) source).shortValue();
+        } else if (Integer.TYPE == destinationType.getRawType()) {
+            return ((Integer) source).intValue();
+        } else if (Long.TYPE == destinationType.getRawType()) {
+            return ((Long) source).longValue();
+        } else if (Float.TYPE == destinationType.getRawType()) {
+            return ((Float) source).floatValue();
+        } else if (Double.TYPE == destinationType.getRawType()) {
+            return ((Double) source).doubleValue();
+        } else if (Boolean.TYPE == destinationType.getRawType()) {
+            return ((Boolean) source).booleanValue();
+        }
+        return null;
     }
     
 }

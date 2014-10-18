@@ -18,6 +18,7 @@
 package ma.glasnost.orika.test.converter;
 
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 
 public class LongToStringConverter extends CustomConverter<Long, String> {
@@ -26,15 +27,17 @@ public class LongToStringConverter extends CustomConverter<Long, String> {
         return Long.class.equals(sourceClass) && String.class.equals(destinationClass);
     }
     
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ma.glasnost.orika.Converter#convert(java.lang.Object,
+     * ma.glasnost.orika.metadata.Type)
      */
-    public String convert(Long source, Type<? extends String> destinationType) {
-    	 if (source != null) {
-             return source.toString();
-         }
-         return null;
+    public String convert(Long source, Type<? extends String> destinationType, MappingContext context) {
+        if (source != null) {
+            return source.toString();
+        }
+        return null;
     }
     
 }

@@ -24,20 +24,21 @@ import java.util.List;
 
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeBuilder;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 public class ConverterInheritanceTestCase {
     
     public static class ListConverter extends CustomConverter<Collection<Person>, PersonGroup> {
-
-        public PersonGroup convert(Collection<Person> source, Type<? extends PersonGroup> destinationType) {
+        
+        public PersonGroup convert(Collection<Person> source, Type<? extends PersonGroup> destinationType, MappingContext context) {
             return new PersonGroup(source);
         }
         
@@ -45,11 +46,11 @@ public class ConverterInheritanceTestCase {
     
     public static class Person {
         private String name;
-
+        
         public String getName() {
             return name;
         }
-
+        
         public void setName(String name) {
             this.name = name;
         }
@@ -70,11 +71,11 @@ public class ConverterInheritanceTestCase {
     }
     
     /**
-     * Note: mapping by raw type doesn't work, because there's no way to know at 
-     * runtime that an ArrayList has been parameterized by 'Person'; it just looks
-     * like an ArrayList of 'Object'
+     * Note: mapping by raw type doesn't work, because there's no way to know at
+     * runtime that an ArrayList has been parameterized by 'Person'; it just
+     * looks like an ArrayList of 'Object'
      */
-    @Test(expected=MappingException.class)
+    @Test(expected = MappingException.class)
     public void testConverterInheritanceRaw() {
         ArrayList<Person> people = new ArrayList<Person>();
         Person person = new Person();
@@ -103,7 +104,8 @@ public class ConverterInheritanceTestCase {
         person.setName("B");
         people.add(person);
         
-        Type<Collection<Person>> personCollectionType = new TypeBuilder<Collection<Person>>(){}.build();
+        Type<Collection<Person>> personCollectionType = new TypeBuilder<Collection<Person>>() {
+        }.build();
         Type<PersonGroup> personGroupType = TypeFactory.valueOf(PersonGroup.class);
         
         MapperFactory factory = MappingUtil.getMapperFactory();

@@ -21,6 +21,7 @@ package ma.glasnost.orika.test.converter;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
@@ -34,15 +35,12 @@ public class ConverterWithNestedPropertyTestCase {
         MapperFactory mapperFactory = MappingUtil.getMapperFactory();
         
         mapperFactory.getConverterFactory().registerConverter(new CustomConverter<Address, String>() {
-            public String convert(Address source, Type<? extends String> destinationClass) {
+            public String convert(Address source, Type<? extends String> destinationClass, MappingContext context) {
                 return source.getLine1() + " " + source.getLine2();
             }
         });
         
-        mapperFactory.classMap(Order.class, OrderDTO.class)
-                     .fieldMap("customer.address", "shippingAddress").add()
-                     .byDefault()
-                     .register();
+        mapperFactory.classMap(Order.class, OrderDTO.class).fieldMap("customer.address", "shippingAddress").add().byDefault().register();
         
         Address address = new Address();
         address.setLine1("5 rue Blida");

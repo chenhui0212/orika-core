@@ -28,6 +28,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 
 /**
@@ -56,12 +57,12 @@ public class DateAndTimeConverters {
     public static class TimestampToCalendarConverter extends BuiltinBidirectionalConverter<Timestamp, Calendar> {
         
         @Override
-        public Calendar convertTo(Timestamp source, Type<Calendar> destinationType) {
+        public Calendar convertTo(Timestamp source, Type<Calendar> destinationType, MappingContext context) {
             return toCalendar(source.getTime());
         }
         
         @Override
-        public Timestamp convertFrom(Calendar source, Type<Timestamp> destinationType) {
+        public Timestamp convertFrom(Calendar source, Type<Timestamp> destinationType, MappingContext context) {
             return new Timestamp(source.getTime().getTime());
         }
     }
@@ -72,12 +73,12 @@ public class DateAndTimeConverters {
     public static class TimeToSqlDateConverter extends BuiltinBidirectionalConverter<Time, java.sql.Date> {
         
         @Override
-        public java.sql.Date convertTo(Time source, Type<java.sql.Date> destinationType) {
+        public java.sql.Date convertTo(Time source, Type<java.sql.Date> destinationType, MappingContext context) {
             return new java.sql.Date(source.getTime());
         }
         
         @Override
-        public Time convertFrom(java.sql.Date source, Type<Time> destinationType) {
+        public Time convertFrom(java.sql.Date source, Type<Time> destinationType, MappingContext context) {
             return new Time(source.getTime());
         }
     }
@@ -88,12 +89,12 @@ public class DateAndTimeConverters {
     public static class TimestampToTimeConverter extends BuiltinBidirectionalConverter<Timestamp, Time> {
         
         @Override
-        public Time convertTo(Timestamp source, Type<Time> destinationType) {
+        public Time convertTo(Timestamp source, Type<Time> destinationType, MappingContext context) {
             return new Time(source.getTime());
         }
         
         @Override
-        public Timestamp convertFrom(Time source, Type<Timestamp> destinationType) {
+        public Timestamp convertFrom(Time source, Type<Timestamp> destinationType, MappingContext context) {
             return new Timestamp(source.getTime());
         }
     }
@@ -104,12 +105,12 @@ public class DateAndTimeConverters {
     public static class TimestampToSqlDateConverter extends BuiltinBidirectionalConverter<Timestamp, java.sql.Date> {
         
         @Override
-        public java.sql.Date convertTo(Timestamp source, Type<java.sql.Date> destinationType) {
+        public java.sql.Date convertTo(Timestamp source, Type<java.sql.Date> destinationType, MappingContext context) {
             return new java.sql.Date(source.getTime());
         }
         
         @Override
-        public Timestamp convertFrom(java.sql.Date source, Type<Timestamp> destinationType) {
+        public Timestamp convertFrom(java.sql.Date source, Type<Timestamp> destinationType, MappingContext context) {
             return new Timestamp(source.getTime());
         }
     }
@@ -120,12 +121,12 @@ public class DateAndTimeConverters {
     public static class DateToCalendarConverter extends BuiltinBidirectionalConverter<Date, Calendar> {
         
         @Override
-        public Calendar convertTo(Date source, Type<Calendar> destinationType) {
+        public Calendar convertTo(Date source, Type<Calendar> destinationType, MappingContext context) {
             return toCalendar(source);
         }
         
         @Override
-        public Date convertFrom(Calendar source, Type<Date> destinationType) {
+        public Date convertFrom(Calendar source, Type<Date> destinationType, MappingContext context) {
             return toDate(source);
         }
     }
@@ -136,12 +137,12 @@ public class DateAndTimeConverters {
     public static class DateToSqlDateConverter extends BuiltinBidirectionalConverter<Date, java.sql.Date> {
         
         @Override
-        public java.sql.Date convertTo(Date source, Type<java.sql.Date> destinationType) {
+        public java.sql.Date convertTo(Date source, Type<java.sql.Date> destinationType, MappingContext context) {
             return new java.sql.Date(source.getTime());
         }
         
         @Override
-        public Date convertFrom(java.sql.Date source, Type<Date> destinationType) {
+        public Date convertFrom(java.sql.Date source, Type<Date> destinationType, MappingContext context) {
             return new Date(source.getTime());
         }
     }
@@ -152,12 +153,12 @@ public class DateAndTimeConverters {
     public static class DateToTimeConverter extends BuiltinBidirectionalConverter<Date, Time> {
         
         @Override
-        public Time convertTo(Date source, Type<Time> destinationType) {
+        public Time convertTo(Date source, Type<Time> destinationType, MappingContext context) {
             return new Time(source.getTime());
         }
         
         @Override
-        public Date convertFrom(Time source, Type<Date> destinationType) {
+        public Date convertFrom(Time source, Type<Date> destinationType, MappingContext context) {
             return new Date(source.getTime());
         }
     }
@@ -181,12 +182,12 @@ public class DateAndTimeConverters {
         }
         
         @Override
-        public java.sql.Date convertTo(XMLGregorianCalendar source, Type<java.sql.Date> destinationType) {
+        public java.sql.Date convertTo(XMLGregorianCalendar source, Type<java.sql.Date> destinationType, MappingContext context) {
             return new java.sql.Date(toLong(source));
         }
         
         @Override
-        public XMLGregorianCalendar convertFrom(java.sql.Date source, Type<XMLGregorianCalendar> destinationType) {
+        public XMLGregorianCalendar convertFrom(java.sql.Date source, Type<XMLGregorianCalendar> destinationType, MappingContext context) {
             return toXMLGregorianCalendar(source.getTime(), factory);
         }
         
@@ -216,12 +217,12 @@ public class DateAndTimeConverters {
         }
         
         @Override
-        public Time convertTo(XMLGregorianCalendar source, Type<Time> destinationType) {
+        public Time convertTo(XMLGregorianCalendar source, Type<Time> destinationType, MappingContext context) {
             return new Time(toLong(source));
         }
         
         @Override
-        public XMLGregorianCalendar convertFrom(Time source, Type<XMLGregorianCalendar> destinationType) {
+        public XMLGregorianCalendar convertFrom(Time source, Type<XMLGregorianCalendar> destinationType, MappingContext context) {
             return toXMLGregorianCalendar(source.getTime(), factory);
         }
         
@@ -237,12 +238,12 @@ public class DateAndTimeConverters {
     public static class CalendarToSqlDateConverter extends BuiltinBidirectionalConverter<Calendar, java.sql.Date> {
         
         @Override
-        public java.sql.Date convertTo(Calendar source, Type<java.sql.Date> destinationType) {
+        public java.sql.Date convertTo(Calendar source, Type<java.sql.Date> destinationType, MappingContext context) {
             return new java.sql.Date(toLong(source));
         }
         
         @Override
-        public Calendar convertFrom(java.sql.Date source, Type<Calendar> destinationType) {
+        public Calendar convertFrom(java.sql.Date source, Type<Calendar> destinationType, MappingContext context) {
             return toCalendar(source);
         }
     }
@@ -253,12 +254,12 @@ public class DateAndTimeConverters {
     public static class CalendarToTimeConverter extends BuiltinBidirectionalConverter<Calendar, Time> {
         
         @Override
-        public Time convertTo(Calendar source, Type<Time> destinationType) {
+        public Time convertTo(Calendar source, Type<Time> destinationType, MappingContext context) {
             return new Time(toLong(source));
         }
         
         @Override
-        public Calendar convertFrom(Time source, Type<Calendar> destinationType) {
+        public Calendar convertFrom(Time source, Type<Calendar> destinationType, MappingContext context) {
             return toCalendar(source);
         }
     }
@@ -282,12 +283,12 @@ public class DateAndTimeConverters {
         }
         
         @Override
-        public XMLGregorianCalendar convertTo(Date source, Type<XMLGregorianCalendar> destinationType) {
+        public XMLGregorianCalendar convertTo(Date source, Type<XMLGregorianCalendar> destinationType, MappingContext context) {
             return toXMLGregorianCalendar(source, factory);
         }
         
         @Override
-        public Date convertFrom(XMLGregorianCalendar source, Type<Date> destinationType) {
+        public Date convertFrom(XMLGregorianCalendar source, Type<Date> destinationType, MappingContext context) {
             return toDate(source);
         }
         
@@ -316,12 +317,12 @@ public class DateAndTimeConverters {
         }
         
         @Override
-        public XMLGregorianCalendar convertTo(Calendar source, Type<XMLGregorianCalendar> destinationType) {
+        public XMLGregorianCalendar convertTo(Calendar source, Type<XMLGregorianCalendar> destinationType, MappingContext context) {
             return toXMLGregorianCalendar(source, factory);
         }
         
         @Override
-        public Calendar convertFrom(XMLGregorianCalendar source, Type<Calendar> destinationType) {
+        public Calendar convertFrom(XMLGregorianCalendar source, Type<Calendar> destinationType, MappingContext context) {
             return toCalendar(source);
         }
         
@@ -337,12 +338,12 @@ public class DateAndTimeConverters {
     public static class LongToDateConverter extends BuiltinBidirectionalConverter<Long, Date> {
         
         @Override
-        public Date convertTo(Long source, Type<Date> destinationType) {
+        public Date convertTo(Long source, Type<Date> destinationType, MappingContext context) {
             return toDate(source);
         }
         
         @Override
-        public Long convertFrom(Date source, Type<Long> destinationType) {
+        public Long convertFrom(Date source, Type<Long> destinationType, MappingContext context) {
             return toLong(source);
         }
     }
@@ -353,12 +354,12 @@ public class DateAndTimeConverters {
     public static class LongToSqlDateConverter extends BuiltinBidirectionalConverter<Long, java.sql.Date> {
         
         @Override
-        public java.sql.Date convertTo(Long source, Type<java.sql.Date> destinationType) {
+        public java.sql.Date convertTo(Long source, Type<java.sql.Date> destinationType, MappingContext context) {
             return new java.sql.Date(source);
         }
         
         @Override
-        public Long convertFrom(java.sql.Date source, Type<Long> destinationType) {
+        public Long convertFrom(java.sql.Date source, Type<Long> destinationType, MappingContext context) {
             return toLong(source);
         }
     }
@@ -369,12 +370,12 @@ public class DateAndTimeConverters {
     public static class LongToTimeConverter extends BuiltinBidirectionalConverter<Long, Time> {
         
         @Override
-        public Time convertTo(Long source, Type<Time> destinationType) {
+        public Time convertTo(Long source, Type<Time> destinationType, MappingContext context) {
             return new Time(source);
         }
         
         @Override
-        public Long convertFrom(Time source, Type<Long> destinationType) {
+        public Long convertFrom(Time source, Type<Long> destinationType, MappingContext context) {
             return toLong(source);
         }
     }
@@ -386,12 +387,12 @@ public class DateAndTimeConverters {
     public static class LongToCalendarConverter extends BuiltinBidirectionalConverter<Long, Calendar> {
         
         @Override
-        public Calendar convertTo(Long source, Type<Calendar> destinationType) {
+        public Calendar convertTo(Long source, Type<Calendar> destinationType, MappingContext context) {
             return toCalendar(source);
         }
         
         @Override
-        public Long convertFrom(Calendar source, Type<Long> destinationType) {
+        public Long convertFrom(Calendar source, Type<Long> destinationType, MappingContext context) {
             return toLong(source);
         }
         
@@ -420,12 +421,12 @@ public class DateAndTimeConverters {
         }
         
         @Override
-        public XMLGregorianCalendar convertTo(Long source, Type<XMLGregorianCalendar> destinationType) {
+        public XMLGregorianCalendar convertTo(Long source, Type<XMLGregorianCalendar> destinationType, MappingContext context) {
             return toXMLGregorianCalendar(source, factory);
         }
         
         @Override
-        public Long convertFrom(XMLGregorianCalendar source, Type<Long> destinationType) {
+        public Long convertFrom(XMLGregorianCalendar source, Type<Long> destinationType, MappingContext context) {
             return toLong(source);
         }
         
@@ -442,12 +443,12 @@ public class DateAndTimeConverters {
     public static class LongToTimestampConverter extends BuiltinBidirectionalConverter<Long, Timestamp> {
         
         @Override
-        public Timestamp convertTo(Long source, Type<Timestamp> destinationType) {
+        public Timestamp convertTo(Long source, Type<Timestamp> destinationType, MappingContext context) {
             return new Timestamp(source);
         }
         
         @Override
-        public Long convertFrom(Timestamp source, Type<Long> destinationType) {
+        public Long convertFrom(Timestamp source, Type<Long> destinationType, MappingContext context) {
             return source.getTime();
         }
         
@@ -472,12 +473,12 @@ public class DateAndTimeConverters {
         }
         
         @Override
-        public Timestamp convertTo(XMLGregorianCalendar source, Type<Timestamp> destinationType) {
+        public Timestamp convertTo(XMLGregorianCalendar source, Type<Timestamp> destinationType, MappingContext context) {
             return new Timestamp(toLong(source));
         }
         
         @Override
-        public XMLGregorianCalendar convertFrom(Timestamp source, Type<XMLGregorianCalendar> destinationType) {
+        public XMLGregorianCalendar convertFrom(Timestamp source, Type<XMLGregorianCalendar> destinationType, MappingContext context) {
             return toXMLGregorianCalendar(source, factory);
         }
         
@@ -493,12 +494,12 @@ public class DateAndTimeConverters {
     public static class DateToTimestampConverter extends BuiltinBidirectionalConverter<Date, Timestamp> {
         
         @Override
-        public Timestamp convertTo(Date source, Type<Timestamp> destinationType) {
+        public Timestamp convertTo(Date source, Type<Timestamp> destinationType, MappingContext context) {
             return new Timestamp(toLong(source));
         }
         
         @Override
-        public Date convertFrom(Timestamp source, Type<Date> destinationType) {
+        public Date convertFrom(Timestamp source, Type<Date> destinationType, MappingContext context) {
             return toDate(source.getTime());
         }
     }
@@ -563,7 +564,6 @@ public class DateAndTimeConverters {
     }
     
     public static boolean polyCanConvert(Type<?> a, Type<?> b, Type<?> c, Type<?> d) {
-        return _polyCanConvert(a, b, c, d) || _polyCanConvert(b, a, c, d); // bidirectional
-                                                                           // poly
+        return _polyCanConvert(a, b, c, d) || _polyCanConvert(b, a, c, d);
     }
 }

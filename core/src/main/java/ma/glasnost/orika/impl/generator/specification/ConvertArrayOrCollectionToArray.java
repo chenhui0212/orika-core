@@ -81,10 +81,9 @@ public class ConvertArrayOrCollectionToArray extends AbstractSpecification {
                 moSource.declareIterator(),
                 moDest.declareIterator(),
                 "while(" + moSource.iteratorHasNext() + ") {",
-                format("%s = (%s) %s.convert((%s)%s, %s)", moDest.nextElement(), moDest.elementTypeName(),
+                format("%s = (%s) %s.convert((%s)%s, %s, mappingContext)", moDest.nextElement(), moDest.elementTypeName(),
                         code.usedConverter(source.getConverter()), moSource.elementTypeName(), moSource.nextElement(),
-                        code.usedType(destination)), 
-                "}");
+                        code.usedType(destination)), "}");
         
         String mapNull = shouldMapNulls(fieldMap, code) ? format(" else { %s; }", destination.assignIfPossible("null")) : "";
         return format(" %s { %s; %s; } %s", source.ifNotNull(), assureInstanceExists, convertArray, mapNull);

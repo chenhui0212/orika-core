@@ -18,31 +18,38 @@
 
 package ma.glasnost.orika.test.customconverter;
 
-import org.junit.Assert;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CustomConverterTestCase {
     
     public static class MyCustomConverter extends CustomConverter<Long, String> {
-
-        /* (non-Javadoc)
-         * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
+        
+        /*
+         * (non-Javadoc)
+         * 
+         * @see ma.glasnost.orika.Converter#convert(java.lang.Object,
+         * ma.glasnost.orika.metadata.Type)
          */
-        public String convert(Long source, Type<? extends String> destinationType) {
+        public String convert(Long source, Type<? extends String> destinationType, MappingContext context) {
             return "long{" + source + "}";
         }
     }
     
     public static class MyCustomConverter2 extends CustomConverter<String, String> {
-        /* (non-Javadoc)
-         * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see ma.glasnost.orika.Converter#convert(java.lang.Object,
+         * ma.glasnost.orika.metadata.Type)
          */
-        public String convert(String source, Type<? extends String> destinationType) {
+        public String convert(String source, Type<? extends String> destinationType, MappingContext context) {
             return "string: " + source;
         }
     }
@@ -53,7 +60,6 @@ public class CustomConverterTestCase {
         MapperFactory factory = MappingUtil.getMapperFactory();
         factory.getConverterFactory().registerConverter(new MyCustomConverter());
         factory.classMap(A.class, B.class).field("id", "string").register();
-        
         
         A source = new A();
         source.setId(42L);

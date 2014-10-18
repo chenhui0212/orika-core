@@ -22,75 +22,83 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
 /**
  * PassThroughConverter allows configuration of a number of specific types which
- * should be passed through (as-is) without creating a mapped copy.<br><br>
+ * should be passed through (as-is) without creating a mapped copy.<br>
+ * <br>
  * 
  * This allows you to declare your own set of types which should be treated by
  * Orika as if they were in the set of immutable types.
  * 
  * @author matt.deboer@gmail.com
+ * @author elaatifi@gmail.com
  *
  */
 public class PassThroughConverter extends CustomConverter<Object, Object> {
-
-	private final Set<Type<?>> passThroughTypes = new HashSet<Type<?>>();
-	private final String description;
-	/**
-	 * Constructs a new PassThroughConverter configured to treat the provided
-	 * list of types as immutable.
-	 * 
-	 * @param types one or more types that should be treated as immutable
-	 */
-	public PassThroughConverter(java.lang.reflect.Type...types) {
-		StringBuilder desc = new StringBuilder(PassThroughConverter.class.getSimpleName()+"(Copy by reference:");
-		String separator = "";
-		for (java.lang.reflect.Type type: types) {
-			Type<?> theType = TypeFactory.valueOf(type);
-			passThroughTypes.add(theType);
-			desc.append(separator).append(theType);
-			separator = ", ";
-		}
-		desc.append(")");
-		description = desc.toString();
-	}
-	
-	private boolean shouldPassThrough(Type<?> type) {
-		for (Type<?> registeredType: passThroughTypes) {
-			if (registeredType.isAssignableFrom(type)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see ma.glasnost.orika.Converter#canConvert(ma.glasnost.orika.metadata.Type, ma.glasnost.orika.metadata.Type)
-	 */
-	public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
-	    return shouldPassThrough(sourceType) && sourceType.equals(destinationType);
+    
+    private final Set<Type<?>> passThroughTypes = new HashSet<Type<?>>();
+    private final String description;
+    
+    /**
+     * Constructs a new PassThroughConverter configured to treat the provided
+     * list of types as immutable.
+     * 
+     * @param types
+     *            one or more types that should be treated as immutable
+     */
+    public PassThroughConverter(java.lang.reflect.Type... types) {
+        StringBuilder desc = new StringBuilder(PassThroughConverter.class.getSimpleName() + "(Copy by reference:");
+        String separator = "";
+        for (java.lang.reflect.Type type : types) {
+            Type<?> theType = TypeFactory.valueOf(type);
+            passThroughTypes.add(theType);
+            desc.append(separator).append(theType);
+            separator = ", ";
+        }
+        desc.append(")");
+        description = desc.toString();
     }
-
-	public Object convert(Object source, Type<? extends Object> destinationType) {
-	    return source;
+    
+    private boolean shouldPassThrough(Type<?> type) {
+        for (Type<?> registeredType : passThroughTypes) {
+            if (registeredType.isAssignableFrom(type)) {
+                return true;
+            }
+        }
+        return false;
     }
-	
-	
-	public String toString() {
-		return description;
-	}
-	
-	@Override
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.Converter#canConvert(ma.glasnost.orika.metadata.Type,
+     * ma.glasnost.orika.metadata.Type)
+     */
+    public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
+        return shouldPassThrough(sourceType) && sourceType.equals(destinationType);
+    }
+    
+    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
+        return source;
+    }
+    
+    public String toString() {
+        return description;
+    }
+    
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((passThroughTypes == null) ? 0 : passThroughTypes.hashCode());
         return result;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -112,23 +120,21 @@ public class PassThroughConverter extends CustomConverter<Object, Object> {
         }
         return true;
     }
-
-
-
+    
     /**
-	 * Extends PassThroughConverter for use as a built-in Converter 
-	 */
-	static class Builtin extends PassThroughConverter {
-		
-		private final String description;
-		
-		Builtin(java.lang.reflect.Type...types) {
-			super(types);
-			description = "builtin:" + super.toString();
-		}
-		
-		public String toString() {
-			return description;
-		}
-	}
+     * Extends PassThroughConverter for use as a built-in Converter
+     */
+    static class Builtin extends PassThroughConverter {
+        
+        private final String description;
+        
+        Builtin(java.lang.reflect.Type... types) {
+            super(types);
+            description = "builtin:" + super.toString();
+        }
+        
+        public String toString() {
+            return description;
+        }
+    }
 }

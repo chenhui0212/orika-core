@@ -27,10 +27,12 @@ import ma.glasnost.orika.unenhance.UnenhanceStrategy;
 
 /**
  *
+ * @author matt.deboer@gmail.com
+ * @author elaatifi@gmail.com
  */
 public class UseConverterStrategy extends AbstractMappingStrategy {
     
-    private final Converter<Object,Object> converter;
+    private final Converter<Object, Object> converter;
     private final UnenhanceStrategy unenhancer;
     
     /**
@@ -41,27 +43,25 @@ public class UseConverterStrategy extends AbstractMappingStrategy {
      * @param converter
      * @param unenhancer
      */
-    public UseConverterStrategy(Type<Object> sourceType, Type<Object> destinationType, Converter<Object,Object> converter, UnenhanceStrategy unenhancer) {
+    public UseConverterStrategy(Type<Object> sourceType, Type<Object> destinationType, Converter<Object, Object> converter,
+            UnenhanceStrategy unenhancer) {
         super(sourceType, destinationType);
         this.converter = converter;
         this.unenhancer = unenhancer;
     }
-
+    
     public Object map(Object sourceObject, Object destinationObject, MappingContext context) {
-        // TODO: mappingContext is not passed to converters, which could 
-        //       be a problem with converters now (recently) having access
-        //       to the MapperFacade; 
         context.beginMapping(sourceType, sourceObject, destinationType, destinationObject);
         try {
-            return converter.convert(unenhancer.unenhanceObject(sourceObject, sourceType), destinationType);
+            return converter.convert(unenhancer.unenhanceObject(sourceObject, sourceType), destinationType, context);
         } finally {
             context.endMapping();
         }
     }
-
-	@Override
-	protected void describeMembers(Map<String, Object> members) {
-		members.put("converter", converter);
-		members.put("unenhancer", unenhancer);
-	}
+    
+    @Override
+    protected void describeMembers(Map<String, Object> members) {
+        members.put("converter", converter);
+        members.put("unenhancer", unenhancer);
+    }
 }
