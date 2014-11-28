@@ -31,13 +31,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MappedTypePair;
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.impl.UtilityResolver;
 import ma.glasnost.orika.impl.util.ClassUtil;
+import ma.glasnost.orika.metadata.func.MapFunc;
 import ma.glasnost.orika.property.PropertyResolver;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
 
@@ -88,6 +91,8 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     private Boolean sourcesMappedOnNull;
     private Boolean destinationsMappedOnNull;
     private Boolean favorsExtension;
+    private MapFunc<A,B> mapAtoB;
+    private MapFunc<B,A> mapBtoA;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassMapBuilder.class);
     
@@ -504,6 +509,27 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     }
     
     /**
+     * Set the custom mapper for A to B
+     * @param map mapper function
+     * @return
+     */
+    public ClassMapBuilder<A,B> customAtoB (MapFunc<A, B> map) {
+        this.mapAtoB = map;
+        return this;
+    }
+    
+    
+    /**
+     * Set the custom mapper for B to A
+     * @param map mapper function
+     * @return
+     */
+    public ClassMapBuilder<A, B> customBtoA(MapFunc<B,A> map) {
+        this.mapBtoA = map;
+        return this;
+    }
+    
+    /**
      * Configure this ClassMapBuilder to use an existing mapping (for parent classes)
      * defined from <code>aParentClass</code> to <code>bParentClass</code>.
      * 
@@ -681,6 +707,28 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     	
     	if(LOGGER.isDebugEnabled()) {
         	LOGGER.debug("ClassMap created:\n\t" + describeClassMap());
+        }
+    	
+    	
+    	if((mapAtoB != null || mapBtoA != null) && customizedMapper != null ) {
+    	    throw new MappingException("You can not call customize and customAtoB/customBtoA, only one of the two si accepted.");
+    	}
+    	
+        if(mapAtoB != null || mapBtoA != null) {
+            customizedMapper = new CustomMapper<A,B>() {
+
+                @Override
+                public void mapAtoB(A a, B b, MappingContext context) {
+                    if(mapAtoB != null)
+                        mapAtoB.map(a,b);
+                }
+
+                @Override
+                public void mapBtoA(B b, A a, MappingContext context) {
+                    if(mapBtoA != null)
+                        mapBtoA.map(b,a);
+                }
+            };
         }
     	
         return new ClassMap<A, B>(aType, bType, fieldsMapping, customizedMapper, usedMappers, constructorA, constructorB, sourcesMappedOnNull, destinationsMappedOnNull, favorsExtension);
