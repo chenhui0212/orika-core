@@ -25,7 +25,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import javassist.CannotCompileException;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingException;
@@ -113,8 +112,7 @@ public class ObjectFactoryGenerator {
     }
     
     private void addCreateMethod(SourceCodeContext code, UsedTypesContext usedTypes, UsedConvertersContext usedConverters,
-            UsedMapperFacadesContext usedMappers, Type<?> type, Type<?> sourceType, MappingContext mappingContext, StringBuilder logDetails)
-            throws CannotCompileException {
+            UsedMapperFacadesContext usedMappers, Type<?> type, Type<?> sourceType, MappingContext mappingContext, StringBuilder logDetails) {
         
         final StringBuilder out = new StringBuilder();
         out.append("public Object create(Object s, " + MappingContext.class.getCanonicalName() + " mappingContext) {");
@@ -156,7 +154,7 @@ public class ObjectFactoryGenerator {
                 out.append(format("if (s instanceof %s) {", sourceType.getCanonicalName()));
                 out.append(format("%s source = (%s) s;", sourceType.getCanonicalName(), sourceType.getCanonicalName()));
                 out.append("\ntry {\n");
-            
+                
                 ConstructorMapping<?> constructorMapping = (ConstructorMapping<?>) constructorResolverStrategy.resolve(classMap,
                         destinationType);
                 Constructor<?> constructor = constructorMapping.getConstructor();
@@ -200,12 +198,12 @@ public class ObjectFactoryGenerator {
                 }
                 out.append(");");
                 /*
-                 * Any exceptions thrown calling constructors should be propagated
+                 * Any exceptions thrown calling constructors should be
+                 * propagated
                  */
-                append(out, "\n} catch (java.lang.Exception e) {\n", "if (e instanceof RuntimeException) {\n", "throw (RuntimeException)e;\n",
-                        "} else {",
-                        "throw new java.lang.RuntimeException(" + "\"Error while constructing new " + destinationType.getSimpleName()
-                                + " instance\", e);", "\n}\n}\n}");
+                append(out, "\n} catch (java.lang.Exception e) {\n", "if (e instanceof RuntimeException) {\n",
+                        "throw (RuntimeException)e;\n", "} else {", "throw new java.lang.RuntimeException("
+                                + "\"Error while constructing new " + destinationType.getSimpleName() + " instance\", e);", "\n}\n}\n}");
             }
         }
         return out.toString();
@@ -232,8 +230,8 @@ public class ObjectFactoryGenerator {
         }
         
         /*
-         * If no default constructor field exists, attempt to locate and 
-         * call a constructor which takes a single argument of source type
+         * If no default constructor field exists, attempt to locate and call a
+         * constructor which takes a single argument of source type
          */
         if (out.length() == 0) {
             for (Constructor<?> constructor : type.getRawType().getConstructors()) {

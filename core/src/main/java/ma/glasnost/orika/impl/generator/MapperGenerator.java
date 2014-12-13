@@ -24,7 +24,6 @@ import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javassist.CannotCompileException;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingException;
@@ -59,14 +58,14 @@ public final class MapperGenerator {
             compilerStrategy.assureTypeIsAccessible(classMap.getBType().getRawType());
             
             if (LOGGER.isDebugEnabled()) {
-            	logDetails = new StringBuilder();
-            	String srcName = TypeFactory.nameOf(classMap.getAType(), classMap.getBType());
-            	String dstName = TypeFactory.nameOf(classMap.getBType(), classMap.getAType());
-            	logDetails.append("Generating new mapper for (" + srcName+", " + dstName +")");
+                logDetails = new StringBuilder();
+                String srcName = TypeFactory.nameOf(classMap.getAType(), classMap.getBType());
+                String dstName = TypeFactory.nameOf(classMap.getBType(), classMap.getAType());
+                logDetails.append("Generating new mapper for (" + srcName + ", " + dstName + ")");
             }
             
-            final SourceCodeContext mapperCode = new SourceCodeContext(
-                    classMap.getMapperClassName(), GeneratedMapperBase.class, context, logDetails);
+            final SourceCodeContext mapperCode = new SourceCodeContext(classMap.getMapperClassName(), GeneratedMapperBase.class, context,
+                    logDetails);
             
             Set<FieldMap> mappedFields = new LinkedHashSet<FieldMap>();
             mappedFields.addAll(addMapMethod(mapperCode, true, classMap, logDetails));
@@ -78,15 +77,16 @@ public final class MapperGenerator {
             instance.setFavorsExtension(classMap.favorsExtension());
             
             if (logDetails != null) {
-            	LOGGER.debug(logDetails.toString());
-            	logDetails = null;
+                LOGGER.debug(logDetails.toString());
+                logDetails = null;
             }
             
             /*
-             * Add a copy of the ClassMap to the current mapping context, which only contains the field
-             * maps that were processed by this mapper generation; this can later be used by ObjectFactory
-             * generation when selecting a constructor -- since we only need a constructor which handles 
-             * the fields not mapped by the generated mapper
+             * Add a copy of the ClassMap to the current mapping context, which
+             * only contains the field maps that were processed by this mapper
+             * generation; this can later be used by ObjectFactory generation
+             * when selecting a constructor -- since we only need a constructor
+             * which handles the fields not mapped by the generated mapper
              */
             classMap = classMap.copy(mappedFields);
             context.registerMapperGeneration(classMap);
@@ -96,8 +96,8 @@ public final class MapperGenerator {
         } catch (final Exception e) {
             if (logDetails != null) {
                 /*
-                 * Print out the partial progress of the code generation, as
-                 * it can help to pinpoint the location of the internal error
+                 * Print out the partial progress of the code generation, as it
+                 * can help to pinpoint the location of the internal error
                  */
                 logDetails.append("\n<---- ERROR occurred here");
                 LOGGER.debug(logDetails.toString());
@@ -106,19 +106,20 @@ public final class MapperGenerator {
         }
     }
     
-    private Set<FieldMap> addMapMethod(SourceCodeContext code, boolean aToB, ClassMap<?, ?> classMap, StringBuilder logDetails) throws CannotCompileException {
-        
+    private Set<FieldMap> addMapMethod(SourceCodeContext code, boolean aToB, ClassMap<?, ?> classMap, StringBuilder logDetails) {
         
         Set<FieldMap> mappedFields = new LinkedHashSet<FieldMap>();
-    	if (logDetails != null) {
-        	if (aToB) {
-        		logDetails.append("\n\t" +code.getClassSimpleName() + ".mapAToB("+ classMap.getAType()+", " + classMap.getBTypeName() +") {");
-        	} else {
-        		logDetails.append("\n\t" +code.getClassSimpleName() + ".mapBToA("+ classMap.getBType()+", " + classMap.getATypeName() +") {");
-        	}
+        if (logDetails != null) {
+            if (aToB) {
+                logDetails.append("\n\t" + code.getClassSimpleName() + ".mapAToB(" + classMap.getAType() + ", " + classMap.getBTypeName()
+                        + ") {");
+            } else {
+                logDetails.append("\n\t" + code.getClassSimpleName() + ".mapBToA(" + classMap.getBType() + ", " + classMap.getATypeName()
+                        + ") {");
+            }
         }
-    	
-    	final StringBuilder out = new StringBuilder();
+        
+        final StringBuilder out = new StringBuilder();
         final String mapMethod = "map" + (aToB ? "AtoB" : "BtoA");
         out.append("\tpublic void ");
         out.append(mapMethod);
@@ -128,36 +129,29 @@ public final class MapperGenerator {
         VariableRef destination;
         if (aToB) {
             source = new VariableRef(classMap.getAType(), "source");
-            destination = new VariableRef(classMap.getBType(), "destination"); 
+            destination = new VariableRef(classMap.getBType(), "destination");
         } else {
             source = new VariableRef(classMap.getBType(), "source");
             destination = new VariableRef(classMap.getAType(), "destination");
         }
-         
-        append(out,
-                format("super.%s(a, b, mappingContext);", mapMethod),
-                "\n\n",
-                "// sourceType: " + source.type() + 
-                source.declare("a"),
-                "// destinationType: " + destination.type() + 
-                destination.declare("b"),
-                "\n\n");
+        
+        append(out, format("super.%s(a, b, mappingContext);", mapMethod), "\n\n", "// sourceType: " + source.type() + source.declare("a"),
+                "// destinationType: " + destination.type() + destination.declare("b"), "\n\n");
         
         for (FieldMap currentFieldMap : classMap.getFieldsMapping()) {
             
-        	
             if (currentFieldMap.isExcluded()) {
-            	if (logDetails != null) {
-            		code.debugField(currentFieldMap, "excuding (explicitly)");
-            	}
+                if (logDetails != null) {
+                    code.debugField(currentFieldMap, "excuding (explicitly)");
+                }
                 continue;
             }
             
             if (isAlreadyExistsInUsedMappers(currentFieldMap, classMap)) {
-            	if (logDetails != null) {
-            		code.debugField(currentFieldMap, "excluding because it is already handled by another mapper in this hierarchy");
-            	}
-            	continue;
+                if (logDetails != null) {
+                    code.debugField(currentFieldMap, "excluding because it is already handled by another mapper in this hierarchy");
+                }
+                continue;
             }
             
             FieldMap fieldMap = currentFieldMap;
@@ -181,13 +175,13 @@ public final class MapperGenerator {
                     me.setDestinationType(destination.type());
                     throw me;
                 }
-            } else if (logDetails !=null) {
-            	code.debugField(fieldMap, "ignored for this mapping direction");
+            } else if (logDetails != null) {
+                code.debugField(fieldMap, "ignored for this mapping direction");
             }
         }
         
         out.append(code.mapAggregateFields());
-                
+        
         out.append("\n\t\tif(customMapper != null) { \n\t\t\t customMapper.")
                 .append(mapMethod)
                 .append("(source, destination, mappingContext);\n\t\t}");
@@ -195,7 +189,7 @@ public final class MapperGenerator {
         out.append("\n\t}");
         
         if (logDetails != null) {
-        	logDetails.append("\n\t}");
+            logDetails.append("\n\t}");
         }
         
         code.addMethod(out.toString());
@@ -209,22 +203,23 @@ public final class MapperGenerator {
                 classMap.getBType()));
         
         if (!fieldMap.isByDefault()) {
-        	return false;
+            return false;
         }
         
         for (ClassMap<Object, Object> usedClassMap : usedClassMapSet) {
-            for(FieldMap usedFieldMap: usedClassMap.getFieldsMapping()) {
-            	if (usedFieldMap.getSource().equals(fieldMap.getSource())
-            			&& usedFieldMap.getDestination().equals(fieldMap.getDestination())) {
-            		return true;
-            	}
+            for (FieldMap usedFieldMap : usedClassMap.getFieldsMapping()) {
+                if (usedFieldMap.getSource().equals(fieldMap.getSource())
+                        && usedFieldMap.getDestination().equals(fieldMap.getDestination())) {
+                    return true;
+                }
             }
         }
         
         return false;
     }
     
-    private String generateFieldMapCode(SourceCodeContext code, FieldMap fieldMap, ClassMap<?, ?> classMap, VariableRef destination, StringBuilder logDetails) throws Exception {
+    private String generateFieldMapCode(SourceCodeContext code, FieldMap fieldMap, ClassMap<?, ?> classMap, VariableRef destination,
+            StringBuilder logDetails) throws Exception {
         
         final VariableRef sourceProperty = new VariableRef(fieldMap.getSource(), "source");
         final VariableRef destinationProperty = new VariableRef(fieldMap.getDestination(), "destination");
@@ -232,22 +227,24 @@ public final class MapperGenerator {
         
         if (!sourceProperty.isReadable() || ((!destinationProperty.isAssignable()) && ClassUtil.isImmutable(destinationProperty.type()))) {
             if (logDetails != null) {
-            	code.debugField(fieldMap, "excluding because ");
-    			if (!sourceProperty.isReadable()) {
-    			    Type<?> sourceType = classMap.getAType().equals(destination.type()) ? classMap.getBType() : classMap.getAType();
-    				logDetails.append(sourceType + "." + fieldMap.getSource().getName() + "(" + fieldMap.getSource().getType() + ") is not readable");
-    			} else {
-    				logDetails.append(destination.type() + "." + fieldMap.getDestination().getName() + 
-    				        "(" + fieldMap.getDestination().getType() + ") is not assignable and cannot be mapped in-place");
-    			}		
+                code.debugField(fieldMap, "excluding because ");
+                if (!sourceProperty.isReadable()) {
+                    Type<?> sourceType = classMap.getAType().equals(destination.type()) ? classMap.getBType() : classMap.getAType();
+                    logDetails.append(sourceType + "." + fieldMap.getSource().getName() + "(" + fieldMap.getSource().getType()
+                            + ") is not readable");
+                } else {
+                    logDetails.append(destination.type() + "." + fieldMap.getDestination().getName() + "("
+                            + fieldMap.getDestination().getType() + ") is not assignable and cannot be mapped in-place");
+                }
             }
-        	return "";
+            return "";
         }
         
-        // Make sure the source and destination types are accessible to the builder
+        // Make sure the source and destination types are accessible to the
+        // builder
         compilerStrategy.assureTypeIsAccessible(sourceProperty.rawType());
         compilerStrategy.assureTypeIsAccessible(destinationProperty.rawType());
-
+        
         return code.mapFields(fieldMap, sourceProperty, destinationProperty, destination.type(), logDetails);
     }
     

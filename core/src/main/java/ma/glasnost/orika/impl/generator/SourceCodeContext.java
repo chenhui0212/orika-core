@@ -36,7 +36,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javassist.CannotCompileException;
 import ma.glasnost.orika.BoundMapperFacade;
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Filter;
@@ -106,7 +105,7 @@ public class SourceCodeContext {
         this.compilerStrategy = (CompilerStrategy) mappingContext.getProperty(Properties.COMPILER_STRATEGY);
         this.propertyResolver = (PropertyResolverStrategy) mappingContext.getProperty(Properties.PROPERTY_RESOLVER_STRATEGY);
         this.filters = (Collection<Filter<Object, Object>>) mappingContext.getProperty(Properties.FILTERS);
-        this.shouldCaptureFieldContext = (Boolean)mappingContext.getProperty(Properties.CAPTURE_FIELD_CONTEXT);
+        this.shouldCaptureFieldContext = (Boolean) mappingContext.getProperty(Properties.CAPTURE_FIELD_CONTEXT);
         
         String safeBaseClassName = baseClassName.replace("[]", "$Array");
         this.sourceBuilder = new StringBuilder();
@@ -730,8 +729,7 @@ public class SourceCodeContext {
         StringBuilder out = new StringBuilder();
         StringBuilder closing = new StringBuilder();
         
-        if (destination.isAssignable() || destination.type().isMultiOccurrence()
-                || !ClassUtil.isImmutable(destination.type())) {
+        if (destination.isAssignable() || destination.type().isMultiOccurrence() || !ClassUtil.isImmutable(destination.type())) {
             
             if (source.isNestedProperty()) {
                 out.append(source.ifPathNotNull());
@@ -769,7 +767,7 @@ public class SourceCodeContext {
                     if (code == null || "".equals(code)) {
                         throw new IllegalStateException("empty code returned for spec " + spec + ", sourceProperty = " + source
                                 + ", destinationProperty = " + destination);
-                    } 
+                    }
                     out.append(code);
                     
                     break;
@@ -785,22 +783,13 @@ public class SourceCodeContext {
     }
     
     private void beginCaptureFieldContext(StringBuilder out, FieldMap fieldMap, VariableRef source, VariableRef dest) {
-        out.append(format("mappingContext.beginMappingField(\"%s\", %s, %s, \"%s\", %s, %s);\n"+
-                "try{\n",
-                escapeQuotes(fieldMap.getSource().getExpression()), 
-                usedType(fieldMap.getAType()),
-                source.asWrapper(),
-                escapeQuotes(fieldMap.getDestination().getExpression()), 
-                usedType(fieldMap.getBType()),
-                dest.asWrapper()
-                ));
+        out.append(format("mappingContext.beginMappingField(\"%s\", %s, %s, \"%s\", %s, %s);\n" + "try{\n",
+                escapeQuotes(fieldMap.getSource().getExpression()), usedType(fieldMap.getAType()), source.asWrapper(),
+                escapeQuotes(fieldMap.getDestination().getExpression()), usedType(fieldMap.getBType()), dest.asWrapper()));
     }
     
     private void endCaptureFieldContext(StringBuilder out) {
-        out.append(
-                "} finally {\n" +
-                "\tmappingContext.endMappingField();\n" +
-                "}\n");
+        out.append("} finally {\n" + "\tmappingContext.endMappingField();\n" + "}\n");
     }
     
     private String escapeQuotes(String string) {
