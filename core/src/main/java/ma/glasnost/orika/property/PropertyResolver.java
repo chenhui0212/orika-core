@@ -579,7 +579,7 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
         if (owningProperty.isMap()) {
             elementType = MapEntry.concreteEntryType((Type<Map<Object, Object>>) owningProperty.getType());
             String key = elementPropertyExpression.substring(1, elementPropertyExpression.length()-1);
-            elementProperty = new MapKeyProperty(key, elementType.getNestedType(1), null); 
+            elementProperty = new MapKeyProperty(key, elementType.getNestedType(0), elementType.getNestedType(1), null);
         } else if (owningProperty.isCollection()) {
             elementType = owningProperty.getType().getNestedType(0);
             try {
