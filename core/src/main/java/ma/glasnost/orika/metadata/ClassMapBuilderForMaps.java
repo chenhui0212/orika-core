@@ -195,7 +195,7 @@ public class ClassMapBuilderForMaps<A, B> extends ClassMapBuilder<A,B> {
             mapAncestor = mapAncestor.findAncestor(Map.class);
         }
         
-        return new MapKeyProperty(expr, mapAncestor.getNestedType(1), null);
+        return new MapKeyProperty(expr, mapAncestor.getNestedType(0), mapAncestor.getNestedType(1), null);
     }
     
 }

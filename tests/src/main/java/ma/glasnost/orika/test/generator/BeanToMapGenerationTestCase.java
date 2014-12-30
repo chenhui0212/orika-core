@@ -229,8 +229,76 @@ public class BeanToMapGenerationTestCase {
         Assert.assertEquals(person.father.last, mapBack.father.last);
             
     }
-	
-	public static class Person {
+
+    @Test
+    public void testNestedMapElementWithIntegerKey() {
+
+
+        MapperFactory factory = MappingUtil.getMapperFactory();
+
+        Type<Map<Integer, String>> mapType = new TypeBuilder<Map<Integer, String>>(){}.build();
+        Type<Name> nameType = TypeFactory.valueOf(Name.class);
+
+        factory.classMap(Name.class, mapType)
+                .field("first", "['0']")
+                .field("last", "['42']")
+                .byDefault()
+                .register();
+
+        MapperFacade mapper = factory.getMapperFacade();
+
+        Name name = new Name();
+        name.first = "Any First Name";
+        name.last = "Any Last Name";
+
+        Map<Integer, String> result = mapper.map(name, nameType, mapType);
+
+        Assert.assertEquals(name.first, result.get(0));
+        Assert.assertEquals(name.last, result.get(42));
+
+        Name mapBack = mapper.map(result, mapType, nameType);
+
+        Assert.assertEquals(name.first, mapBack.first);
+        Assert.assertEquals(name.last, mapBack.last);
+    }
+
+    @Test
+    public void testNestedMapElementWithEnumKey() {
+
+
+        MapperFactory factory = MappingUtil.getMapperFactory();
+
+        Type<Map<NameFields, String>> mapType = new TypeBuilder<Map<NameFields, String>>(){}.build();
+        Type<Name> nameType = TypeFactory.valueOf(Name.class);
+
+        factory.classMap(Name.class, mapType)
+                .field("first", "['FIRST']")
+                .field("last", "['LAST']")
+                .byDefault()
+                .register();
+
+        MapperFacade mapper = factory.getMapperFacade();
+
+        Name name = new Name();
+        name.first = "Any First Name";
+        name.last = "Any Last Name";
+
+        Map<NameFields, String> result = mapper.map(name, nameType, mapType);
+
+        Assert.assertEquals(name.first, result.get(NameFields.FIRST));
+        Assert.assertEquals(name.last, result.get(NameFields.LAST));
+
+        Name mapBack = mapper.map(result, mapType, nameType);
+
+        Assert.assertEquals(name.first, mapBack.first);
+        Assert.assertEquals(name.last, mapBack.last);
+    }
+
+    public static enum NameFields {
+        FIRST, LAST;
+    }
+
+    public static class Person {
 	    public Name name;
 	    public Name father;
 	}
