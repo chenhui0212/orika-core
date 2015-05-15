@@ -55,7 +55,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>janino</groupId>
+			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<scope>compile</scope>
 		</dependency>

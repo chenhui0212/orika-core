@@ -23,7 +23,6 @@ import java.io.StringReader;
 import ma.glasnost.orika.MappingException;
 
 import org.codehaus.janino.ClassLoaderIClassLoader;
-import org.codehaus.janino.DebuggingInformation;
 import org.codehaus.janino.IClassLoader;
 import org.codehaus.janino.Java;
 import org.codehaus.janino.Parser;
@@ -59,7 +58,7 @@ public class JaninoCompilerStrategy extends CompilerStrategy {
             scanner = new Scanner(sourceCode.getClassName(), new StringReader(sourceCode.toSourceFile()));
             Java.CompilationUnit localCompilationUnit = new Parser(scanner).parseCompilationUnit();
             UnitCompiler unitCompile = new UnitCompiler(localCompilationUnit, iClassLoader);
-            ClassFile[] classes = unitCompile.compileUnit(DebuggingInformation.NONE);
+            ClassFile[] classes = unitCompile.compileUnit(false, false, false);
             return classLoader.findClass(classes[0].getThisClassName());
         } catch (Exception e) {
             LOG.error("Can not compile {0}", sourceCode.getClassName(), e);
@@ -68,7 +67,6 @@ public class JaninoCompilerStrategy extends CompilerStrategy {
         
     }
     
-    @Override
     public void assureTypeIsAccessible(Class<?> type) throws SourceCodeGenerationException {
         //
     }
