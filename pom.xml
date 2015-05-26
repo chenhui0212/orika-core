@@ -47,9 +47,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<url>git@github.com:orika-mapper/orika.git</url>
-		<connection>scm:git:git@github.com:orika-mapper/orika.git</connection>
-		<developerConnection>scm:git:git@github.com:orika-mapper/orika.git</developerConnection>
+		<url>https://github.com/orika-mapper/orika.git</url>
+		<connection>scm:git:https://github.com/orika-mapper/orika.git</connection>
+		<developerConnection>scm:git:https://github.com/orika-mapper/orika.git</developerConnection>
 	</scm>
 
 	<properties>
