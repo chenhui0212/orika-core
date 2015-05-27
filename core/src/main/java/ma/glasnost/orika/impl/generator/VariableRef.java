@@ -774,6 +774,34 @@ public class VariableRef {
         }
         return path.toString();
     }
+
+    /**
+     * Return Java code which checks if this path is null;
+     * if it is not backed by a nested property, this method
+     * returns the empty string.
+     *
+     * @return
+     */
+    public String pathNull() {
+        StringBuilder path = new StringBuilder();
+        if (property.hasPath()) {
+            boolean first = true;
+            path.append("(");
+            String expression = this.name;
+
+            for (final Property p : property.getPath()) {
+                if (!first) {
+                    path.append(" || ");
+                } else {
+                    first = false;
+                }
+                path.append(format("(%s)", isNull(p, expression)));
+                expression = getGetter(p, expression);
+            }
+            path.append(")");
+        }
+        return path.toString();
+    }
     
     /**
      * Return Java code which avoids a NullPointerException when accessing this
@@ -785,6 +813,21 @@ public class VariableRef {
     public String ifPathNotNull() {
         if (nullPathPossible) {
             return "if " + pathNotNull();
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Return Java code which checks if this path is null;
+     * if it is not backed by a nested property, this method
+     * returns the empty string.
+     *
+     * @return
+     */
+    public String ifPathNull() {
+        if (nullPathPossible) {
+            return "if " + pathNull();
         } else {
             return "";
         }
