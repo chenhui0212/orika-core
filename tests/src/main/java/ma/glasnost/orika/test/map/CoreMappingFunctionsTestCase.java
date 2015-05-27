@@ -25,16 +25,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Assert;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapEntry;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeBuilder;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CoreMappingFunctionsTestCase {
@@ -42,7 +43,8 @@ public class CoreMappingFunctionsTestCase {
     /*
      * Case 1: from a map to another map
      * 
-     * we iterate over the entry set, map the key and value, and put into new map
+     * we iterate over the entry set, map the key and value, and put into new
+     * map
      */
     @Test
     public void testMapToMap_Simple() {
@@ -54,7 +56,9 @@ public class CoreMappingFunctionsTestCase {
         
         MapperFacade mapper = MappingUtil.getMapperFactory().getMapperFacade();
         
-        Map<String, Integer> result = mapper.mapAsMap(sourceMap, new TypeBuilder<Map<String, Integer>>(){}.build(), new TypeBuilder<Map<String, Integer>>(){}.build());
+        Map<String, Integer> result = mapper.mapAsMap(sourceMap, new TypeBuilder<Map<String, Integer>>() {
+        }.build(), new TypeBuilder<Map<String, Integer>>() {
+        }.build());
         
         Assert.assertNotNull(result);
         Assert.assertNotSame(sourceMap, result);
@@ -71,27 +75,28 @@ public class CoreMappingFunctionsTestCase {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
         factory.getConverterFactory().registerConverter(new CustomConverter<Integer, String>() {
-
+            
             public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
-                return destinationType.getRawType().equals(String.class) && 
-                        (sourceType.getRawType().equals(Integer.class) || 
-                                sourceType.getRawType().equals(int.class));
+                return destinationType.getRawType().equals(String.class)
+                        && (sourceType.getRawType().equals(Integer.class) || sourceType.getRawType().equals(int.class));
             }
-
-            public String convert(Integer source, Type<? extends String> destinationType) {
-                return ""+source;
+            
+            public String convert(Integer source, Type<? extends String> destinationType, MappingContext context) {
+                return "" + source;
             }
             
         });
         MapperFacade mapper = factory.getMapperFacade();
         
-        Map<String, String> result = mapper.mapAsMap(sourceMap, new TypeBuilder<Map<String, Integer>>(){}.build(), new TypeBuilder<Map<String, String>>(){}.build());
+        Map<String, String> result = mapper.mapAsMap(sourceMap, new TypeBuilder<Map<String, Integer>>() {
+        }.build(), new TypeBuilder<Map<String, String>>() {
+        }.build());
         
         Assert.assertNotNull(result);
         Assert.assertNotSame(sourceMap, result);
-        for (Entry<String, Integer> entry: sourceMap.entrySet()) {
+        for (Entry<String, Integer> entry : sourceMap.entrySet()) {
             Assert.assertNotNull(result.get(entry.getKey()));
-            Assert.assertTrue(result.get(entry.getKey()).equals(""+entry.getValue().toString()));
+            Assert.assertTrue(result.get(entry.getKey()).equals("" + entry.getValue().toString()));
         }
         
     }
@@ -99,16 +104,19 @@ public class CoreMappingFunctionsTestCase {
     public static class Ranking {
         private String name;
         private Integer rank;
-         
+        
         public String getName() {
             return name;
         }
+        
         public void setName(String name) {
             this.name = name;
         }
+        
         public Integer getRank() {
             return rank;
         }
+        
         public void setRank(Integer rank) {
             this.rank = rank;
         }
@@ -117,8 +125,9 @@ public class CoreMappingFunctionsTestCase {
     /*
      * Case 2a: from a collection to a map
      * 
-     * we iterate over the collection, and attempt to map each element to a Map.Entry;
-     * we'll need a special concrete destination type since Map.Entry is not concrete
+     * we iterate over the collection, and attempt to map each element to a
+     * Map.Entry; we'll need a special concrete destination type since Map.Entry
+     * is not concrete
      */
     @Test
     public void testCollectionToMap_Simple() {
@@ -138,11 +147,12 @@ public class CoreMappingFunctionsTestCase {
         source.add(r);
         
         /*
-         * To make the map work for Collection to Map, we provide a class mapping
-         * from the element type in the collection to the special type MapEntry which
-         * represents map entries.
+         * To make the map work for Collection to Map, we provide a class
+         * mapping from the element type in the collection to the special type
+         * MapEntry which represents map entries.
          */
-        Type<Map<String, Integer>> mapType = new TypeBuilder<Map<String, Integer>>(){}.build();
+        Type<Map<String, Integer>> mapType = new TypeBuilder<Map<String, Integer>>() {
+        }.build();
         Type<MapEntry<String, Integer>> entryType = MapEntry.concreteEntryType(mapType);
         Type<Ranking> rankingType = TypeFactory.valueOf(Ranking.class);
         
@@ -150,26 +160,27 @@ public class CoreMappingFunctionsTestCase {
         factory.registerClassMap(factory.classMap(rankingType, entryType)
                 .field("name", "key")
                 .field("rank", "value")
-                .byDefault().toClassMap());
-                
+                .byDefault()
+                .toClassMap());
+        
         factory.registerConcreteType(Map.Entry.class, MapEntry.class);
         MapperFacade mapper = factory.getMapperFacade();
         Map<String, Integer> result = mapper.mapAsMap(source, rankingType, mapType);
         
         Assert.assertNotNull(result);
         Assert.assertEquals(source.size(), result.size());
-        for (Ranking ranking: source) {
+        for (Ranking ranking : source) {
             Assert.assertTrue(result.get(ranking.getName()).equals(ranking.getRank()));
         }
- 
+        
     }
-    
     
     /*
      * Case 2b: from an array to a map
      * 
-     * we iterator over the array, and attempt to map each element to a Map.Entry;
-     * we'll need a special concrete destination type since Map.Entry is not concrete
+     * we iterator over the array, and attempt to map each element to a
+     * Map.Entry; we'll need a special concrete destination type since Map.Entry
+     * is not concrete
      */
     @Test
     public void testArrayToMap_Simple() {
@@ -191,32 +202,30 @@ public class CoreMappingFunctionsTestCase {
         Ranking[] source = tempList.toArray(new Ranking[0]);
         
         /*
-         * To make the map work for Collection to Map, we provide a class mapping
-         * from the element type in the collection to the special type MapEntry which
-         * represents map entries.
+         * To make the map work for Collection to Map, we provide a class
+         * mapping from the element type in the collection to the special type
+         * MapEntry which represents map entries.
          */
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.registerClassMap(factory.classMap(Ranking.class, new TypeBuilder<MapEntry<String, Integer>>(){}.build())
-                .field("name", "key")
-                .field("rank", "value")
-                .byDefault().toClassMap());
-                
+        factory.registerClassMap(factory.classMap(Ranking.class, new TypeBuilder<MapEntry<String, Integer>>() {
+        }.build()).field("name", "key").field("rank", "value").byDefault().toClassMap());
+        
         MapperFacade mapper = factory.getMapperFacade();
-        Map<String, Integer> result = mapper.mapAsMap(source, TypeFactory.valueOf(Ranking.class), new TypeBuilder<Map<String, Integer>>(){}.build());
+        Map<String, Integer> result = mapper.mapAsMap(source, TypeFactory.valueOf(Ranking.class), new TypeBuilder<Map<String, Integer>>() {
+        }.build());
         
         Assert.assertNotNull(result);
         Assert.assertEquals(source.length, result.size());
-        for (Ranking ranking: source) {
+        for (Ranking ranking : source) {
             Assert.assertTrue(result.get(ranking.getName()).equals(ranking.getRank()));
         }
- 
-    }   
+        
+    }
     
     /*
      * Case 3a: from a map to a collection
      * 
      * we iterate over the entry set, and map each entry to a collection element
-     * 
      */
     @Test
     public void testMapToCollection_Simple() {
@@ -226,7 +235,8 @@ public class CoreMappingFunctionsTestCase {
         source.put("B", 2);
         source.put("C", 3);
         
-        Type<Map<String, Integer>> mapType = new TypeBuilder<Map<String, Integer>>(){}.build();
+        Type<Map<String, Integer>> mapType = new TypeBuilder<Map<String, Integer>>() {
+        }.build();
         Type<MapEntry<String, Integer>> entryType = MapEntry.concreteEntryType(mapType);
         Type<Ranking> rankingType = TypeFactory.valueOf(Ranking.class);
         
@@ -234,18 +244,20 @@ public class CoreMappingFunctionsTestCase {
         factory.registerClassMap(factory.classMap(rankingType, entryType)
                 .field("name", "key")
                 .field("rank", "value")
-                .byDefault().toClassMap());
-                
+                .byDefault()
+                .toClassMap());
+        
         MapperFacade mapper = factory.getMapperFacade();
         
         List<Ranking> result = mapper.mapAsList(source, mapType, rankingType);
         
         Assert.assertNotNull(result);
         
-        for (Ranking ranking: result) {
+        for (Ranking ranking : result) {
             Assert.assertTrue(source.get(ranking.getName()).equals(ranking.getRank()));
         }
     }
+    
     /*
      * Case 3b: from a map to an array
      * 
@@ -259,24 +271,25 @@ public class CoreMappingFunctionsTestCase {
         source.put("B", 2);
         source.put("C", 3);
         
-        Type<Map<String, Integer>> mapType = new TypeBuilder<Map<String, Integer>>(){}.build();
+        Type<Map<String, Integer>> mapType = new TypeBuilder<Map<String, Integer>>() {
+        }.build();
         Type<MapEntry<String, Integer>> entryType = MapEntry.concreteEntryType(mapType);
         Type<Ranking> rankingType = TypeFactory.valueOf(Ranking.class);
-        
         
         MapperFactory factory = MappingUtil.getMapperFactory();
         factory.registerClassMap(factory.classMap(rankingType, entryType)
                 .field("name", "key")
                 .field("rank", "value")
-                .byDefault().toClassMap());
-                
+                .byDefault()
+                .toClassMap());
+        
         MapperFacade mapper = factory.getMapperFacade();
         
         Ranking[] result = mapper.mapAsArray(new Ranking[source.size()], source, mapType, rankingType);
         
         Assert.assertNotNull(result);
         
-        for (Ranking ranking: result) {
+        for (Ranking ranking : result) {
             Assert.assertTrue(source.get(ranking.getName()).equals(ranking.getRank()));
         }
     }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Filter;
@@ -49,6 +50,20 @@ import ma.glasnost.orika.property.PropertyResolverStrategy;
  * 
  */
 public class VariableRef {
+
+    private static final Set<Class<?>> OPTIONAL_CLASSES = Collections.newSetFromMap(new ConcurrentHashMap<Class<?>, Boolean>());
+    static {
+        try {
+            OPTIONAL_CLASSES.add(Class.forName("java.util.Optional"));
+        } catch (ClassNotFoundException e) {
+            // No j.u.Optional...
+        }
+        try {
+            OPTIONAL_CLASSES.add(Class.forName("com.google.common.base.Optional"));
+        } catch (ClassNotFoundException e) {
+            // No Guava Optional...
+        }
+    }
     
     protected String name;
     private Property property;
@@ -133,7 +148,19 @@ public class VariableRef {
     public Type<?> type() {
         return type;
     }
-    
+
+    public boolean isOptional() {
+        final Class<?> rawType = rawType();
+
+        for (final Class<?> optionalClass : OPTIONAL_CLASSES) {
+            if (optionalClass.isAssignableFrom(rawType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean isPrimitive() {
         return type.isPrimitive();
     }
@@ -472,6 +499,10 @@ public class VariableRef {
     }
     
     public String isNull() {
+        if (isOptional()) {
+            return String.format("(%1$s == null || !%1$s.isPresent())", getter());
+        }
+
         return property != null ? isNull(property, name) : getter() + " == null";
     }
     

@@ -22,15 +22,17 @@ import ma.glasnost.orika.metadata.Type;
 /**
  * Converter is used to provide direct conversion from one type to another,
  * useful for those scenarios where complete control over the mapping is
- * desired.<br><br>
+ * desired.<br>
+ * <br>
  * 
- * Note that an instance of the current MapperFacade is provided in the <code>convert</code>
- * method for cases where you only want to control a specific portion of the mapping, 
- * but wish to delegate some or all of the mapping of the nested types.
- * <br><br>
+ * Note that an instance of the current MapperFacade is provided in the
+ * <code>convert</code> method for cases where you only want to control a
+ * specific portion of the mapping, but wish to delegate some or all of the
+ * mapping of the nested types. <br>
+ * <br>
  * 
- * See also {@link ma.glasnost.orika.CustomConverter} for a base class which can be
- * extended to create your own custom converter instance.
+ * See also {@link ma.glasnost.orika.CustomConverter} for a base class which can
+ * be extended to create your own custom converter instance.
  *
  * @param <S>
  * @param <D>
@@ -38,8 +40,8 @@ import ma.glasnost.orika.metadata.Type;
 public interface Converter<S, D> extends MappedTypePair<S, D> {
     
     /**
-     * Answers whether this converter can be used to handle the conversion of <code>sourceType</code>
-     * to <code>destinationType</code>.
+     * Answers whether this converter can be used to handle the conversion of
+     * <code>sourceType</code> to <code>destinationType</code>.
      * 
      * @param sourceType
      * @param destinationType
@@ -51,17 +53,24 @@ public interface Converter<S, D> extends MappedTypePair<S, D> {
      * Perform the conversion of <code>source</code> into a new instance of
      * <code>destinationType</code>.
      * 
-     * @param source the source object to be converted
-     * @param destinationType the destination type to produce
+     * @param source
+     *            the source object to be converted
+     * @param destinationType
+     *            the destination type to produce
+     * @param mappingContext
+     *            since converters now have access to <code>MapperFacade</code>,
+     *            they have to pass mapping context
+     * 
      * @return a new instance of <code>destinationType</code>
      */
-    D convert(S source, Type<? extends D> destinationType);
+    D convert(S source, Type<? extends D> destinationType, MappingContext mappingContext);
     
     /**
-     * Store an instance of the current MapperFacade which may be used 
-     * in mapping of nested types.
+     * Store an instance of the current MapperFacade which may be used in
+     * mapping of nested types.
      * 
-     * @param mapper the current MapperFacade
+     * @param mapper
+     *            the current MapperFacade
      */
     void setMapperFacade(MapperFacade mapper);
 }

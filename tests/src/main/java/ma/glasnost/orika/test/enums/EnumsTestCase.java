@@ -18,9 +18,10 @@
 
 package ma.glasnost.orika.test.enums;
 
+import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.enums.EnumsTestCaseClasses.Book;
@@ -74,8 +75,9 @@ public class EnumsTestCase {
         MapperFactory factory = MappingUtil.getMapperFactory();
         
         factory.getConverterFactory().registerConverter(new CustomConverter<PublicationFormat, PublicationFormatDTOAltCase>() {
-
-            public PublicationFormatDTOAltCase convert(PublicationFormat source, Type<? extends PublicationFormatDTOAltCase> destinationType) {
+            
+            public PublicationFormatDTOAltCase convert(PublicationFormat source,
+                    Type<? extends PublicationFormatDTOAltCase> destinationType, MappingContext context) {
                 switch (source) {
                 case HARDBACK:
                     return PublicationFormatDTOAltCase.hardBack;
@@ -102,9 +104,9 @@ public class EnumsTestCase {
     public void testMapAlternateEnumWithConverter() {
         MapperFactory factory = MappingUtil.getMapperFactory();
         factory.getConverterFactory().registerConverter(new CustomConverter<PublicationFormat, PublicationFormatDTOAlternate>() {
-
+            
             public PublicationFormatDTOAlternate convert(PublicationFormat source,
-                    Type<? extends PublicationFormatDTOAlternate> destinationType) {
+                    Type<? extends PublicationFormatDTOAlternate> destinationType, MappingContext context) {
                 switch (source) {
                 case HARDBACK:
                     return PublicationFormatDTOAlternate.PUB_HARDBACK;

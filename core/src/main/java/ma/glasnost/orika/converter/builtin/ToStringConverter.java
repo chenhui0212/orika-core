@@ -17,21 +17,22 @@
  */
 package ma.glasnost.orika.converter.builtin;
 
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
-
 
 /**
  * Converts any object to string
  * 
  * @author matt.deboer@gmail.com
+ * @author elaatifi@gmail.com
  */
 public class ToStringConverter extends BuiltinCustomConverter<Object, Object> {
-
+    
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
         return destinationType.isString();
     }
     
-	public Object convert(Object source, Type<? extends Object> destinationType) {
-		return "" + source;
-	}
+    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
+        return "" + source;
+    }
 }

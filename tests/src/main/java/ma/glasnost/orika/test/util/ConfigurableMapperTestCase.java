@@ -21,8 +21,8 @@ package ma.glasnost.orika.test.util;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.ConfigurableMapper;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 
 import org.junit.Assert;
@@ -35,15 +35,16 @@ public class ConfigurableMapperTestCase {
         protected void configure(MapperFactory mapperFactory) {
             mapperFactory.getConverterFactory().registerConverter(new CustomConverter<Address, String>() {
                 
-                public String convert(Address source, Type<? extends String> destinationType) {
+                public String convert(Address source, Type<? extends String> destinationType, MappingContext context) {
                     return source.getLine1() + " " + source.getLine2();
                 }
             });
             
             mapperFactory.classMap(Order.class, OrderDTO.class)
-                .fieldMap("customer.address", "shippingAddress").add()
-                .byDefault()
-                .register();
+                    .fieldMap("customer.address", "shippingAddress")
+                    .add()
+                    .byDefault()
+                    .register();
         }
         
     }

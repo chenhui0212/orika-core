@@ -30,6 +30,7 @@ import java.util.List;
 
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import ma.glasnost.orika.metadata.Type;
 
@@ -62,7 +63,7 @@ public class Issue44TestCase {
             protected void configure(MapperFactory factory) {
                 factory.getConverterFactory().registerConverter("productToName", new CustomConverter<List<Product>, List<String>>() {
                     
-                    public List<String> convert(List<Product> source, Type<? extends List<String>> destinationType) {
+                    public List<String> convert(List<Product> source, Type<? extends List<String>> destinationType, MappingContext context) {
                         ArrayList<String> list = new ArrayList<String>(source.size());
                         for (Product product : source) {
                             list.add(product.getName());
@@ -94,7 +95,7 @@ public class Issue44TestCase {
             protected void configure(MapperFactory factory) {
                 factory.getConverterFactory().registerConverter("productToName", new CustomConverter<Product, String>() {
                     
-                    public String convert(Product source, Type<? extends String> destinationType) {
+                    public String convert(Product source, Type<? extends String> destinationType, MappingContext context) {
                         return source.getName();
                     }
                 });
@@ -123,7 +124,7 @@ public class Issue44TestCase {
             protected void configure(MapperFactory factory) {
                 factory.getConverterFactory().registerConverter("productToName", new CustomConverter<Product, String>() {
                     
-                    public String convert(Product source, Type<? extends String> destinationType) {
+                    public String convert(Product source, Type<? extends String> destinationType, MappingContext context) {
                         return source.getName();
                     }
                 });

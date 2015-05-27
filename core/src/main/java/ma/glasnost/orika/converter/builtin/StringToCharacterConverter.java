@@ -17,28 +17,38 @@
  */
 package ma.glasnost.orika.converter.builtin;
 
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.metadata.Type;
 
 /**
- * 
+ * Provides String to Character conversion
  *
+ * @author elaatifi@gmail.com
  */
 public class StringToCharacterConverter extends BidirectionalConverter<String, Character> {
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang.Object, ma.glasnost.orika.metadata.Type)
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.converter.BidirectionalConverter#convertTo(java.lang
+     * .Object, ma.glasnost.orika.metadata.Type)
      */
     @Override
-    public Character convertTo(String source, Type<Character> destinationType) {
+    public Character convertTo(String source, Type<Character> destinationType, MappingContext context) {
         return source.charAt(0);
     }
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang.Object, ma.glasnost.orika.metadata.Type)
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ma.glasnost.orika.converter.BidirectionalConverter#convertFrom(java.lang
+     * .Object, ma.glasnost.orika.metadata.Type)
      */
     @Override
-    public String convertFrom(Character source, Type<String> destinationType) {
+    public String convertFrom(Character source, Type<String> destinationType, MappingContext context) {
         return "" + source;
     }
     

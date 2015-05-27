@@ -21,21 +21,17 @@ import java.util.Date;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import ma.glasnost.orika.converter.CustomConverterBase;
+import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.metadata.Type;
 
-@SuppressWarnings("deprecation")
-public class XMLGregorianCalendarToDateConverter extends CustomConverterBase<XMLGregorianCalendar, Date> {
+public class XMLGregorianCalendarToDateConverter extends CustomConverter<XMLGregorianCalendar, Date> {
     
-    public Date convert(XMLGregorianCalendar source, Class<? extends Date> destinationClass) {
+    public Date convert(XMLGregorianCalendar source, Type<? extends Date> destinationClass, MappingContext context) {
         Date target = null;
         if (source != null) {
             target = source.toGregorianCalendar().getTime();
         }
         return target;
     }
-    
-    public boolean canConvert(Class<XMLGregorianCalendar> sourceClass, Class<? extends Date> destinationClass) {
-        return XMLGregorianCalendar.class.isAssignableFrom(sourceClass) && Date.class.equals(destinationClass);
-    }
-    
 }

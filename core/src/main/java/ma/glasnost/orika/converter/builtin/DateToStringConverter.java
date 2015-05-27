@@ -22,14 +22,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.metadata.Type;
 
 /**
- * DateToStringConverter provides custom conversion from String values
- * to and from Date instances, based on a provided date format pattern.<br><br>
+ * DateToStringConverter provides custom conversion from String values to and
+ * from Date instances, based on a provided date format pattern.<br>
+ * <br>
  * 
- * The format is applied based on the rules defined in {@link java.text.SimpleDateFormat}.
+ * The format is applied based on the rules defined in
+ * {@link java.text.SimpleDateFormat}.
+ * 
+ * @author elaatifi@gmail.com
  *
  */
 public class DateToStringConverter extends BidirectionalConverter<Date, String> {
@@ -42,25 +47,26 @@ public class DateToStringConverter extends BidirectionalConverter<Date, String> 
      * @return a SimpleDateFormat instance safe for use in the current thread
      */
     private SimpleDateFormat getDateFormat() {
-    	SimpleDateFormat formatter = dateFormats.get();
-    	if (formatter == null) {
-    		formatter = new SimpleDateFormat(pattern, locale);
-    		dateFormats.set(formatter);
-    	}
-    	return formatter;
+        SimpleDateFormat formatter = dateFormats.get();
+        if (formatter == null) {
+            formatter = new SimpleDateFormat(pattern, locale);
+            dateFormats.set(formatter);
+        }
+        return formatter;
     }
     
     /**
-     * Constructs a new instance of DateToStringConverter capable of
-     * parsing and constructing Date strings according to the provided format. 
+     * Constructs a new instance of DateToStringConverter capable of parsing and
+     * constructing Date strings according to the provided format.
      * 
-     * @param format the format descriptor, processed according to the rules
-     * defined in {@link java.text.SimpleDateFormat}
+     * @param format
+     *            the format descriptor, processed according to the rules
+     *            defined in {@link java.text.SimpleDateFormat}
      */
     public DateToStringConverter(final String format) {
         this(format, Locale.getDefault());
     }
-
+    
     /**
      * Constructs a new instance of DateToStringConverter with given locale
      */
@@ -70,16 +76,16 @@ public class DateToStringConverter extends BidirectionalConverter<Date, String> 
     }
     
     @Override
-	public String convertTo(Date source, Type<String> destinationType) {
+    public String convertTo(Date source, Type<String> destinationType, MappingContext context) {
         return getDateFormat().format(source);
     }
     
     @Override
-	public Date convertFrom(String source, Type<Date> destinationType) {
+    public Date convertFrom(String source, Type<Date> destinationType, MappingContext context) {
         try {
             return getDateFormat().parse(source);
         } catch (ParseException e) {
             return null;
         }
-    }    
+    }
 }

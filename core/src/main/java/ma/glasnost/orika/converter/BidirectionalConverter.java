@@ -19,6 +19,7 @@ package ma.glasnost.orika.converter;
 
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
@@ -36,25 +37,24 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
     
     private volatile Reversed<D, S> reversed;
     
-    public abstract D convertTo(S source, Type<D> destinationType);
+    public abstract D convertTo(S source, Type<D> destinationType, MappingContext mappingContext);
     
-    public abstract S convertFrom(D source, Type<S> destinationType);
+    public abstract S convertFrom(D source, Type<S> destinationType, MappingContext mappingContext);
     
     @SuppressWarnings("unchecked")
-    public Object convert(Object source, Type<? extends Object> destinationType) {
+    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext mappingContext) {
         if (this.destinationType.isAssignableFrom(destinationType) || this.destinationType.isWrapperFor(destinationType)
                 || this.destinationType.isPrimitiveFor(destinationType)) {
-            return convertTo((S) source, (Type<D>) destinationType);
+            return convertTo((S) source, (Type<D>) destinationType, mappingContext);
         } else {
-            return convertFrom((D) source, (Type<S>) destinationType);
+            return convertFrom((D) source, (Type<S>) destinationType, mappingContext);
         }
     }
     
     @Override
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
         
-        return super.canConvert(sourceType, destinationType) || this.destinationType.isAssignableFrom(sourceType)
-                && this.sourceType.equals(destinationType);
+        return super.canConvert(sourceType, destinationType) || super.canConvert(destinationType, sourceType);
     }
     
     public String toString() {
@@ -92,13 +92,13 @@ public abstract class BidirectionalConverter<S, D> extends CustomConverter<Objec
         }
         
         @Override
-        public D convertTo(S source, Type<D> destinationType) {
-            return delegate.convertFrom(source, destinationType);
+        public D convertTo(S source, Type<D> destinationType, MappingContext mappingContext) {
+            return delegate.convertFrom(source, destinationType, mappingContext);
         }
         
         @Override
-        public S convertFrom(D source, Type<S> destinationType) {
-            return delegate.convertTo(source, destinationType);
+        public S convertFrom(D source, Type<S> destinationType, MappingContext mappingContext) {
+            return delegate.convertTo(source, destinationType, mappingContext);
         }
         
         public BidirectionalConverter<D, S> reverse() {

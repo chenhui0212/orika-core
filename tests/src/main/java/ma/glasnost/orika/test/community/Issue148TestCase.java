@@ -20,6 +20,7 @@ package ma.glasnost.orika.test.community;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 import ma.glasnost.orika.metadata.Type;
@@ -33,117 +34,119 @@ import org.junit.Test;
  * @since 07.03.14
  */
 public class Issue148TestCase {
-
+    
     // one class has a simple string property
     public static class A {
         private String code;
-
+        
         public String getCode() {
             return code;
         }
-
+        
         public void setCode(String code) {
             this.code = code;
         }
     }
-
+    
     // the other class has the same string property, wrapped in an object
     public static class B {
         private WrapperObject code;
-
+        
         public WrapperObject getCode() {
             return code;
         }
-
+        
         public void setCode(WrapperObject code) {
             this.code = code;
         }
     }
-
+    
     private static MapperFacade mapper;
-
+    
     @BeforeClass
     public static void init() {
-
+        
         DefaultMapperFactory.Builder factoryBuilder = new DefaultMapperFactory.Builder();
         factoryBuilder.compilerStrategy(new EclipseJdtCompilerStrategy());
         MapperFactory factory = factoryBuilder.build();
-
+        
         factory.getConverterFactory().registerConverter(new Converter.Object2String());
         factory.getConverterFactory().registerConverter(new Converter.String2Object());
-
-
+        
         mapper = factory.getMapperFacade();
     }
-
-
+    
     @Test
-    // map string to wrapper object. expectation: wrapper object should contain string
+    // map string to wrapper object. expectation: wrapper object should contain
+    // string
     public void testA2BwithValue() {
         A a = new A();
         a.code = "x";
-
+        
         B b = mapper.map(a, B.class);
-
+        
         Assert.assertNotNull(b);
         Assert.assertEquals(a.code, b.code.getId());
     }
-
+    
     @Test
-    // map wrapper object to string. expectation: string should contain content of wrapper object
+    // map wrapper object to string. expectation: string should contain content
+    // of wrapper object
     public void testB2AwithValue() {
         B b = new B();
         b.code = new WrapperObject();
         b.code.setId("x");
-
+        
         A a = mapper.map(b, A.class);
-
+        
         Assert.assertNotNull(a);
         Assert.assertEquals(b.code.getId(), a.code);
     }
-
+    
     @Test
-    // map null string to wrapper object. expectation: wrapper object should be null
+    // map null string to wrapper object. expectation: wrapper object should be
+    // null
     public void testA2BwithNullValue() {
         B b = new B();
         b.code = new WrapperObject();
         b.code.setId(null);
-
+        
         A a = mapper.map(b, A.class);
-
+        
         Assert.assertNotNull(a);
         Assert.assertNull(a.code);
     }
-
+    
     @Test
     // map null wrapper object to string. expectation: string should be null
     public void testB2AwithNullWrapper() {
         B b = new B();
         b.code = null;
-
+        
         A a = mapper.map(b, A.class);
-
+        
         Assert.assertNotNull(a);
         Assert.assertNull(a.code);
     }
-
+    
     @Test
-    // map wrapper object with null content to string. expectation: string should be null
+    // map wrapper object with null content to string. expectation: string
+    // should be null
     public void testB2AwithNullValue() {
         B b = new B();
         b.code = new WrapperObject();
         b.code.setId(null);
-
+        
         A a = mapper.map(b, A.class);
-
+        
         Assert.assertNotNull(a);
         Assert.assertNull(a.code);
     }
     
     public static class Converter {
-
+        
         public static class String2Object extends CustomConverter<String, WrapperObject> {
-            public WrapperObject convert(String source, Type<? extends WrapperObject> destinationType) {
+            public WrapperObject convert(String source, Type<? extends WrapperObject> destinationType, MappingContext context) {
                 if (source == null) {
                     return null;
                 } else {
@@ -153,9 +156,9 @@ public class Issue148TestCase {
                 }
             }
         }
-
+        
         public static class Object2String extends CustomConverter<WrapperObject, String> {
-            public String convert(WrapperObject source, Type<? extends String> destinationType) {
+            public String convert(WrapperObject source, Type<? extends String> destinationType, MappingContext context) {
                 if (source == null) {
                     return null;
                 } else {
@@ -167,15 +170,14 @@ public class Issue148TestCase {
     
     public static class WrapperObject {
         private String id;
-
+        
         public String getId() {
             return id;
         }
-
+        
         public void setId(String id) {
             this.id = id;
         }
     }
     
 }
-

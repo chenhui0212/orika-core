@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>orika-parent</artifactId>
 		<groupId>ma.glasnost.orika</groupId>
-		<version>1.4.7-SNAPSHOT</version>
+		<version>1.5.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>orika-tests</artifactId>
@@ -136,6 +136,10 @@
 			<artifactId>jaxb-impl</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
 
 	</dependencies>
 

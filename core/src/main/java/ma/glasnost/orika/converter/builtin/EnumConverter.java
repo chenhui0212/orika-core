@@ -17,25 +17,30 @@
  */
 package ma.glasnost.orika.converter.builtin;
 
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.Type;
 
-
 /**
- * EnumConverter is used to convert from one enum to another, based on
- * exact name match
+ * EnumConverter is used to convert from one enum to another, based on exact
+ * name match
+ * 
+ * @author elaatifi@gmail.com
  */
 public class EnumConverter extends BuiltinCustomConverter<Object, Object> {
     
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
         return sourceType.isEnum() && destinationType.isEnum();
     }
-
-    /* (non-Javadoc)
-     * @see ma.glasnost.orika.Converter#convert(java.lang.Object, ma.glasnost.orika.metadata.Type)
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ma.glasnost.orika.Converter#convert(java.lang.Object,
+     * ma.glasnost.orika.metadata.Type)
      */
-    public Object convert(Object source, Type<? extends Object> destinationType) {
+    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        Enum<?> result = (Enum<?>) Enum.valueOf((Class<Enum>)destinationType.getRawType(), ((Enum)source).name());
+        Enum<?> result = (Enum<?>) Enum.valueOf((Class<Enum>) destinationType.getRawType(), ((Enum) source).name());
         return result;
     }
 }

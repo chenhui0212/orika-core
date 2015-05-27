@@ -57,7 +57,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
 	public void testDateToCalendarConverter() {
 		MapperFactory factory = MappingUtil.getMapperFactory();
-		factory.getConverterFactory().registerConverter(new DateToCalendarConverter());
 		MapperFacade mapper = factory.getMapperFacade();
 		
 		Date now = new Date();
@@ -71,7 +70,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
     public void testSqlDateToCalendarConverter() {
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.getConverterFactory().registerConverter(new DateToCalendarConverter());
         MapperFacade mapper = factory.getMapperFacade();
         
         java.sql.Date now = new java.sql.Date(System.currentTimeMillis());
@@ -181,7 +179,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
 	public void testCalendarToXmlGregorianCalendarConverter() {
 		MapperFactory factory = MappingUtil.getMapperFactory();
-		factory.getConverterFactory().registerConverter(new CalendarToXmlGregorianCalendarConverter());
 		MapperFacade mapper = factory.getMapperFacade();
 		
 		Calendar cal = Calendar.getInstance();
@@ -195,7 +192,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
 	public void testLongToXmlGregorianCalendarConverter() {
 		MapperFactory factory = MappingUtil.getMapperFactory();
-		factory.getConverterFactory().registerConverter(new LongToXmlGregorianCalendarConverter());
 		MapperFacade mapper = factory.getMapperFacade();
 		
 		long now = System.currentTimeMillis();
@@ -210,7 +206,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
 	public void testLongToDateConverter() {
 		MapperFactory factory = MappingUtil.getMapperFactory();
-		factory.getConverterFactory().registerConverter(new LongToDateConverter());
 		MapperFacade mapper = factory.getMapperFacade();
 		
 		long now = System.currentTimeMillis();
@@ -224,7 +219,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
     public void testLongToTimeConverter() {
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.getConverterFactory().registerConverter(new LongToDateConverter());
         MapperFacade mapper = factory.getMapperFacade();
         
         long now = System.currentTimeMillis();
@@ -238,7 +232,6 @@ public class DateAndTimeConvertersTestCase {
 	@Test
     public void testLongToSqlDateConverter() {
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.getConverterFactory().registerConverter(new LongToDateConverter());
         MapperFacade mapper = factory.getMapperFacade();
         
         long now = System.currentTimeMillis();

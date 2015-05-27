@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JavassistCompilerStrategy extends CompilerStrategy {
     
+    private static final Random RANDOM = new Random();
     private static final String WRITE_SOURCE_FILES_BY_DEFAULT = "false";
     private static final String WRITE_CLASS_FILES_BY_DEFAULT = "false";
     
@@ -203,7 +204,7 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
         StringBuilder className = new StringBuilder(sourceCode.getClassName());
         CtClass byteCodeClass = null;
         int attempts = 0;
-        Random rand = new Random();
+        Random rand = RANDOM;
         while (byteCodeClass == null) {
             try {
                 byteCodeClass = classPool.makeClass(className.toString());
@@ -225,7 +226,7 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
             writeSourceFile(sourceCode);
             
             // TODO: do we really need this check here?
-            assureTypeIsAccessible(this.getClass());
+            // assureTypeIsAccessible(this.getClass());
             
             Boolean existing = superClasses.put(sourceCode.getSuperClass(), true);
             if (existing == null || !existing) {
@@ -252,14 +253,14 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
                 try {
                     byteCodeClass.addMethod(CtNewMethod.make(methodDef, byteCodeClass));
                 } catch (CannotCompileException e) {
-                    LOG.error("An exception occured while compiling the following method:\n\n " + methodDef
-                            + "\n\n for " + sourceCode.getClassName() + "\n", e);
+                    LOG.error(
+                            "An exception occured while compiling the following method:\n\n " + methodDef + "\n\n for "
+                                    + sourceCode.getClassName() + "\n", e);
                     throw e;
                 }
                 
             }
             compiledClass = byteCodeClass.toClass(this.getClass().getClassLoader(), this.getClass().getProtectionDomain());
-            
             
             writeClassFile(sourceCode, byteCodeClass);
             

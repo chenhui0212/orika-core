@@ -1631,22 +1631,6 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
             return delegate.canConvert(sourceType, destinationType);
         }
-        
-        @SuppressWarnings("deprecation")
-        public <S, D> void registerConverter(ma.glasnost.orika.converter.Converter<S, D> converter) {
-            delegate.registerConverter(converter);
-            if (isBuilding || isBuilt) {
-                mapperFacade.factoryModified(DefaultMapperFactory.this);
-            }
-        }
-        
-        @SuppressWarnings("deprecation")
-        public <S, D> void registerConverter(String converterId, ma.glasnost.orika.converter.Converter<S, D> converter) {
-            delegate.registerConverter(converterId, converter);
-            if (isBuilding || isBuilt) {
-                mapperFacade.factoryModified(DefaultMapperFactory.this);
-            }
-        }
     }
     
 }
