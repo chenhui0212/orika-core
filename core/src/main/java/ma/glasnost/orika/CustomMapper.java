@@ -18,8 +18,6 @@
 
 package ma.glasnost.orika;
 
-import java.lang.reflect.ParameterizedType;
-
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
@@ -32,22 +30,22 @@ import ma.glasnost.orika.metadata.TypeFactory;
  */
 public abstract class CustomMapper<A, B> implements Mapper<A, B> {
     
+    private static final Type<Mapper> MAPPER_INTERFACE = TypeFactory.valueOf(Mapper.class);
     protected Type<A> aType;
     protected Type<B> bType;
     protected MapperFacade mapperFacade;
     
     public CustomMapper() {
-        java.lang.reflect.Type genericSuperclass = getClass().getGenericSuperclass();
-        if (genericSuperclass != null && genericSuperclass instanceof ParameterizedType) {
-            ParameterizedType superType = (ParameterizedType)getClass().getGenericSuperclass();
-            try {
-                aType = TypeFactory.valueOf(superType.getActualTypeArguments()[0]);
-                bType = TypeFactory.valueOf(superType.getActualTypeArguments()[1]);
-            } catch (IllegalArgumentException e) {
-                /* do nothing; this was not extended by a user 
-                 * getXXType methods must be manually overridden 
-                 */
-            }
+        try {
+            Type<?> mapperInterface = TypeFactory.valueOf(getClass()).findInterface(MAPPER_INTERFACE);
+            java.lang.reflect.Type[] actualTypeArguments = mapperInterface.getActualTypeArguments();
+            aType = TypeFactory.valueOf(actualTypeArguments[0]);
+            bType = TypeFactory.valueOf(actualTypeArguments[1]);
+        } catch (IllegalArgumentException e) {
+            /*
+             * do nothing; this was not extended by a user getXXType methods
+             * must be manually overridden
+             */
         }
     }
     
@@ -60,14 +58,14 @@ public abstract class CustomMapper<A, B> implements Mapper<A, B> {
     }
     
     public Type<A> getAType() {
-        if (aType==null) {
+        if (aType == null) {
             throw new IllegalStateException("getAType() must be overridden when Type parameters are not supplied");
         }
         return aType;
     }
     
     public Type<B> getBType() {
-        if (bType==null) {
+        if (bType == null) {
             throw new IllegalStateException("getBType() must be overridden when Type parameters are not supplied");
         }
         return bType;

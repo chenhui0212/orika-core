@@ -18,12 +18,12 @@
 
 package ma.glasnost.orika.test.custommapper;
 
-import org.junit.Assert;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.test.MappingUtil;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CustomMappingTestCase {
@@ -32,16 +32,13 @@ public class CustomMappingTestCase {
     public void testCustomMapping() {
         MapperFactory factory = MappingUtil.getMapperFactory();
         
-        factory.classMap(PersonDTO.class, Person.class)
-                .customize(
-                        new CustomMapper<PersonDTO, Person>() {
-                            @Override
-                            public void mapBtoA(Person b, PersonDTO a, MappingContext context) {
-                                a.setName(b.getFirstName() + " " + b.getLastName());
-                            }
-                            
-                        })
-               .register();
+        factory.classMap(PersonDTO.class, Person.class).customize(new CustomMapper<PersonDTO, Person>() {
+            @Override
+            public void mapBtoA(Person b, PersonDTO a, MappingContext context) {
+                a.setName(b.getFirstName() + " " + b.getLastName());
+            }
+            
+        }).register();
         
         Person person = new Person();
         person.setFirstName("Abdelkrim");
@@ -50,6 +47,31 @@ public class CustomMappingTestCase {
         PersonDTO dto = factory.getMapperFacade().map(person, PersonDTO.class);
         
         Assert.assertEquals(dto.getName(), person.getFirstName() + " " + person.getLastName());
+    }
+    
+    @Test
+    public void testCustomInheritedMapping() {
+        MapperFactory factory = MappingUtil.getMapperFactory();
+        
+        factory.classMap(PersonDTO.class, Person.class).customize(new CustomPersonMapper<PersonDTO>() {
+            @Override
+            public void mapBtoA(Person b, PersonDTO a, MappingContext context) {
+                a.setName(b.getFirstName() + " " + b.getLastName());
+            }
+            
+        }).register();
+        
+        Person person = new Person();
+        person.setFirstName("Abdelkrim");
+        person.setLastName("EL KHETTABI");
+        
+        PersonDTO dto = factory.getMapperFacade().map(person, PersonDTO.class);
+        
+        Assert.assertEquals(dto.getName(), person.getFirstName() + " " + person.getLastName());
+    }
+    
+    public static class CustomPersonMapper<D> extends CustomMapper<D, Person> {
+        
     }
     
     public static class PersonDTO {
