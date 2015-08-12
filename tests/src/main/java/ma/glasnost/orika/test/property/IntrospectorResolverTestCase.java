@@ -76,7 +76,47 @@ public class IntrospectorResolverTestCase {
 	    
 	    Assert.assertNotNull(city.getSetter());
 	}
-	
+
+	@Test
+	public void testExcludeTransient() {
+
+		/* Test include */
+		PropertyResolverStrategy resolver = new IntrospectorPropertyResolver(false, true);
+		Map<String, Property> props = resolver.getProperties(TransientContainer.class);
+		Assert.assertTrue(props.containsKey("trans"));
+
+		resolver = new IntrospectorPropertyResolver(false);
+		props = resolver.getProperties(TransientContainer.class);
+		Assert.assertTrue(props.containsKey("trans"));
+
+		/* Test exclude not functional pre java 7 */
+		//resolver = new IntrospectorPropertyResolver(false, false);
+		//props = resolver.getProperties(TransientContainer.class);
+		//Assert.assertFalse(props.containsKey("trans"));
+	}
+
+	public static class TransientContainer {
+		private String nonTrans;
+		private String trans;
+
+		public String getNonTrans() {
+			return nonTrans;
+		}
+
+		public void setNonTrans(String nonTrans) {
+			this.nonTrans = nonTrans;
+		}
+
+		//@java.beans.Transient
+		public String getTrans() {
+			return trans;
+		}
+
+		public void setTrans(String trans) {
+			this.trans = trans;
+		}
+	}
+
 	public static class Point {
 		private int x, y;
 
