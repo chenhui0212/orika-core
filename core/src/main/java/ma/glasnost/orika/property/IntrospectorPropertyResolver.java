@@ -18,10 +18,8 @@
 
 package ma.glasnost.orika.property;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import java.beans.*;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -37,16 +35,35 @@ import ma.glasnost.orika.metadata.Type;
  * 
  */
 public class IntrospectorPropertyResolver extends PropertyResolver {
-    
+
+    private boolean includeTransientFields;
+
+    /**
+     * Constructs a new IntrospectorPropertyResolver that processes transient fields
+     * (backward compatibility)
+     *
+     * @param includePublicFields
+     *            whether properties for public fields should be processed as
+     *            properties
+     */
+    public IntrospectorPropertyResolver(boolean includePublicFields) {
+        this(includePublicFields, true);
+    }
+
+
     /**
      * Constructs a new IntrospectorPropertyResolver
      * 
      * @param includePublicFields
      *            whether properties for public fields should be processed as
      *            properties
+     * @param  includeTransientFields
+     *            whether properties (getters) annotated with <code>java.beans.Transient</code>
+     *            should be processed
      */
-    public IntrospectorPropertyResolver(boolean includePublicFields) {
+    public IntrospectorPropertyResolver(boolean includePublicFields, boolean includeTransientFields) {
         super(includePublicFields);
+        this.includeTransientFields = includeTransientFields;
     }
     
     /**
@@ -77,7 +94,11 @@ public class IntrospectorPropertyResolver extends PropertyResolver {
             for (final PropertyDescriptor pd : descriptors) {
                 
                 try {
+
                     Method readMethod = getReadMethod(pd, type);
+                    if (!includeTransientFields && isTransient(readMethod)) {
+                        continue;
+                    }
                     Method writeMethod = getWriteMethod(pd, type, null);
                     
                     Property property = 
@@ -98,7 +119,25 @@ public class IntrospectorPropertyResolver extends PropertyResolver {
             throw new MappingException(e);
         }
     }
-    
+
+    /**
+     * The annotation @java.beans.Transient is available since Java 7.
+     * To ensure backward compatibility we avoid using a class reference.
+     * @param readMethod The getter method
+     * @return True, if annotated with @java.beans.Transient
+     */
+    private boolean isTransient(Method readMethod) {
+        if (readMethod != null) {
+            Annotation[] annotations = readMethod.getAnnotations();
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType().getName().equals("java.beans.Transient")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * This method performs special handling to deal with deficiencies in older (pre java-7)
      * versions of the introspector, which don't properly match getters with setters in
