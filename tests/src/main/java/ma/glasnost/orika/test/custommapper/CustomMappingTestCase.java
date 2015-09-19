@@ -87,7 +87,7 @@ public class CustomMappingTestCase {
     public void testCustomCollectionWildcardMapping() {
         CustomCollectionWithWildcardsMapper mapper = new CustomCollectionWithWildcardsMapper();
 
-        assertThat(mapper.getAType().toString(), is("Collection<Object>")); // ? super PersonDTO
+        assertThat(mapper.getAType().toString(), is("Collection<PersonDTO>")); // ? super PersonDTO
         assertThat(mapper.getBType().toString(), is("Collection<Person>")); // ? extends Person
     }
     @Test

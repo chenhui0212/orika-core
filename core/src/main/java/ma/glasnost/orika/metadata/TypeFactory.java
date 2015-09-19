@@ -304,31 +304,18 @@ public abstract class TypeFactory {
      * @return the resolved Type instance
      */
     private static Type<?> refineBounds(Set<Type<?>> bounds) {
-        if (bounds.size() > 1) {
-            // Consolidate bounds to most significant
-            Iterator<Type<?>> currentBoundIter = bounds.iterator();
-            while (currentBoundIter.hasNext()) {
-                Type<?> currentBound = currentBoundIter.next();
-                Iterator<Type<?>> boundIter = bounds.iterator();
-                while (boundIter.hasNext()) {
-                    Type<?> nextType = boundIter.next();
-                    if (nextType.equals(currentBound)) {
-                        continue;
-                    } else {
-                        Type<?> mostSpecific = TypeUtil.getMostSpecificType(currentBound, nextType);
-                        if (nextType.equals(mostSpecific)) {
-                            boundIter.remove();
-                        }
-                    }
-                    
-                }
-            }
-            if (bounds.size() != 1) {
-                throw new IllegalArgumentException(bounds + " is not refinable");
+        // Consolidate bounds to most significant
+        Type<?> currentMostSpecific = null;
+        Iterator<Type<?>> currentBoundIter = bounds.iterator();
+        while (currentBoundIter.hasNext()) {
+            Type<?> currentBound = currentBoundIter.next();
+            if (currentMostSpecific == null) {
+                currentMostSpecific = currentBound;
+            } else {
+                currentMostSpecific = TypeUtil.getMostSpecificType(currentMostSpecific, currentBound);
             }
         }
-        
-        return bounds.iterator().next();
+        return currentMostSpecific;
     }
     
     /**
