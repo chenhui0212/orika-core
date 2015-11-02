@@ -287,9 +287,12 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
          */
         for (Node destRef : destNodes) {
             if (destRef.isRoot() && !destRef.isLeaf()) {
-                if (destRef.multiOccurrenceVar.isArray() || destRef.multiOccurrenceVar.isMap()) {
+                if (destRef.multiOccurrenceVar.isArray()) {
                     /*
                      * We use a List as the temporary collector element for Arrays and Maps
+                     * The collector element for Maps can be handled as all other cases here,
+                     * because a reassign to the local destRef variable doesn't makes sense.
+                     * @see Github issues #82 and #87
                      */
                     append(out,
                             format("if (%s && %s) {",destRef.newDestination.notNull(), destRef.newDestination.notEmpty()),
@@ -303,7 +306,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
                             "} else {\n",
                             destRef.multiOccurrenceVar + ".clear()",
                             "}\n",
-                            destRef.multiOccurrenceVar.addAll(destRef.newDestination),
+                            destRef.multiOccurrenceVar.addAllButNoAssign(destRef.newDestination),
                             "}\n");
                 }
             }

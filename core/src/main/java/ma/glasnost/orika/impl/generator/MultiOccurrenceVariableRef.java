@@ -156,18 +156,32 @@ public class MultiOccurrenceVariableRef extends VariableRef {
      * @return
      */
     public String addAll(VariableRef value) {
+        String assignment = addAllByAssign(value);
+        return assignment != null ? assignment : addAllButNoAssign(value);
+    }
+
+    private String addAllByAssign(VariableRef value) {
         if (isArray() && value.isCollection()) {
             if (type().getComponentType().isPrimitive()) {
                 return assign("%sArray(%s)", type().getComponentType().getCanonicalName(), value);
             } else {
                 return assign("listToArray(%s, %s.class)", value, type().getCanonicalName());
             }
-        } else if (isMap() && value.isList()) {
-            if (isAssignable()) {
-                return assign("listToMap(%s, java.util.LinkedHashMap.class)", value);
-            } else {
-                return String.format("listToMap(%s, %s)", value, this);
-            }
+        } else if (isMap() && value.isList() && isAssignable()) {
+            return assign("listToMap(%s, java.util.LinkedHashMap.class)", value);
+        }
+        return null;
+    }
+
+    /**
+     * A convenience function which adds all of one multi-occurence type to another variable, but without any assignment
+     *
+     * @param value
+     * @return
+     */
+    public String addAllButNoAssign(VariableRef value) {
+        if (isMap() && value.isList()) {
+            return String.format("listToMap(%s, %s)", value, this);
         } else if (isCollection() && value.isArray()) {
             if (value.type().getComponentType().isPrimitive()) {
                 return getter() + ".addAll(asList(" + value + "))";
