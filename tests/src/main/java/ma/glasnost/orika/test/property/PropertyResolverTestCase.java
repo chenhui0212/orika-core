@@ -814,5 +814,31 @@ public class PropertyResolverTestCase {
         }
 	}
 	
+	@Test
+	public void resolveParameterizedTypeFromAncestor() {
 
+		Type<?> type = TypeFactory.valueOf(Child.class);
+		PropertyResolverStrategy resolver = new IntrospectorPropertyResolver();
+		Property property = resolver.getProperty(type, "content");
+
+		Type<?> expectedType = new TypeBuilder<Map<String, Element>>() {
+		}.build();
+
+		Assert.assertEquals(expectedType, property.getType());
+	}
+
+	public static class Parent<T> {
+		private T content;
+
+		public T getContent() {
+			return content;
+		}
+
+		public void setContent(T content) {
+			this.content = content;
+		}
+	}
+
+	public static class Child extends Parent<Map<String, Element>> {
+	}
 }

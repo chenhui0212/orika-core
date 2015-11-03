@@ -76,7 +76,7 @@ abstract class TypeUtil {
             for (int i = 0, len = actualTypeArguments.length; i < len; ++i) {
                 java.lang.reflect.Type typeArg = typeArguments[i];
                 TypeVariable<?> var = vars[i];
-                if (typeArg instanceof Class) {
+                if (typeArg instanceof ParameterizedType ||  typeArg instanceof Class) {
                     actualTypeArguments[i] = TypeFactory.valueOf(typeArg);
                 } else {
                     if (typeArg instanceof TypeVariable) {
