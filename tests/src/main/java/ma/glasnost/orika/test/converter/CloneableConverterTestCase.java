@@ -86,20 +86,30 @@ public class CloneableConverterTestCase {
         	.byDefault().register();
         MapperFacade facade = factory.getMapperFacade();
         
-        Date date = new Date(System.currentTimeMillis() + 100000);
-        SourceDateHolder sourceObject = new SourceDateHolder(date);
+        Date date1 = new Date(System.currentTimeMillis() + 100001);        
+        Date date2 = new Date(System.currentTimeMillis() + 100002);        
         ArrayOfDates arrayOfDate = new ArrayOfDates();
-        arrayOfDate.getDateHolder().add(sourceObject);
-        arrayOfDate.getDateHolder().add(new SourceDateHolder(null));
+        arrayOfDate.getDateHolder().add(new SourceDateHolder(date1));
+        arrayOfDate.getDateHolder().add(new SourceDateHolder(date2));
                 
         ComplexSource complexSource = new ComplexSource(arrayOfDate);
         ComplexDest complexDest = facade.map(complexSource, ComplexDest.class);
                 
         Assert.assertEquals(complexSource.getSomeDate().getDateHolder().size(), complexDest.getMeaningfulDate().size());
-        Assert.assertEquals(complexSource.getSomeDate().getDateHolder().get(0).getDate(), complexDest.getMeaningfulDate().get(0).getDate());        
-        Assert.assertNotSame(complexSource.getSomeDate().getDateHolder().get(0).getDate(), complexDest.getMeaningfulDate().get(0).getDate());
         
-        Assert.assertEquals(complexSource.getSomeDate().getDateHolder().get(1).getDate(), complexDest.getMeaningfulDate().get(1).getDate());
+        Assert.assertEquals(date1, complexDest.getMeaningfulDate().get(0).getDate());        
+        Assert.assertNotSame(date1, complexDest.getMeaningfulDate().get(0).getDate());
+        
+        Assert.assertEquals(date2, complexDest.getMeaningfulDate().get(1).getDate());        
+        Assert.assertNotSame(date2, complexDest.getMeaningfulDate().get(1).getDate());
+        
+        complexSource.getSomeDate().getDateHolder().add(new SourceDateHolder(null));
+        
+        // use cached clone method here without checking if source is null causes a NullPointerException 
+        complexDest = facade.map(complexSource, ComplexDest.class);
+        Assert.assertEquals(complexSource.getSomeDate().getDateHolder().size(), complexDest.getMeaningfulDate().size());
+        
+        Assert.assertNull(complexDest.getMeaningfulDate().get(2).getDate());
     }
     
     

@@ -109,6 +109,10 @@ public class CloneableConverter extends CustomConverter<Object, Object> {
     }
     
     public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
+    	if (source == null) {
+    		return null;
+    	}
+    	
         try {
             Method clone;
             if (cloneMethod != null) {
