@@ -19,22 +19,27 @@
 package ma.glasnost.orika.test.converter;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.converter.builtin.CloneableConverter;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.junit.Test;
+
 import org.junit.Assert;
 
 public class CloneableConverterTestCase {
@@ -73,6 +78,39 @@ public class CloneableConverterTestCase {
         Assert.assertNotSame(source.xmlCalendar, dest.xmlCalendar);
     }
 
+    @Test
+    public void cloneableConverterNullSource() throws DatatypeConfigurationException {    	
+    	MapperFactory factory = new DefaultMapperFactory.Builder().build();
+        factory.classMap(ComplexSource.class, ComplexDest.class)
+        	.field("someDate.dateHolder{date}", "meaningfulDate{date}")
+        	.byDefault().register();
+        MapperFacade facade = factory.getMapperFacade();
+        
+        Date date1 = new Date(System.currentTimeMillis() + 100001);        
+        Date date2 = new Date(System.currentTimeMillis() + 100002);        
+        ArrayOfDates arrayOfDate = new ArrayOfDates();
+        arrayOfDate.getDateHolder().add(new SourceDateHolder(date1));
+        arrayOfDate.getDateHolder().add(new SourceDateHolder(date2));
+                
+        ComplexSource complexSource = new ComplexSource(arrayOfDate);
+        ComplexDest complexDest = facade.map(complexSource, ComplexDest.class);
+                
+        Assert.assertEquals(complexSource.getSomeDate().getDateHolder().size(), complexDest.getMeaningfulDate().size());
+        
+        Assert.assertEquals(date1, complexDest.getMeaningfulDate().get(0).getDate());        
+        Assert.assertNotSame(date1, complexDest.getMeaningfulDate().get(0).getDate());
+        
+        Assert.assertEquals(date2, complexDest.getMeaningfulDate().get(1).getDate());        
+        Assert.assertNotSame(date2, complexDest.getMeaningfulDate().get(1).getDate());
+        
+        complexSource.getSomeDate().getDateHolder().add(new SourceDateHolder(null));
+        
+        // use cached clone method here without checking if source is null causes a NullPointerException 
+        complexDest = facade.map(complexSource, ComplexDest.class);
+        Assert.assertEquals(complexSource.getSomeDate().getDateHolder().size(), complexDest.getMeaningfulDate().size());
+        
+        Assert.assertNull(complexDest.getMeaningfulDate().get(2).getDate());
+    }
     
     
     /**
@@ -156,6 +194,83 @@ public class CloneableConverterTestCase {
         	return HashCodeBuilder.reflectionHashCode(this);
         }
         
+    }
+    
+    public static class ComplexSource {
+    	private ArrayOfDates someDate;
+    	
+    	public ComplexSource() {}
+    	
+    	public ComplexSource(ArrayOfDates someDate) {
+    		this.someDate = someDate;
+    	}
+
+		public ArrayOfDates getSomeDate() {
+			return someDate;
+		}
+
+		public void setSomeDate(ArrayOfDates someDate) {
+			this.someDate = someDate;
+		}
+    }
+    
+    public static class ArrayOfDates {
+    	protected List<SourceDateHolder> dateHolder;
+    	
+    	public List<SourceDateHolder> getDateHolder() {
+            if (dateHolder == null) {
+            	dateHolder = new ArrayList<SourceDateHolder>();
+            }
+            return this.dateHolder;
+        }    	
+    }
+    
+    public static class SourceDateHolder {
+    	private Date date;
+    	
+    	public SourceDateHolder() {}
+    	
+    	public SourceDateHolder(Date date) {
+    		this.date = date;    		
+    	}
+
+		public Date getDate() {
+			return date;
+		}
+
+		public void setDate(Date date) {
+			this.date = date;
+		}
+    }
+    
+    public static class ComplexDest {
+    	private List<DestDateHolder> meaningfulDate = new ArrayList<DestDateHolder>();
+
+		public List<DestDateHolder> getMeaningfulDate() {
+			return meaningfulDate;
+		}
+
+		public void setMeaningfulDate(List<DestDateHolder> meaningfulDate) {
+			this.meaningfulDate = meaningfulDate;
+		}
+    }
+    
+    public static class DestDateHolder {
+    	private Date date;
+    	
+    	public DestDateHolder() {}
+    	
+    	public DestDateHolder(Date date) {
+    		this.date = date;    		
+    	}
+
+		public Date getDate() {
+			return date;
+		}
+
+		public void setDate(Date date) {
+			this.date = date;
+		}
     }
 
 }
