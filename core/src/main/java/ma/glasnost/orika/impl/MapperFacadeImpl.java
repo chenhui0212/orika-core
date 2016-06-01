@@ -194,24 +194,20 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 strategyRecorder.setResolvedConverter(mapperFactory.getConverterFactory().getConverter(resolvedSourceType, destinationType));
                 
             } else {
-                Type<? extends D> resolvedDestinationType;
-                if (mapInPlace) {
-                    resolvedDestinationType = destinationType;
-                } else {
-                    strategyRecorder.setInstantiate(true);
-                    resolvedDestinationType = mapperFactory.lookupConcreteDestinationType(resolvedSourceType, destinationType, context);
-                    if (resolvedDestinationType == null) {
-                        if (!ClassUtil.isConcrete(destinationType)) {
-                            MappingException e = new MappingException("No concrete class mapping defined for source class "
-                                    + resolvedSourceType.getName());
-                            e.setDestinationType(destinationType);
-                            e.setSourceType(resolvedSourceType);
-                            throw exceptionUtil.decorate(e);
-                        } else {
-                            resolvedDestinationType = destinationType;
-                        }
+                strategyRecorder.setInstantiate(true);
+                Type<? extends D> resolvedDestinationType = mapperFactory.lookupConcreteDestinationType(resolvedSourceType, destinationType, context);
+                if (resolvedDestinationType == null) {
+                    if (!ClassUtil.isConcrete(destinationType)) {
+                        MappingException e = new MappingException("No concrete class mapping defined for source class "
+                                + resolvedSourceType.getName());
+                        e.setDestinationType(destinationType);
+                        e.setSourceType(resolvedSourceType);
+                        throw exceptionUtil.decorate(e);
+                    } else {
+                        resolvedDestinationType = destinationType;
                     }
                 }
+
                 strategyRecorder.setResolvedDestinationType(resolvedDestinationType);
                 strategyRecorder.setResolvedMapper(resolveMapper(resolvedSourceType, resolvedDestinationType));
                 if (!mapInPlace) {
