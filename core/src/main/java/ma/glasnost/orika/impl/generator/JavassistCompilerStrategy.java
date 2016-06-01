@@ -260,7 +260,7 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
                 }
                 
             }
-            compiledClass = byteCodeClass.toClass(this.getClass().getClassLoader(), this.getClass().getProtectionDomain());
+            compiledClass = byteCodeClass.toClass(Thread.currentThread().getContextClassLoader(), this.getClass().getProtectionDomain());
             
             writeClassFile(sourceCode, byteCodeClass);
             
