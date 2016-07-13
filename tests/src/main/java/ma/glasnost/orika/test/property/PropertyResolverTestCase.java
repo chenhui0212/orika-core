@@ -841,4 +841,26 @@ public class PropertyResolverTestCase {
 
 	public static class Child extends Parent<Map<String, Element>> {
 	}
+
+    @Test
+    public void resolveParameterizedTypeFromInterface() {
+
+        Type<?> type = TypeFactory.valueOf(ChildInterface.class);
+        PropertyResolverStrategy resolver = new IntrospectorPropertyResolver();
+        Property property = resolver.getProperty(type, "content");
+
+        Type<?> expectedType = new TypeBuilder<Map<String, Element>>() {
+        }.build();
+
+        Assert.assertEquals(expectedType, property.getType());
+    }
+
+    public interface ParentInterface<T> {
+        T getContent();
+
+        void setContent(T content);
+    }
+
+    public interface ChildInterface extends ParentInterface<Map<String, Element>> {
+    }
 }
