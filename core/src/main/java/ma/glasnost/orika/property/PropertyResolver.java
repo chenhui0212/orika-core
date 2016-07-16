@@ -156,27 +156,36 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
      * 
      * @param genericType
      *            the type to resolve
+     * @param owningType
+     *            the owning type to use for lookup of type variables
      * @param referenceType
      *            the reference type to use for lookup of type variables
      * @return
      */
-    private Type<?> resolveGenericType(java.lang.reflect.Type genericType, Type<?> referenceType) {
+    private Type<?> resolveGenericType(java.lang.reflect.Type genericType, Class<?> owningType, Type<?> referenceType) {
         Type<?> resolvedType = null;
         Type<?> reference = referenceType;
         do {
-            if (genericType instanceof TypeVariable && reference.isParameterized()) {
-                java.lang.reflect.Type t = reference.getTypeByVariable((TypeVariable<?>) genericType);
-                if (t != null) {
-                    resolvedType = TypeFactory.valueOf(t);
+            Type<?> referenceInterface = null;
+            if (genericType instanceof TypeVariable) {
+                if (reference.isParameterized()) {
+                    java.lang.reflect.Type t = reference.getTypeByVariable((TypeVariable<?>) genericType);
+                    if (t != null) {
+                        resolvedType = TypeFactory.valueOf(t);
+                    }
+                } else if (hasTypeParameters(owningType) && owningType.isInterface()) {
+                    referenceInterface = reference.findInterface(TypeFactory.valueOf(owningType));
                 }
             } else if (genericType instanceof ParameterizedType) {
                 if (reference.isSelfOrAncestorParameterized()) {
                     resolvedType = TypeFactory.resolveValueOf((ParameterizedType) genericType, reference);
+                } else if (hasTypeParameters(owningType) && owningType.isInterface()) {
+                    referenceInterface = reference.findInterface(TypeFactory.valueOf(owningType));
                 } else {
                     resolvedType = TypeFactory.valueOf((ParameterizedType) genericType);
                 }
             }
-            reference = reference.getSuperType();
+            reference = referenceInterface != null ? referenceInterface : reference.getSuperType();
         } while (resolvedType == null && reference != TypeFactory.TYPE_OF_OBJECT);
         return resolvedType;
     }
@@ -311,6 +320,7 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
                 try {
                     resolvedGenericType = resolveGenericType(
                             readMethod.getDeclaringClass().getDeclaredMethod(readMethod.getName(), new Class[0]).getGenericReturnType(),
+                            owningType,
                             referenceType);
                 } catch (NoSuchMethodException e) {
                     throw new IllegalStateException("readMethod does not exist", e);
@@ -341,7 +351,7 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
                 builder.name(f.getName());
                 
                 Class<?> rawType = f.getType();
-                Type<?> genericType = resolveGenericType(f.getGenericType(), referenceType);
+                Type<?> genericType = resolveGenericType(f.getGenericType(), f.getDeclaringClass(), referenceType);
                 if (genericType != null && !genericType.isAssignableFrom(rawType)) {
                     builder.type(genericType);
                 } else {
@@ -546,7 +556,7 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
         } else {
             throw new IllegalArgumentException("'" + p + "' is not a valid element property for " + type);
         }
-        
+
         return new NestedElementProperty(owningProperty, elementProperty, this);
     }
     
