@@ -104,11 +104,11 @@ public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
      * ma.glasnost.orika.impl.generator.CodeGenerationStrategy.Position,
      * ma.glasnost.orika.impl.generator.Specification)
      */
-    public void addSpecification(Specification spec, Position relativePosition, Class<Specification> relativeSpec) {
+    public void addSpecification(Specification spec, Position relativePosition, Class<? extends Specification> relativeSpec) {
         addSpec(this.specifications, spec, relativePosition, relativeSpec);
     }
     
-    protected static <T> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<T> relativeSpec) {
+    protected static <T> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<?> relativeSpec) {
         
         if (relativePosition == null || relativePosition == Position.LAST) {
             specifications.add(spec);
