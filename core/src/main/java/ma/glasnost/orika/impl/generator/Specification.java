@@ -28,19 +28,9 @@ import ma.glasnost.orika.metadata.FieldMap;
  * @author mattdeboer
  *
  */
-public interface Specification {
+public interface Specification extends BaseSpecification {
     
     void setMapperFactory(MapperFactory mapperFactory);
-    
-    /**
-     * Tests whether this Specification applies to the specified MappedTypePair
-     * @param fieldMap 
-     * 
-     * @param typePair
-     * @return true if this specification applies to the given MappedTypePair
-     */
-    boolean appliesTo(FieldMap fieldMap);
-    
     
     /**
      * Generates code for a boolean equality test between the two variable types,
@@ -48,8 +38,7 @@ public interface Specification {
      * 
      * @param source
      * @param destination
-     * @param inverseProperty 
-     * @param code 
+     * @param code
      * @return the code snippet which represents a true|false statement describing
      * whether the two types should be considered 'equal'
      */
@@ -62,8 +51,7 @@ public interface Specification {
      * @param fieldMap the fieldMap for which source code should be generated
      * @param source a convenience wrapper around the source field which can be used facilitate code generation
      * @param destination a convenience wrapper around the destination field which can be used facilitate code generation
-     * @param inverseProperty 
-     * @param code 
+     * @param code
      * @return the code snippet which represents mapping from the source to destination
      * property
      */

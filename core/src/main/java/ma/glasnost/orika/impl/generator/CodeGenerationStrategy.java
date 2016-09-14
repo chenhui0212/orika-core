@@ -58,7 +58,7 @@ public interface CodeGenerationStrategy {
      * @param relativePosition the relative position
      * @param relativeSpec the other relative spec (for Positions BEFORE, AFTER, or IN_PLACE_OF)
      */
-    public void addSpecification(Specification spec, Position relativePosition, Class<Specification> relativeSpec);
+    public void addSpecification(Specification spec, Position relativePosition, Class<? extends Specification> relativeSpec);
     
     /**
      * @return the defined specifications 

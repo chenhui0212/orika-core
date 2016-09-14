@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.generator.AggregateSpecification;
+import ma.glasnost.orika.impl.generator.BaseSpecification;
 import ma.glasnost.orika.impl.generator.CodeGenerationStrategy;
 import ma.glasnost.orika.impl.generator.Specification;
 import ma.glasnost.orika.impl.generator.specification.AnyTypeToString;
@@ -104,11 +105,11 @@ public class DefaultCodeGenerationStrategy implements CodeGenerationStrategy {
      * ma.glasnost.orika.impl.generator.CodeGenerationStrategy.Position,
      * ma.glasnost.orika.impl.generator.Specification)
      */
-    public void addSpecification(Specification spec, Position relativePosition, Class<Specification> relativeSpec) {
+    public void addSpecification(Specification spec, Position relativePosition, Class<? extends Specification> relativeSpec) {
         addSpec(this.specifications, spec, relativePosition, relativeSpec);
     }
     
-    protected static <T> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<T> relativeSpec) {
+    protected static <T extends BaseSpecification> void addSpec(List<T> specifications, T spec, Position relativePosition, Class<? extends BaseSpecification> relativeSpec) {
         
         if (relativePosition == null || relativePosition == Position.LAST) {
             specifications.add(spec);
