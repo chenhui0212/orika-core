@@ -168,7 +168,7 @@ public class ObjectFactoryGenerator {
                 List<FieldMap> properties = constructorMapping.getMappedFields();
                 Type<?>[] constructorArguments = constructorMapping.getParameterTypes();
                 
-                if (properties.size() != constructorArguments.length) {
+                if (constructorArguments == null || properties.size() != constructorArguments.length) {
                     throw new MappingException("While attempting to generate ObjectFactory using constructor '" + constructor
                             + "', an automatic mapping of the source type ('" + sourceType
                             + "') to this constructor call could not be determined. Please "
