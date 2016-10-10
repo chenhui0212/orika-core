@@ -1088,30 +1088,30 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      */
     protected Type<?> resolveConcreteType(Type<?> type, Type<?> originalType) {
         
-        Type<?> concreteType = (Type<?>) this.concreteTypeRegistry.get(type);
-        if (concreteType == null) {
-            concreteType = (Type<?>) this.concreteTypeRegistry.get(type.getRawType());
-            if (concreteType != null) {
-                concreteType = TypeFactory.resolveValueOf(concreteType.getRawType(), type);
-            }
-        }
+        Type<?> concreteType = concreteTypeOf(type);
         
         if (concreteType != null && !concreteType.isAssignableFrom(originalType)) {
             if (ClassUtil.isConcrete(originalType)) {
                 concreteType = originalType;
             } else {
-                concreteType = (Type<?>) this.concreteTypeRegistry.get(originalType);
-                if (concreteType == null) {
-                    concreteType = (Type<?>) this.concreteTypeRegistry.get(originalType.getRawType());
-                    if (concreteType != null) {
-                        concreteType = TypeFactory.resolveValueOf(concreteType.getRawType(), originalType);
-                    }
-                }
+                concreteType = concreteTypeOf(originalType);
+            }
+        }
+
+        return concreteType;
+    }
+
+    private Type<?> concreteTypeOf(Type<?> type) {
+        Type<?> concreteType = this.concreteTypeRegistry.get(type);
+        if (concreteType == null) {
+            concreteType = this.concreteTypeRegistry.get(type.getRawType());
+            if (concreteType != null) {
+                concreteType = TypeFactory.resolveValueOf(concreteType.getRawType(), type);
             }
         }
         return concreteType;
     }
-    
+
     @SuppressWarnings("unchecked")
     public synchronized <A, B> void registerClassMap(ClassMap<A, B> classMap) {
         classMapRegistry.put(new MapperKey(classMap.getAType(), classMap.getBType()), (ClassMap<Object, Object>) classMap);
