@@ -18,47 +18,8 @@
 
 package ma.glasnost.orika.impl;
 
-import static java.lang.Boolean.valueOf;
-import static java.lang.System.getProperty;
-import static ma.glasnost.orika.OrikaSystemProperties.CAPTURE_FIELD_CONTEXT;
-import static ma.glasnost.orika.OrikaSystemProperties.DUMP_STATE_ON_EXCEPTION;
-import static ma.glasnost.orika.OrikaSystemProperties.FAVOR_EXTENSION;
-import static ma.glasnost.orika.OrikaSystemProperties.MAP_NULLS;
-import static ma.glasnost.orika.OrikaSystemProperties.USE_AUTO_MAPPING;
-import static ma.glasnost.orika.OrikaSystemProperties.USE_BUILTIN_CONVERTERS;
-import static ma.glasnost.orika.StateReporter.DIVIDER;
-import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
-import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import ma.glasnost.orika.BoundMapperFacade;
-import ma.glasnost.orika.Converter;
-import ma.glasnost.orika.DefaultFieldMapper;
-import ma.glasnost.orika.Filter;
-import ma.glasnost.orika.MapEntry;
-import ma.glasnost.orika.MappedTypePair;
-import ma.glasnost.orika.Mapper;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.MappingContextFactory;
-import ma.glasnost.orika.MappingException;
-import ma.glasnost.orika.ObjectFactory;
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import ma.glasnost.orika.*;
 import ma.glasnost.orika.Properties;
 import ma.glasnost.orika.StateReporter.Reportable;
 import ma.glasnost.orika.constructor.ConstructorResolverStrategy;
@@ -72,25 +33,27 @@ import ma.glasnost.orika.impl.generator.ObjectFactoryGenerator;
 import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.inheritance.DefaultSuperTypeResolverStrategy;
 import ma.glasnost.orika.inheritance.SuperTypeResolverStrategy;
-import ma.glasnost.orika.metadata.ClassMap;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
-import ma.glasnost.orika.metadata.ClassMapBuilderFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilderForArrays;
-import ma.glasnost.orika.metadata.ClassMapBuilderForLists;
-import ma.glasnost.orika.metadata.ClassMapBuilderForMaps;
-import ma.glasnost.orika.metadata.MapperKey;
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
+import ma.glasnost.orika.metadata.*;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
 import ma.glasnost.orika.unenhance.BaseUnenhancer;
 import ma.glasnost.orika.unenhance.UnenhanceStrategy;
 import ma.glasnost.orika.util.Ordering;
 import ma.glasnost.orika.util.SortedCollection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import java.lang.reflect.Constructor;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+import static ma.glasnost.orika.OrikaSystemProperties.*;
+import static ma.glasnost.orika.StateReporter.DIVIDER;
+import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
+import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
 
 /**
  * The mapper factory is the heart of Orika, a small container where metadata
@@ -1125,30 +1088,30 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      */
     protected Type<?> resolveConcreteType(Type<?> type, Type<?> originalType) {
         
-        Type<?> concreteType = (Type<?>) this.concreteTypeRegistry.get(type);
-        if (concreteType == null) {
-            concreteType = (Type<?>) this.concreteTypeRegistry.get(type.getRawType());
-            if (concreteType != null) {
-                concreteType = TypeFactory.resolveValueOf(concreteType.getRawType(), type);
-            }
-        }
+        Type<?> concreteType = concreteTypeOf(type);
         
         if (concreteType != null && !concreteType.isAssignableFrom(originalType)) {
             if (ClassUtil.isConcrete(originalType)) {
                 concreteType = originalType;
             } else {
-                concreteType = (Type<?>) this.concreteTypeRegistry.get(originalType);
-                if (concreteType == null) {
-                    concreteType = (Type<?>) this.concreteTypeRegistry.get(originalType.getRawType());
-                    if (concreteType != null) {
-                        concreteType = TypeFactory.resolveValueOf(concreteType, originalType);
-                    }
-                }
+                concreteType = concreteTypeOf(originalType);
+            }
+        }
+
+        return concreteType;
+    }
+
+    private Type<?> concreteTypeOf(Type<?> type) {
+        Type<?> concreteType = this.concreteTypeRegistry.get(type);
+        if (concreteType == null) {
+            concreteType = this.concreteTypeRegistry.get(type.getRawType());
+            if (concreteType != null) {
+                concreteType = TypeFactory.resolveValueOf(concreteType.getRawType(), type);
             }
         }
         return concreteType;
     }
-    
+
     @SuppressWarnings("unchecked")
     public synchronized <A, B> void registerClassMap(ClassMap<A, B> classMap) {
         classMapRegistry.put(new MapperKey(classMap.getAType(), classMap.getBType()), (ClassMap<Object, Object>) classMap);
