@@ -18,6 +18,7 @@
 package ma.glasnost.orika.impl.generator;
 
 import static java.lang.String.format;
+import static ma.glasnost.orika.impl.util.StringUtil.toValidVariableName;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -499,7 +500,7 @@ public class VariableRef {
     }
 
     public Object validVariableName() {
-        return name().replace("//", "_");
+        return toValidVariableName(name());
     }
     
     public String isNull() {
