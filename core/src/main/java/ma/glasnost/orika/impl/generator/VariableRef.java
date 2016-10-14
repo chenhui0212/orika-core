@@ -33,6 +33,7 @@ import ma.glasnost.orika.Filter;
 import ma.glasnost.orika.MapEntry;
 import ma.glasnost.orika.PropertyNotFoundException;
 import ma.glasnost.orika.impl.util.ClassUtil;
+import ma.glasnost.orika.impl.util.StringUtil;
 import ma.glasnost.orika.metadata.NestedProperty;
 import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;
@@ -495,7 +496,7 @@ public class VariableRef {
     }
     
     public String name() {
-        return property != null && !"".equals(property.getName()) ? property.getName() : name;
+        return (property != null && !"".equals(property.getName()) ? property.getName() : name).replace("//", "_");
     }
     
     public String isNull() {
