@@ -18,14 +18,15 @@
 
 package ma.glasnost.orika.impl.generator.specification;
 
-import static java.lang.String.format;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.impl.generator.MultiOccurrenceVariableRef;
 import ma.glasnost.orika.impl.generator.SourceCodeContext;
 import ma.glasnost.orika.impl.generator.VariableRef;
 import ma.glasnost.orika.metadata.FieldMap;
+
+import static java.lang.String.format;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
 
 /**
  * ArrayOrCollectionToCollection handles mapping of an Array or Collection
@@ -60,7 +61,7 @@ public class ArrayOrCollectionToCollection extends AbstractSpecification {
          *  fill it, and then assign it to the destination using the setter. 
          */
        
-        MultiOccurrenceVariableRef newDest = new MultiOccurrenceVariableRef(d.type(), "new_" + d.name());
+        MultiOccurrenceVariableRef newDest = new MultiOccurrenceVariableRef(d.type(), "new_" + d.validVariableName());
         if (d.isAssignable()) {
             out.append(statement(newDest.declare(d.newInstance(source.size()))));
         } else {
