@@ -293,7 +293,6 @@ public class VariableRef {
      * assignable.
      * 
      * @param value
-     * @param replacements
      * @return
      */
     public String assignIfPossible(VariableRef value) {
@@ -418,9 +417,9 @@ public class VariableRef {
      */
     public String declare() {
         declared = true;
-        return format("\n%s %s = %s", typeName(), name(), getDefaultValue(rawType()));
+        return format("\n%s %s = %s", typeName(), validVariableName(), getDefaultValue(rawType()));
     }
-    
+
     /**
      * Returns Java code which declares this variable, initialized with the
      * provided value.
@@ -437,7 +436,7 @@ public class VariableRef {
         String valueExpr = format(value, args);
         valueExpr = cast(valueExpr);
         declared = true;
-        return format("\n%s %s = %s", typeName(), name(), valueExpr);
+        return format("\n%s %s = %s", typeName(), validVariableName(), valueExpr);
     }
     
     /**
@@ -452,7 +451,7 @@ public class VariableRef {
     public String declare(VariableRef initialValueRef) {
         String valueExpr = cast(initialValueRef);
         declared = true;
-        return format("\n%s %s = %s", typeName(), name(), valueExpr);
+        return format("\n%s %s = %s", typeName(), validVariableName(), valueExpr);
     }
     
     public boolean isDeclared() {
@@ -496,7 +495,11 @@ public class VariableRef {
     }
     
     public String name() {
-        return (property != null && !"".equals(property.getName()) ? property.getName() : name).replace("//", "_");
+        return property != null && !"".equals(property.getName()) ? property.getName() : name;
+    }
+
+    public Object validVariableName() {
+        return name().replace("//", "_");
     }
     
     public String isNull() {
