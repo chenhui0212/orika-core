@@ -499,7 +499,7 @@ public class VariableRef {
         return property != null && !"".equals(property.getName()) ? property.getName() : name;
     }
 
-    public Object validVariableName() {
+    public String validVariableName() {
         return toValidVariableName(name());
     }
     

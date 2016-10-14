@@ -37,7 +37,7 @@ public class ArrayOrCollectionToArray extends AbstractSpecification {
 
     public String generateMappingCode(FieldMap fieldMap, VariableRef source, VariableRef destination, SourceCodeContext code) {
         
-        final VariableRef arrayVar = destination.elementRef(destination.validVariableName()+"Array__");
+        final VariableRef arrayVar = destination.elementRef(destination.name()+"Array__");
         String newArray = format("%s[] %s = new %s[%s]", destination.elementTypeName(), arrayVar.validVariableName(), destination.elementTypeName(), source.size());
         
         String mapArray;

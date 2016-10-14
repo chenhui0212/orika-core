@@ -834,9 +834,9 @@ public class SourceCodeContext {
     private static String varPath(VariableRef var) {
         List<VariableRef> path = var.getPath();
         if (path.isEmpty()) {
-            return var.name();
+            return var.validVariableName();
         } else {
-            return path.get(path.size() - 1).property().getExpression() + "." + var.name();
+            return path.get(path.size() - 1).property().getExpression() + "." + var.validVariableName();
         }
     }
     
@@ -863,7 +863,7 @@ public class SourceCodeContext {
                             destinationValue = ClassUtil.getWrapperType(dest.rawType()).getCanonicalName() + ".valueOf(%s)";
                         }
                         String filteredValue = format("%s.filterDestination(%s, %s, \"%s\", %s, \"%s\", mappingContext)",
-                                usedFilter(filter), destinationValue, usedType(src.type()), src.name(), usedType(dest.type()), dest.name()).replace(
+                                usedFilter(filter), destinationValue, usedType(src.type()), src.validVariableName(), usedType(dest.type()), dest.validVariableName()).replace(
                                 "$$$", "%s");
                         
                         setter = super.setter().replace("%s", dest.cast(filteredValue));
@@ -901,7 +901,7 @@ public class SourceCodeContext {
                             sourceValue = ClassUtil.getWrapperType(src.rawType()).getCanonicalName() + ".valueOf(" + sourceValue + ")";
                         }
                         getter = src.cast(format("%s.filterSource(%s, %s, \"%s\", %s, \"%s\", mappingContext)", usedFilter(filter),
-                                sourceValue, usedType(src.type()), src.name(), usedType(dest.type()), dest.name()));
+                                sourceValue, usedType(src.type()), src.validVariableName(), usedType(dest.type()), dest.validVariableName()));
                     }
                     return getter;
                 }
