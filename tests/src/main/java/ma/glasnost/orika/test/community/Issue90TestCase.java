@@ -22,7 +22,6 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class Issue90TestCase {
