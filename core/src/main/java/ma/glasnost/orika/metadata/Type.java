@@ -241,7 +241,13 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
             if (sp.getRawType() != Object.class && isAssignableFrom(sp)) {
                 return true;
             }
-            
+            if (getRawType() != Object.class) {
+                for (Type<?> superInterface : other.getInterfaces()) {
+                    if (isAssignableFrom(superInterface)) {
+                        return true;
+                    }
+                }
+            }
             if (this.getActualTypeArguments().length != other.getActualTypeArguments().length) {
                 return false;
             }
