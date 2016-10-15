@@ -17,16 +17,14 @@
  */
 package ma.glasnost.orika.test.perf;
 
+import ma.glasnost.orika.impl.generator.EclipseJdtCompiler;
+import ma.glasnost.orika.test.MavenProjectUtil;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import ma.glasnost.orika.impl.generator.EclipseJdtCompiler;
-import ma.glasnost.orika.test.MavenProjectUtil;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * @author matt.deboer@gmail.com
@@ -77,7 +75,6 @@ public class MultiLayeredClassloader_IDEOnly {
      * Test that Orika can be run from a nested class-loader
      */
     @Test
-    @Ignore
     public void nestedClassLoader() throws Exception {
         File projectRoot = MavenProjectUtil.findProjectRoot();
         
