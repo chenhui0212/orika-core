@@ -24,7 +24,6 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class Issue87TestCase {
@@ -49,7 +48,6 @@ public class Issue87TestCase {
     }
 
     @Test
-//    @Ignore
     public void mapAbstractNestedPropertyWhenConcreteTypeIsRegistered() {
 
             // Register concrete type for AbstractNestedType
