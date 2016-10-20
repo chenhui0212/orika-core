@@ -245,7 +245,7 @@ public final class MapperGenerator {
         compilerStrategy.assureTypeIsAccessible(sourceProperty.rawType());
         compilerStrategy.assureTypeIsAccessible(destinationProperty.rawType());
         
-        return code.mapFields(fieldMap, sourceProperty, destinationProperty, destination.type(), logDetails);
+        return code.mapFields(fieldMap, sourceProperty, destinationProperty);
     }
     
 }

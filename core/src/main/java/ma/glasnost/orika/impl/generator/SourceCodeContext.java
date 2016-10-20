@@ -717,14 +717,9 @@ public class SourceCodeContext {
      *            a variable reference to the source property
      * @param destination
      *            a variable reference to the destination property
-     * @param destinationType
-     *            the destination's type
-     * @param logDetails
-     *            a StringBuilder to contain the debug output
      * @return a reference to <code>this</code> CodeSourceBuilder
      */
-    public String mapFields(FieldMap fieldMap, VariableRef source, VariableRef destination, Type<?> destinationType,
-            StringBuilder logDetails) {
+    public String mapFields(FieldMap fieldMap, VariableRef source, VariableRef destination) {
         
         StringBuilder out = new StringBuilder();
         StringBuilder closing = new StringBuilder();
@@ -736,9 +731,9 @@ public class SourceCodeContext {
                 out.append("{ \n");
                 closing.append("\n}");
             }
-            
+
             boolean mapNulls = AbstractSpecification.shouldMapNulls(fieldMap, this);
-            
+
             if (destination.isNullPathPossible()) {
                 if (!source.isPrimitive()) {
                     if (!mapNulls) {
@@ -749,7 +744,7 @@ public class SourceCodeContext {
                 }
                 out.append(assureInstanceExists(destination, source));
             }
-            
+
             Converter<Object, Object> converter = getConverter(fieldMap, fieldMap.getConverterId());
             source.setConverter(converter);
             
