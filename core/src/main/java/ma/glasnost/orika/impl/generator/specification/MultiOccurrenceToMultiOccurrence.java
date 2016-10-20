@@ -18,19 +18,6 @@
 
 package ma.glasnost.orika.impl.generator.specification;
 
-import static java.lang.String.format;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.join;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.generator.AggregateSpecification;
 import ma.glasnost.orika.impl.generator.Node;
@@ -38,12 +25,12 @@ import ma.glasnost.orika.impl.generator.Node.NodeList;
 import ma.glasnost.orika.impl.generator.SourceCodeContext;
 import ma.glasnost.orika.impl.generator.VariableRef;
 import ma.glasnost.orika.impl.util.ClassUtil;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
-import ma.glasnost.orika.metadata.FieldMap;
-import ma.glasnost.orika.metadata.MapperKey;
-import ma.glasnost.orika.metadata.Property;
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
+import ma.glasnost.orika.metadata.*;
+
+import java.util.*;
+
+import static java.lang.String.format;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.*;
 
 /**
  * MultiOccurrenceToMultiOccurrence handles the mapping of one or more
@@ -83,6 +70,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
 
                 Node.addFieldMap(map, sourceNodes, true);
                 Node.addFieldMap(map, destNodes, false);
+
             }    
               
             registerClassMaps(sourceNodes, destNodes);
@@ -115,7 +103,17 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
         
         StringBuilder out = new StringBuilder();
         StringBuilder sourcesNotNull = new StringBuilder();
-        
+
+        for (FieldMap fieldMap : subFields) {
+
+            if (fieldMap.getDestination().getContainer() instanceof NestedProperty) {
+                VariableRef newDestination = new VariableRef(fieldMap.getDestination().getContainer(), "destination");
+                VariableRef newSource = new VariableRef(fieldMap.getSource().getContainer(), "source");
+                out.append(code.assureInstanceExists(newDestination, newSource));
+            }
+
+        }
+
         /*
          * Construct size/length expressions used to limit the parallel iteration
          * of multiple source variables; only keep iterating so long as all variables
