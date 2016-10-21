@@ -106,7 +106,6 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
 
         for (FieldMap fieldMap : subFields) {
             out.append(code.assureContainerInstanceExists(fieldMap));
-
         }
 
         /*
@@ -176,8 +175,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
         }
         
         StringBuilder endWhiles = new StringBuilder();
-        StringBuilder addLastElement = new StringBuilder();
-        
+
         iterateSources(sourceNodes, destNodes, out, endWhiles);
         
         LinkedList<Node> stack = new LinkedList<Node>(destNodes);
@@ -205,7 +203,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
                 String currentElementComparator = code.currentElementComparator(srcNode, currentNode, sourceNodes, destNodes);
                 String or = (!"".equals(currentElementNull) && !"".equals(currentElementComparator)) ? " || " : "";
                 
-                if (mapperFactory.getConverterFactory().canConvert(srcNode.elementRef.type(), currentNode.elementRef.type()) //) {
+                if (mapperFactory.getConverterFactory().canConvert(srcNode.elementRef.type(), currentNode.elementRef.type())
                         || ClassUtil.isImmutable(currentNode.elementRef.type())) {
                 
                     append(out,
@@ -257,8 +255,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
                     VariableRef s = makeVariable(srcNode.property, srcNode, "source");
                     VariableRef d = makeVariable(currentNode.property, currentNode, "destination");
                     code.applyFilters(s, d, out, endWhiles);
-    
-    
+
                     d = currentNode.isRoot() ? currentNode.newDestination : currentNode.multiOccurrenceVar;
                     out.append(format("\nmappingContext.beginMapping(%s, %s, %s, %s);\n",
                                 code.usedType(s.type()),
@@ -272,8 +269,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
         }  
         
         out.append(endWhiles.toString());
-        out.append(addLastElement.toString());
-        
+
         /*
          * Finally, we loop over the destination nodes and assign/copy all of the temporary 
          * "collector" variables back into their final destination
