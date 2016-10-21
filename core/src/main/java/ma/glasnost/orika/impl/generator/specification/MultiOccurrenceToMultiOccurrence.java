@@ -52,8 +52,6 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
      * @param fieldMappings
      *            the field mappings to be applied
      * @param code 
-     * @param logDetails
-     *            a StringBuilder to accept debug logging information
      * @return a reference to <code>this</code> SourceCodeBuilder
      */
     public String fromMultiOccurrenceToMultiOccurrence(List<FieldMap> fieldMappings, SourceCodeContext code) {
@@ -84,18 +82,11 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
      * Generates the code to support a (potentially parallel) mapping from one
      * or more multi-occurrence fields in the source type to one or more
      * multi-occurrence fields in the destination type.
-     * @param sourceNodes 
-     * @param destNodes 
-     * 
-     * @param sources
-     *            the associated source variables
-     * @param destinations
-     *            the associated destination variables
+     * @param sourceNodes
+     * @param destNodes
      * @param subFields
      *            the nested properties of the individual field maps
-     * @param code 
-     * @param logDetails
-     *            a StringBuilder to accept debug logging information
+     * @param code
      * @return a reference to <code>this</code> CodeSourceBuilder
      */
     public String generateMultiOccurrenceMapping(NodeList sourceNodes, NodeList destNodes,
