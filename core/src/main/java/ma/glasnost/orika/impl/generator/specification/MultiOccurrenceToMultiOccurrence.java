@@ -105,7 +105,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
         StringBuilder sourcesNotNull = new StringBuilder();
 
         for (FieldMap fieldMap : subFields) {
-            out.append(assureContainerInstanceExists(code, fieldMap));
+            out.append(code.assureContainerInstanceExists(fieldMap));
 
         }
 
@@ -306,19 +306,6 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
         }
         
         return out.toString();
-    }
-
-    private String assureContainerInstanceExists(SourceCodeContext code, FieldMap fieldMap) {
-        Property destination = fieldMap.getDestination();
-        Property source = fieldMap.getSource();
-        if (destination.getContainer() instanceof NestedProperty) {
-            VariableRef containerDestination = new VariableRef(destination.getContainer(), "destination");
-            VariableRef containerSource = new VariableRef(source.getContainer(), "source");
-            return code.assureInstanceExists(containerDestination, containerSource);
-        }
-        else {
-            return "";
-        }
     }
 
     private Property innermostElement(final Property p) {

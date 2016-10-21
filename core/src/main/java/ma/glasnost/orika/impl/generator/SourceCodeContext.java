@@ -51,10 +51,7 @@ import ma.glasnost.orika.impl.generator.Node.NodeList;
 import ma.glasnost.orika.impl.generator.UsedMapperFacadesContext.UsedMapperFacadesIndex;
 import ma.glasnost.orika.impl.generator.specification.AbstractSpecification;
 import ma.glasnost.orika.impl.util.ClassUtil;
-import ma.glasnost.orika.metadata.FieldMap;
-import ma.glasnost.orika.metadata.Property;
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
+import ma.glasnost.orika.metadata.*;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
 
 /**
@@ -397,6 +394,26 @@ public class SourceCodeContext {
             return "null";
         } else {
             return newObjectFromMapper(source, destinationType);
+        }
+    }
+
+    /**
+     * Append a statement with assures that the container variable reference
+     * has an existing instance; if it does not, a new object is generated
+     * using MapperFacade.newObject
+     * @param fieldMap
+     * @return the code to assure the variable reference's instantiation
+     */
+    public String assureContainerInstanceExists(FieldMap fieldMap) {
+        Property destination = fieldMap.getDestination();
+        Property source = fieldMap.getSource();
+        if (destination.getContainer() instanceof NestedProperty) {
+            VariableRef containerDestination = new VariableRef(destination.getContainer(), "destination");
+            VariableRef containerSource = new VariableRef(source.getContainer(), "source");
+            return assureInstanceExists(containerDestination, containerSource);
+        }
+        else {
+            return "";
         }
     }
     
@@ -991,4 +1008,5 @@ public class SourceCodeContext {
         }
         return converter;
     }
+
 }
