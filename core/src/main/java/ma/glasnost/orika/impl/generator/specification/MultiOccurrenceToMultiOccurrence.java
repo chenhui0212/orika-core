@@ -89,7 +89,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
      * @param code
      * @return a reference to <code>this</code> CodeSourceBuilder
      */
-    public String generateMultiOccurrenceMapping(NodeList sourceNodes, NodeList destNodes,
+    private String generateMultiOccurrenceMapping(NodeList sourceNodes, NodeList destNodes,
             Set<FieldMap> subFields, SourceCodeContext code) {
         
         StringBuilder out = new StringBuilder();
