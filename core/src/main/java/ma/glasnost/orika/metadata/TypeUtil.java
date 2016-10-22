@@ -188,9 +188,7 @@ abstract class TypeUtil {
             
             for (int i = 0, len = actualTypeArguments.length; i < len; ++i) {
                 java.lang.reflect.Type t = actualTypeArguments[i];
-                recursiveBounds.add(rawType);
                 resultTypeArguments[i] = TypeFactory.limitedValueOf(t, recursiveBounds);
-                recursiveBounds.remove(rawType);
             }
         }
         return resultTypeArguments;
