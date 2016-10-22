@@ -186,7 +186,7 @@ abstract class TypeUtil {
             throw new IllegalArgumentException("Must provide all type-arguments or none");
         } else {
             
-            for (int i = 0, len = actualTypeArguments.length; i < len; ++i) {
+            for (int i = 0; i < actualTypeArguments.length; i++) {
                 java.lang.reflect.Type t = actualTypeArguments[i];
                 resultTypeArguments[i] = TypeFactory.limitedValueOf(t, recursiveBounds);
             }
