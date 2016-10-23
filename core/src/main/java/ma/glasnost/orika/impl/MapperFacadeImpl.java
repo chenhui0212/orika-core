@@ -18,31 +18,9 @@
 
 package ma.glasnost.orika.impl;
 
-import static ma.glasnost.orika.StateReporter.DIVIDER;
-import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
-import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import ma.glasnost.orika.Converter;
-import ma.glasnost.orika.MapEntry;
-import ma.glasnost.orika.Mapper;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.MappingContextFactory;
-import ma.glasnost.orika.MappingException;
-import ma.glasnost.orika.MappingStrategy;
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import ma.glasnost.orika.*;
 import ma.glasnost.orika.MappingStrategy.Key;
-import ma.glasnost.orika.ObjectFactory;
 import ma.glasnost.orika.StateReporter.Reportable;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.mapping.strategy.MappingStrategyRecorder;
@@ -51,11 +29,16 @@ import ma.glasnost.orika.metadata.MapperKey;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.unenhance.UnenhanceStrategy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static ma.glasnost.orika.StateReporter.DIVIDER;
+import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
+import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
 
 /**
  * MapperFacadeImpl is the base implementation of MapperFacade
@@ -85,7 +68,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         this.userUnenhanceStrategy = mapperFactory.getUserUnenhanceStrategy();
         this.contextFactory = contextFactory;
     }
-    
+
     /**
      * Normalize the source type based on the registered converters, mappers and
      * accessible super types, as well as available unenhancers
@@ -117,11 +100,11 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 if (ClassUtil.isConcrete(sourceType)) {
                     resolvedType = unenhanceStrategy.unenhanceType(sourceObject, sourceType);
                 } else {
-                    resolvedType = unenhanceStrategy.unenhanceType(sourceObject, TypeFactory.resolveTypeOf(sourceObject, sourceType));
+                    resolvedType = unenhanceStrategy.unenhanceType(sourceObject, resolveTypeOf(sourceObject, sourceType));
                 }
             }
         } else {
-            resolvedType = unenhanceStrategy.unenhanceType(sourceObject, TypeFactory.typeOf(sourceObject));
+            resolvedType = unenhanceStrategy.unenhanceType(sourceObject, typeOf(sourceObject));
         }
         
         return (Type<S>) resolvedType;
@@ -174,7 +157,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             
             @SuppressWarnings("unchecked")
             Type<S> sourceType = (Type<S>) (initialSourceType != null ? TypeFactory.valueOf(initialSourceType)
-                    : TypeFactory.typeOf(sourceObject));
+                    : typeOf(sourceObject));
             Type<D> destinationType = TypeFactory.valueOf(initialDestinationType);
             
             MappingStrategyRecorder strategyRecorder = new MappingStrategyRecorder(key, unenhanceStrategy);
@@ -756,56 +739,56 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     }
     
     public <S, D> Set<D> mapAsSet(final Iterable<S> source, final Class<D> destinationClass) {
-        return mapAsSet(source, TypeFactory.elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
+        return mapAsSet(source, elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
     }
     
     public <S, D> Set<D> mapAsSet(final Iterable<S> source, final Class<D> destinationClass, final MappingContext context) {
-        return mapAsSet(source, TypeFactory.elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
+        return mapAsSet(source, elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
     public <S, D> Set<D> mapAsSet(final S[] source, final Class<D> destinationClass) {
-        return mapAsSet(source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
+        return mapAsSet(source, componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
     }
     
     public <S, D> Set<D> mapAsSet(final S[] source, final Class<D> destinationClass, final MappingContext context) {
-        return mapAsSet(source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
+        return mapAsSet(source, componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
     public <S, D> List<D> mapAsList(final Iterable<S> source, final Class<D> destinationClass) {
-        return mapAsList(source, TypeFactory.elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
+        return mapAsList(source, elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
     }
     
     public <S, D> List<D> mapAsList(final Iterable<S> source, final Class<D> destinationClass, final MappingContext context) {
-        return mapAsList(source, TypeFactory.elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
+        return mapAsList(source, elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
     public <S, D> List<D> mapAsList(final S[] source, final Class<D> destinationClass) {
-        return mapAsList(source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
+        return mapAsList(source, componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
     }
     
     public <S, D> List<D> mapAsList(final S[] source, final Class<D> destinationClass, final MappingContext context) {
-        return mapAsList(source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
+        return mapAsList(source, componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
     public <S, D> D[] mapAsArray(final D[] destination, final Iterable<S> source, final Class<D> destinationClass) {
-        return mapAsArray(destination, source, TypeFactory.elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
+        return mapAsArray(destination, source, elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
     }
     
     public <S, D> D[] mapAsArray(final D[] destination, final S[] source, final Class<D> destinationClass) {
-        return mapAsArray(destination, source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
+        return mapAsArray(destination, source, componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass));
     }
     
     public <S, D> D[] mapAsArray(final D[] destination, final Iterable<S> source, final Class<D> destinationClass,
             final MappingContext context) {
-        return mapAsArray(destination, source, TypeFactory.elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
+        return mapAsArray(destination, source, elementTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
     public <S, D> D[] mapAsArray(final D[] destination, final S[] source, final Class<D> destinationClass, final MappingContext context) {
-        return mapAsArray(destination, source, TypeFactory.componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
+        return mapAsArray(destination, source, componentTypeOf(source), TypeFactory.<D> valueOf(destinationClass), context);
     }
     
     public <S, D> D convert(final S source, final Class<D> destinationClass, final String converterId, MappingContext context) {
-        return convert(source, TypeFactory.typeOf(source), TypeFactory.<D> valueOf(destinationClass), converterId, context);
+        return convert(source, typeOf(source), TypeFactory.<D> valueOf(destinationClass), converterId, context);
     }
     
     public <Sk, Sv, Dk, Dv> Map<Dk, Dv> mapAsMap(final Map<Sk, Sv> source, final Type<? extends Map<Sk, Sv>> sourceType,
@@ -1007,7 +990,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
          * existing mapping for Map.Entry to to type D.
          */
         Set<D> destination = new HashSet<D>(source.size());
-        Type<Entry<Sk, Sv>> entryType = TypeFactory.resolveTypeOf(source.entrySet(), sourceType).getNestedType(0);
+        Type<Entry<Sk, Sv>> entryType = resolveTypeOf(source.entrySet(), sourceType).getNestedType(0);
         return (Set<D>) mapAsCollection(source.entrySet(), entryType, destinationType, destination, context);
     }
     
@@ -1101,6 +1084,59 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
         out.append(DIVIDER);
         out.append("\nUnenhance strategy: ").append(unenhanceStrategy);
+    }
+
+    /**
+     * Return the Type for the given object.
+     *
+     * @param object
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    private <T> Type<T> typeOf(final T object) {
+        return object == null ? null : TypeFactory.valueOf((Class<T>) object.getClass());
+    }
+
+    /**
+     * Resolve the (element) component type for the given array.
+     *
+     * @param object
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    private <T> Type<T> componentTypeOf(final T[] object) {
+        return object == null ? null : TypeFactory.valueOf((Class<T>) object.getClass().getComponentType());
+    }
+
+    /**
+     * Resolve the Type for the given object, using the provided referenceType
+     * to resolve the actual type arguments.
+     *
+     * @param object
+     * @param referenceType
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    private <T> Type<T> resolveTypeOf(final T object, Type<?> referenceType) {
+        return object == null ? null : TypeFactory.resolveValueOf((Class<T>) object.getClass(), referenceType);
+    }
+
+    /**
+     * Resolve the nested element type for the given Iterable.
+     *
+     * @param object
+     * @return the resolved Type instance
+     */
+    private <T> Type<T> elementTypeOf(final Iterable<T> object) {
+        try {
+            Method iterator = object.getClass().getMethod("iterator");
+            Type<Iterable<T>> type = TypeFactory.valueOf(iterator.getGenericReturnType());
+            return type.getNestedType(0);
+        } catch (SecurityException e) {
+            throw new IllegalStateException(e);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(e);
+        }
     }
     
 }

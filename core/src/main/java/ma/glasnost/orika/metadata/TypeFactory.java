@@ -17,19 +17,14 @@
  */
 package ma.glasnost.orika.metadata;
 
+import ma.glasnost.orika.metadata.TypeUtil.InvalidTypeDescriptorException;
+
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import ma.glasnost.orika.metadata.TypeUtil.InvalidTypeDescriptorException;
 
 /**
  * TypeFactory contains various methods for obtaining a Type instance to
@@ -421,61 +416,7 @@ public abstract class TypeFactory {
             }
         }
     }
-    
-    /**
-     * Return the Type for the given object.
-     * 
-     * @param object
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> typeOf(final T object) {
-        return (Type<T>) (object == null ? null : valueOf((Class<T>) object.getClass()));
-    }
-    
-    /**
-     * Resolve the Type for the given object, using the provided referenceType
-     * to resolve the actual type arguments.
-     * 
-     * @param object
-     * @param referenceType
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> resolveTypeOf(final T object, Type<?> referenceType) {
-        return object == null ? null : resolveValueOf((Class<T>) object.getClass(), referenceType);
-    }
-    
-    /**
-     * Resolve the (element) component type for the given array.
-     * 
-     * @param object
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> componentTypeOf(final T[] object) {
-        return (Type<T>) (object == null ? null : valueOf((Class<T>) object.getClass().getComponentType()));
-    }
-    
-    /**
-     * Resolve the nested element type for the given Iterable.
-     * 
-     * @param object
-     * @return the resolved Type instance
-     */
-    public static <T> Type<T> elementTypeOf(final Iterable<T> object) {
-        
-        try {
-            Method iterator = object.getClass().getMethod("iterator");
-            Type<Iterable<T>> type = valueOf(iterator.getGenericReturnType());
-            return type.getNestedType(0);
-        } catch (SecurityException e) {
-            throw new IllegalStateException(e);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-    
+
     /**
      * Constructs a nested type from a string description of that type; allows for package names
      * to be omitted for 'java.lang' and 'java.util' classes.
