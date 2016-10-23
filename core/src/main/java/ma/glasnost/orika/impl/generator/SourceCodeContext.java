@@ -51,10 +51,7 @@ import ma.glasnost.orika.impl.generator.Node.NodeList;
 import ma.glasnost.orika.impl.generator.UsedMapperFacadesContext.UsedMapperFacadesIndex;
 import ma.glasnost.orika.impl.generator.specification.AbstractSpecification;
 import ma.glasnost.orika.impl.util.ClassUtil;
-import ma.glasnost.orika.metadata.FieldMap;
-import ma.glasnost.orika.metadata.Property;
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
+import ma.glasnost.orika.metadata.*;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
 
 /**
@@ -399,6 +396,26 @@ public class SourceCodeContext {
             return newObjectFromMapper(source, destinationType);
         }
     }
+
+    /**
+     * Append a statement with assures that the container variable reference
+     * has an existing instance; if it does not, a new object is generated
+     * using MapperFacade.newObject
+     * @param fieldMap
+     * @return the code to assure the variable reference's instantiation
+     */
+    public String assureContainerInstanceExists(FieldMap fieldMap) {
+        Property destination = fieldMap.getDestination();
+        Property source = fieldMap.getSource();
+        if (destination.getContainer() instanceof NestedProperty) {
+            VariableRef containerDestination = new VariableRef(destination.getContainer(), "destination");
+            VariableRef containerSource = new VariableRef(source.getContainer(), "source");
+            return assureInstanceExists(containerDestination, containerSource);
+        }
+        else {
+            return "";
+        }
+    }
     
     /**
      * Append a statement which assures that the variable reference has an
@@ -717,14 +734,9 @@ public class SourceCodeContext {
      *            a variable reference to the source property
      * @param destination
      *            a variable reference to the destination property
-     * @param destinationType
-     *            the destination's type
-     * @param logDetails
-     *            a StringBuilder to contain the debug output
      * @return a reference to <code>this</code> CodeSourceBuilder
      */
-    public String mapFields(FieldMap fieldMap, VariableRef source, VariableRef destination, Type<?> destinationType,
-            StringBuilder logDetails) {
+    public String mapFields(FieldMap fieldMap, VariableRef source, VariableRef destination) {
         
         StringBuilder out = new StringBuilder();
         StringBuilder closing = new StringBuilder();
@@ -736,9 +748,9 @@ public class SourceCodeContext {
                 out.append("{ \n");
                 closing.append("\n}");
             }
-            
+
             boolean mapNulls = AbstractSpecification.shouldMapNulls(fieldMap, this);
-            
+
             if (destination.isNullPathPossible()) {
                 if (!source.isPrimitive()) {
                     if (!mapNulls) {
@@ -749,7 +761,7 @@ public class SourceCodeContext {
                 }
                 out.append(assureInstanceExists(destination, source));
             }
-            
+
             Converter<Object, Object> converter = getConverter(fieldMap, fieldMap.getConverterId());
             source.setConverter(converter);
             
@@ -996,4 +1008,5 @@ public class SourceCodeContext {
         }
         return converter;
     }
+
 }

@@ -17,28 +17,23 @@
  */
 package ma.glasnost.orika.impl.generator;
 
-import static java.lang.String.format;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.util.List;
-
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.constructor.ConstructorResolverStrategy;
 import ma.glasnost.orika.constructor.ConstructorResolverStrategy.ConstructorMapping;
 import ma.glasnost.orika.impl.GeneratedObjectFactory;
-import ma.glasnost.orika.metadata.ClassMap;
-import ma.glasnost.orika.metadata.FieldMap;
-import ma.glasnost.orika.metadata.MapperKey;
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
-
+import ma.glasnost.orika.metadata.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.List;
+
+import static java.lang.String.format;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
 
 /**
  * ObjectFactoryGenerator generates source code which implements an
@@ -186,7 +181,7 @@ public class ObjectFactoryGenerator {
                     VariableRef destOwner = new VariableRef(fieldMap.getDestination(), "");
                     v.setOwner(destOwner);
                     out.append(statement(v.declare()));
-                    out.append(code.mapFields(fieldMap, s, v, destinationType, logDetails));
+                    out.append(code.mapFields(fieldMap, s, v));
                 }
                 
                 out.append(format("return new %s(", destinationType.getCanonicalName()));

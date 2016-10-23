@@ -18,12 +18,13 @@
 
 package ma.glasnost.orika.impl.generator.specification;
 
-import static java.lang.String.format;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
 import ma.glasnost.orika.converter.builtin.CopyByReferenceConverter;
 import ma.glasnost.orika.impl.generator.SourceCodeContext;
 import ma.glasnost.orika.impl.generator.VariableRef;
 import ma.glasnost.orika.metadata.FieldMap;
+
+import static java.lang.String.format;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
 
 /**
  * Convert applies the conversion operation between two properties. There is a
@@ -81,10 +82,7 @@ public class Convert extends AbstractSpecification {
     }
     
     public String generateMappingCode(FieldMap fieldMap, VariableRef source, VariableRef destination, SourceCodeContext code) {
-        
-        String assureInstanceExists = destination.isNestedProperty() ? (statement(code.assureInstanceExists(destination, source)) + "\n")
-                : "";
-        
+
         String statement;
         boolean canHandleNulls;
         if (source.getConverter() instanceof CopyByReferenceConverter) {
@@ -110,7 +108,7 @@ public class Convert extends AbstractSpecification {
         } else {
             String elseSetNull = shouldSetNull ? (" else " + destinationNotNull + "{ \n" + destination.assignIfPossible("null")) + ";\n }"
                     : "";
-            return statement(source.ifNotNull() + "{ \n" + assureInstanceExists + statement) + "\n}" + elseSetNull;
+            return statement(source.ifNotNull() + "{ \n" + statement) + "\n}" + elseSetNull;
         }
     }
 }
