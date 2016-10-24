@@ -140,10 +140,12 @@ abstract class TypeUtil {
     private static Type<?> getMostSpecificType(final Type<?> type0, final Type<?> type1, final Set<Type<?>> ignoredTypes) {
         if (type1 == null && type0 == null) {
             return null;
-        } else if (type0 == null) {
+        } else if (type0 == null && type1 != null) {
             return type1;
-        } else if (type1 == null) {
+        } else if (type1 == null && type0 != null) {
             return type0;
+        } else if (type1 == null && type0 == null) {
+            return null;
         } else if (ignoredTypes.contains(type1) && ignoredTypes.contains(type0)) {
             return TypeFactory.TYPE_OF_OBJECT;
         } else if (ignoredTypes.contains(type1)) {
