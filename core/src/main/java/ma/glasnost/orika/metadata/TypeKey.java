@@ -33,6 +33,24 @@ class TypeKey {
 	private static volatile WeakHashMap<java.lang.reflect.Type, Integer> knownTypes = new WeakHashMap<java.lang.reflect.Type, Integer>();
 	private static AtomicInteger currentIndex = new AtomicInteger();
 
+	/**
+	 * Calculates an identity for a Class, Type[] pair; avoids maintaining a
+	 * reference the actual class.
+	 *
+	 * @param rawType
+	 * @param typeArguments
+	 * @return
+	 */
+	static TypeKey valueOf(Class<?> rawType, java.lang.reflect.Type[] typeArguments) {
+
+		byte[] identityHashBytes = new byte[(typeArguments.length + 1) * 4];
+		intToByteArray(getTypeIndex(rawType), identityHashBytes, 0);
+		for (int i = 0, len = typeArguments.length; i < len; ++i) {
+			intToByteArray(getTypeIndex(typeArguments[i]), identityHashBytes, i + 1);
+		}
+		return new TypeKey(identityHashBytes);
+	}
+
 	private static int getTypeIndex(java.lang.reflect.Type type) {
 		Integer typeIndex = knownTypes.get(type);
 		if (typeIndex == null) {
@@ -51,37 +69,17 @@ class TypeKey {
 	/**
 	 * Merge an int value into byte array, starting at the specified starting
 	 * index (occupies the next 4 bytes);
-	 * 
+	 *
 	 * @param value
 	 * @param bytes
 	 * @param startIndex
 	 */
-	static final void intToByteArray(int value, byte[] bytes, int startIndex) {
+	private static void intToByteArray(int value, byte[] bytes, int startIndex) {
 		int i = startIndex * 4;
 		bytes[i] = (byte) (value >>> 24);
 		bytes[i + 1] = (byte) (value >>> 16);
 		bytes[i + 2] = (byte) (value >>> 8);
 		bytes[i + 3] = (byte) (value);
-	}
-
-	/**
-	 * Calculates an identity for a Class, Type[] pair; avoids maintaining a
-	 * reference the actual class.
-	 * 
-	 * @param rawType
-	 * @param typeArguments
-	 * @return
-	 */
-	static final TypeKey valueOf(Class<?> rawType,
-			java.lang.reflect.Type[] typeArguments) {
-
-		byte[] identityHashBytes = new byte[(typeArguments.length + 1) * 4];
-		intToByteArray(getTypeIndex(rawType), identityHashBytes, 0);
-		for (int i = 0, len = typeArguments.length; i < len; ++i) {
-			intToByteArray(getTypeIndex(typeArguments[i]), identityHashBytes,
-					i + 1);
-		}
-		return new TypeKey(identityHashBytes);
 	}
 
 	private final byte[] bytes;
