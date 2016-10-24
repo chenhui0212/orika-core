@@ -388,15 +388,11 @@ public abstract class TypeFactory {
     private static Type<?> refineBounds(Set<Type<?>> bounds) {
         if (bounds.size() > 1) {
             // Consolidate bounds to most significant
-            Iterator<Type<?>> currentBoundIter = bounds.iterator();
-            while (currentBoundIter.hasNext()) {
-                Type<?> currentBound = currentBoundIter.next();
+            for (Type<?> currentBound : bounds) {
                 Iterator<Type<?>> boundIter = bounds.iterator();
                 while (boundIter.hasNext()) {
                     Type<?> nextType = boundIter.next();
-                    if (nextType.equals(currentBound)) {
-                        continue;
-                    } else {
+                    if (!nextType.equals(currentBound)) {
                         Type<?> mostSpecific = TypeUtil.getMostSpecificType(currentBound, nextType);
                         if (nextType.equals(mostSpecific)) {
                             boundIter.remove();
