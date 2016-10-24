@@ -35,11 +35,11 @@ import java.util.Set;
 abstract class TypeUtil {
     
     @SuppressWarnings("unchecked")
-    static final Set<Type<?>> IGNORED_TYPES = new HashSet<Type<?>>(Arrays.asList(TypeFactory.valueOf(Cloneable.class),
+    private static final Set<Type<?>> IGNORED_TYPES = new HashSet<Type<?>>(Arrays.asList(TypeFactory.valueOf(Cloneable.class),
             TypeFactory.valueOf(Serializable.class), TypeFactory.valueOf(Externalizable.class)));
     
     @SuppressWarnings("serial")
-    static final Map<String, Class<?>> PRIMITIVES_CLASSES = new HashMap<String, Class<?>>() {
+    private static final Map<String, Class<?>> PRIMITIVES_CLASSES = new HashMap<String, Class<?>>() {
         {
             put(Boolean.TYPE.getName(), Boolean.TYPE);
             put(Short.TYPE.getName(), Short.TYPE);
@@ -137,7 +137,7 @@ abstract class TypeUtil {
      * @param ignoredTypes
      * @return
      */
-    static Type<?> getMostSpecificType(final Type<?> type0, final Type<?> type1, final Set<Type<?>> ignoredTypes) {
+    private static Type<?> getMostSpecificType(final Type<?> type0, final Type<?> type1, final Set<Type<?>> ignoredTypes) {
         if (type1 == null && type0 == null) {
             return null;
         } else if (type0 == null && type1 != null) {
@@ -186,45 +186,43 @@ abstract class TypeUtil {
             throw new IllegalArgumentException("Must provide all type-arguments or none");
         } else {
             
-            for (int i = 0, len = actualTypeArguments.length; i < len; ++i) {
+            for (int i = 0; i < actualTypeArguments.length; i++) {
                 java.lang.reflect.Type t = actualTypeArguments[i];
-                recursiveBounds.add(rawType);
                 resultTypeArguments[i] = TypeFactory.limitedValueOf(t, recursiveBounds);
-                recursiveBounds.remove(rawType);
             }
         }
         return resultTypeArguments;
     }
-    
+
     /**
      * Use the ancestry of a given raw type in order to determine the most
      * specific type parameters possible from the known bounds.
-     * 
+     *
      * @param rawType
      * @return
      */
-    static Type<?>[] convertTypeArgumentsFromAncestry(final Class<?> rawType, final Set<java.lang.reflect.Type> bounds) {
-        
+    private static Type<?>[] convertTypeArgumentsFromAncestry(final Class<?> rawType, final Set<java.lang.reflect.Type> bounds) {
+
         Map<TypeVariable<?>, Type<?>> typesByVariable = new LinkedHashMap<TypeVariable<?>, Type<?>>();
         for (TypeVariable<?> var : rawType.getTypeParameters()) {
             typesByVariable.put(var, TypeFactory.limitedValueOf(var, bounds));
         }
-        
+
         Set<java.lang.reflect.Type> genericAncestors = new LinkedHashSet<java.lang.reflect.Type>();
-        
+
         genericAncestors.add(rawType.getGenericSuperclass());
         genericAncestors.add(rawType.getSuperclass());
         genericAncestors.addAll(Arrays.asList(rawType.getGenericInterfaces()));
         genericAncestors.addAll(Arrays.asList(rawType.getInterfaces()));
-        
+
         Iterator<java.lang.reflect.Type> iter = genericAncestors.iterator();
         while (iter.hasNext()) {
-            
+
             java.lang.reflect.Type ancestor = iter.next();
             iter.remove();
-            
+
             if (ancestor instanceof ParameterizedType) {
-                
+
                 ParameterizedType superType = (ParameterizedType) ancestor;
                 TypeVariable<?>[] variables = ((Class<?>) superType.getRawType()).getTypeParameters();
                 java.lang.reflect.Type[] actuals = superType.getActualTypeArguments();
@@ -237,9 +235,9 @@ abstract class TypeUtil {
                     }
                 }
             } else if (ancestor instanceof Class) {
-                
+
                 Class<?> superType = (Class<?>) ancestor;
-                
+
                 TypeVariable<?>[] variables = superType.getTypeParameters();
                 for (int i = 0; i < variables.length; ++i) {
                     Type<?> resolvedActual = TypeFactory.limitedValueOf(variables[i], bounds);
@@ -250,10 +248,10 @@ abstract class TypeUtil {
                 }
             }
         }
-        
+
         return typesByVariable.values().toArray(new Type<?>[0]);
     }
-    
+
     static class InvalidTypeDescriptorException extends Exception {
         private static final long serialVersionUID = 1L;
     }

@@ -18,12 +18,6 @@
 
 package ma.glasnost.orika.impl.generator.specification;
 
-import static java.lang.String.format;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
-import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
-
-import java.util.Map;
-
 import ma.glasnost.orika.impl.generator.MapEntryRef;
 import ma.glasnost.orika.impl.generator.MapEntryRef.EntryPart;
 import ma.glasnost.orika.impl.generator.MultiOccurrenceVariableRef;
@@ -33,6 +27,12 @@ import ma.glasnost.orika.impl.util.StringUtil;
 import ma.glasnost.orika.metadata.FieldMap;
 import ma.glasnost.orika.metadata.FieldMapBuilder;
 import ma.glasnost.orika.metadata.TypeFactory;
+
+import java.util.Map;
+
+import static java.lang.String.format;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.append;
+import static ma.glasnost.orika.impl.generator.SourceCodeContext.statement;
 
 /**
  * MapToMap handles conversion of a Map to another Map
@@ -67,8 +67,7 @@ public class MapToMap extends AbstractSpecification {
             out.append(statement(newDest.declare(d)));
             out.append(statement("%s.clear()", newDest));
         }
-        
-        
+
         VariableRef newKey = new VariableRef(d.mapKeyType(), "new" + StringUtil.capitalize(d.name()) + "Key");
         VariableRef newVal = new VariableRef(d.mapValueType(), "new" + StringUtil.capitalize(d.name()) + "Val");
         VariableRef entry = new VariableRef(TypeFactory.valueOf(Map.Entry.class), "source" + StringUtil.capitalize(d.name()) + "Entry");
@@ -78,9 +77,10 @@ public class MapToMap extends AbstractSpecification {
          * Loop through the individual entries, map key/value and then put
          * them into the destination
          */
+
         append(out,
-                format("for( java.util.Iterator entryIter = %s.entrySet().iterator(); entryIter.hasNext(); ) {\n", s),
-                entry.declare("entryIter.next()"),
+                format("for( %s; %s; ) { \n", s.declareIterator(), s.iteratorHasNext()),
+                entry.declare(s.nextElement()),
                 newKey.declare(),
                 newVal.declare(),
                 code.mapFields(FieldMapBuilder.mapKeys(s.mapKeyType(), d.mapKeyType()), sourceKey, newKey),
