@@ -47,84 +47,15 @@ public abstract class TypeFactory {
      * Types (classes) which may belong to descendant class-loaders
      */
     private static final ConcurrentHashMap<TypeKey, WeakReference<Type<?>>> typeCache = new ConcurrentHashMap<TypeKey, WeakReference<Type<?>>>();
-    
+
     /**
      * The Type instance which represents the Object class
      */
     public static final Type<Object> TYPE_OF_OBJECT = valueOf(Object.class);
-    
-    /**
-     * Store the combination of rawType and type arguments as a Type within the
-     * type cache.<br>
-     * Use the existing type if already available; we try to enforce that Type
-     * should be immutable.
-     * 
-     * @param rawType
-     *            the raw class of the type
-     * @param typeArguments
-     *            the type arguments of the type
-     * @param recursiveBounds
-     *            the limits on recursively nested types
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private static <T> Type<T> intern(final Class<T> rawType, final java.lang.reflect.Type[] typeArguments,
-            final Set<java.lang.reflect.Type> recursiveBounds) {
-        
-        Type<?>[] convertedArguments = TypeUtil.convertTypeArguments(rawType, typeArguments, recursiveBounds);
-        TypeKey key = TypeKey.valueOf(rawType, convertedArguments);
-        
-        WeakReference<Type<?>> mapped = typeCache.get(key);
-        Type<T> typeResult = null;
-        if (mapped != null) {
-            typeResult = (Type<T>) mapped.get();
-        }
-        if (typeResult == null) {
-            synchronized (rawType) {
-                mapped = typeCache.get(key);
-                if (mapped != null) {
-                    typeResult = (Type<T>) mapped.get();
-                }
-                if (typeResult == null) {
-                    typeResult = createType(key, rawType, convertedArguments);
-                    mapped = new WeakReference<Type<?>>(typeResult);
-                    WeakReference<Type<?>> existing = typeCache.putIfAbsent(key, mapped);
-                    if (existing != null) {
-                        if (existing.get() == null) {
-                            /*
-                             *  Should not be possible, since the references are
-                             *  based on Class objects, which cannot be GC'd until 
-                             *  their respective class loader is GC'd, in which case, 
-                             *  such a Class could not be passed into this method as
-                             *  an argument, or embedded within an argument 
-                             */
-                            typeCache.put(key, mapped);
-                        } else {
-                            mapped = existing;
-                            typeResult = (Type<T>) mapped.get();
-                        }
-                    }
-                }
-            }
-        }
-        return typeResult;
-        
-    }
-    
-    private static <T> Type<T> createType(TypeKey key, Class<T> rawType, Type<?>[] typeArguments) {
-        Map<String, Type<?>> typesByVariable = null;
-        if (typeArguments.length > 0) {
-            typesByVariable = new HashMap<String, Type<?>>(typeArguments.length);
-            for (int i = 0, len = typeArguments.length; i < len; ++i) {
-                typesByVariable.put(rawType.getTypeParameters()[i].getName(), typeArguments[i]);
-            }
-        }
-        return new Type<T>(key, rawType, typesByVariable, typeArguments);
-    }
-    
+
     /**
      * Resolves the Type value of the specified raw Class type
-     * 
+     *
      * @param rawType
      * @return the resolved Type instance
      */
@@ -138,29 +69,26 @@ public abstract class TypeFactory {
             return intern(rawType, new java.lang.reflect.Type[0], new HashSet<java.lang.reflect.Type>());
         }
     }
-    
+
     /**
-     * @param rawType
-     * @param recursiveBounds
-     * @param actualTypeArguments
-     * @return the resolved Type instance
+     * Constructs a nested type from a string description of that type; allows for package names
+     * to be omitted for 'java.lang' and 'java.util' classes.
+     *
+     * @param typeDescriptor a string representation of the java declaration of a generic type
+     * @return
      */
-    public static <E> Type<E> limitedValueOf(final Class<E> rawType, Set<java.lang.reflect.Type> recursiveBounds,
-            final java.lang.reflect.Type... actualTypeArguments) {
-        if (rawType == null) {
-            return null;
-        } else if (rawType.isAnonymousClass() && rawType.getGenericSuperclass() instanceof ParameterizedType) {
-            ParameterizedType genericSuper = (ParameterizedType) rawType.getGenericSuperclass();
-            return limitedValueOf(genericSuper, recursiveBounds);
-        } else {
-            return (Type<E>) intern(rawType, actualTypeArguments, recursiveBounds);
+    public static Type<?> valueOf(final String typeDescriptor) {
+        try {
+            return TypeUtil.parseTypeDescriptor(typeDescriptor);
+        } catch (InvalidTypeDescriptorException e) {
+            throw new IllegalArgumentException(typeDescriptor + " is an invalid type descriptor");
         }
     }
-    
+
     /**
      * Resolve the Type value of the given raw Class type, filling the type
      * parameters with the provided actual type arguments
-     * 
+     *
      * @param rawType
      * @param actualTypeArguments
      * @return the resolved Type instance
@@ -169,25 +97,25 @@ public abstract class TypeFactory {
         if (rawType == null) {
             return null;
         } else {
-            return (Type<E>) intern((Class<E>) rawType, actualTypeArguments, new HashSet<java.lang.reflect.Type>());
+            return intern(rawType, actualTypeArguments, new HashSet<java.lang.reflect.Type>());
         }
     }
-    
+
     /**
      * This method declaration helps to shortcut the other methods for
      * ParameterizedType which it extends; we just return it.
-     * 
+     *
      * @param type
      * @return the resolved Type instance
      */
     public static <T> Type<T> valueOf(final Type<T> type) {
         return type;
     }
-    
+
     /**
      * Return the Type for the given ParameterizedType, resolving actual type
      * arguments where possible.
-     * 
+     *
      * @param type
      * @return the resolved Type instance
      */
@@ -195,29 +123,16 @@ public abstract class TypeFactory {
     public static <T> Type<T> valueOf(final ParameterizedType type) {
         return valueOf((Class<T>) type.getRawType(), type.getActualTypeArguments());
     }
-    
-    /**
-     * Return the Type for the given ParameterizedType, resolving actual type
-     * arguments where possible; uses recursiveBounds to limit the recursion.
-     * 
-     * @param type
-     * @param recursiveBounds
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> limitedValueOf(final ParameterizedType type, final Set<java.lang.reflect.Type> recursiveBounds) {
-        return limitedValueOf((Class<T>) type.getRawType(), recursiveBounds, type.getActualTypeArguments());
-    }
-    
+
     /**
      * Finds the Type value of the given TypeVariable
-     * 
+     *
      * @param var
      * @return the resolved Type instance
      */
     @SuppressWarnings("unchecked")
     public static <T> Type<T> valueOf(final TypeVariable<?> var) {
-        
+
         if (var.getBounds().length > 0) {
             Set<Type<?>> bounds = new HashSet<Type<?>>(var.getBounds().length);
             for (int i = 0, len = var.getBounds().length; i < len; ++i) {
@@ -228,18 +143,178 @@ public abstract class TypeFactory {
             return (Type<T>) TYPE_OF_OBJECT;
         }
     }
-    
+
+    /**
+     * Finds the Type value of the given wildcard type
+     *
+     * @param var
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Type<T> valueOf(final WildcardType var) {
+
+        Set<Type<?>> bounds = new HashSet<Type<?>>(var.getUpperBounds().length + var.getLowerBounds().length);
+        for (int i = 0, len = var.getUpperBounds().length; i < len; ++i) {
+            bounds.add(valueOf(var.getUpperBounds()[i]));
+        }
+        for (int i = 0, len = var.getLowerBounds().length; i < len; ++i) {
+            bounds.add(valueOf(var.getLowerBounds()[i]));
+        }
+        return (Type<T>) refineBounds(bounds);
+    }
+
+    /**
+     * Return the Type for the given java.lang.reflect.Type, either for a
+     * ParameterizedType or a Class instance
+     *
+     * @param type
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Type<T> valueOf(final java.lang.reflect.Type type) {
+        if (type instanceof Type) {
+            return (Type<T>) type;
+        } else if (type instanceof ParameterizedType) {
+            return valueOf((ParameterizedType) type);
+        } else if (type instanceof Class) {
+            return valueOf((Class<T>) type);
+        } else if (type instanceof TypeVariable) {
+            return valueOf((TypeVariable<?>) type);
+        } else if (type instanceof WildcardType) {
+            return valueOf((WildcardType) type);
+        } else {
+            throw new IllegalArgumentException(type + " is an unsupported type");
+        }
+    }
+
+    /**
+     * Resolve the Type for the given ParameterizedType, using the provided
+     * referenceType to resolve any unresolved actual type arguments.
+     *
+     * @param type
+     * @param referenceType
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Type<T> resolveValueOf(final ParameterizedType type, final Type<?> referenceType) {
+        if (type == null) {
+            return null;
+        } else {
+            java.lang.reflect.Type[] actualTypeArguments = TypeUtil.resolveActualTypeArguments(type, referenceType);
+            return intern((Class<T>) type.getRawType(), actualTypeArguments, new HashSet<java.lang.reflect.Type>());
+        }
+    }
+
+    /**
+     * Resolve the Type for the given Class, using the provided referenceType to
+     * resolve the actual type arguments.
+     *
+     * @param type
+     * @param referenceType
+     * @return the resolved Type instance
+     */
+    public static <T> Type<T> resolveValueOf(final Class<T> type, final Type<?> referenceType) {
+        if (type == null) {
+            return null;
+        } else {
+            if (type.getTypeParameters() != null && type.getTypeParameters().length > 0) {
+                java.lang.reflect.Type[] actualTypeArguments = TypeUtil.resolveActualTypeArguments(type.getTypeParameters(),
+                        type.getTypeParameters(), referenceType);
+                return valueOf(type, actualTypeArguments);
+            } else {
+                return valueOf(type);
+            }
+        }
+    }
+
+    /**
+     * Gets the name for a type, using the Simple name when the type does not
+     * match the associated type, but using fully-qualified name when the associated
+     * type has a matching simple name, but is not the same.
+     *
+     * @param type the type for which to return the name
+     * @param associatedType the associated type, used to decide the level of detail
+     *  required in the returned name
+     * @return
+     */
+    public static String nameOf(java.lang.reflect.Type type, java.lang.reflect.Type associatedType) {
+        String shortTypeName;
+        String longTypeName;
+        String shortAscTypeName;
+        String longAscTypeName;
+
+        if (type instanceof Type) {
+            longTypeName = ((Type<?>)type).toFullyQualifiedString();
+            shortTypeName = type.toString();
+        } else if (type instanceof Class) {
+            longTypeName = ((Class<?>)type).getCanonicalName();
+            shortTypeName = ((Class<?>)type).getSimpleName();
+        } else {
+            longTypeName = String.valueOf(type);
+            String[] parts = longTypeName.split("\\s+");
+            longTypeName = parts[parts.length-1];
+            parts = longTypeName.split("[.]");
+            shortTypeName = parts[parts.length-1];
+        }
+
+        if (associatedType instanceof Type) {
+            longAscTypeName = ((Type<?>)associatedType).toFullyQualifiedString();
+            shortAscTypeName = associatedType.toString();
+        } else if (associatedType instanceof Class) {
+            longAscTypeName = ((Class<?>)associatedType).getCanonicalName();
+            shortAscTypeName = ((Class<?>)associatedType).getSimpleName();
+        } else {
+            longAscTypeName = String.valueOf(associatedType);
+            String[] parts = longAscTypeName.split("\\s+");
+            longAscTypeName = parts[parts.length-1];
+            parts = longAscTypeName.split("[.]");
+            shortAscTypeName = parts[parts.length-1];
+        }
+
+        if (shortTypeName.equals(shortAscTypeName) &&
+                !longTypeName.equals(longAscTypeName)) {
+            return longTypeName;
+        } else {
+            return shortTypeName;
+        }
+    }
+
+    /**
+     * Return the Type for the given java.lang.reflect.Type, limiting the
+     * recursive depth on any type already contained in recursiveBounds.
+     *
+     * @param type
+     * @param recursiveBounds
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    static <T> Type<T> limitedValueOf(final java.lang.reflect.Type type, final Set<java.lang.reflect.Type> recursiveBounds) {
+        if (type instanceof Type) {
+            return (Type<T>) type;
+        } else if (type instanceof ParameterizedType) {
+            return limitedValueOf((ParameterizedType) type, recursiveBounds);
+        } else if (type instanceof Class) {
+            return limitedValueOf((Class<T>) type, recursiveBounds, new java.lang.reflect.Type[0]);
+        } else if (type instanceof TypeVariable) {
+            return limitedValueOf((TypeVariable<?>) type, recursiveBounds);
+        } else if (type instanceof WildcardType) {
+            return limitedValueOf((WildcardType) type, recursiveBounds);
+        } else {
+            throw new IllegalArgumentException(type + " is an unsupported type");
+        }
+    }
+
     /**
      * Finds the Type value of the given TypeVariable, using recursiveBounds to
      * limit the recursion.
-     * 
+     *
      * @param var
      * @param recursiveBounds
      * @return the resolved Type instance
      */
     @SuppressWarnings("unchecked")
-    public static <T> Type<T> limitedValueOf(final TypeVariable<?> var, final Set<java.lang.reflect.Type> recursiveBounds) {
-        
+    static <T> Type<T> limitedValueOf(final TypeVariable<?> var, final Set<java.lang.reflect.Type> recursiveBounds) {
+
         if (var.getBounds().length > 0) {
             Set<Type<?>> bounds = new HashSet<Type<?>>(var.getBounds().length);
             for (int i = 0, len = var.getBounds().length; i < len; ++i) {
@@ -250,38 +325,19 @@ public abstract class TypeFactory {
             return (Type<T>) TYPE_OF_OBJECT;
         }
     }
-    
+
     /**
-     * Finds the Type value of the given wildcard type
-     * 
-     * @param var
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> valueOf(final WildcardType var) {
-        
-        Set<Type<?>> bounds = new HashSet<Type<?>>(var.getUpperBounds().length + var.getLowerBounds().length);
-        for (int i = 0, len = var.getUpperBounds().length; i < len; ++i) {
-            bounds.add(valueOf(var.getUpperBounds()[i]));
-        }
-        for (int i = 0, len = var.getLowerBounds().length; i < len; ++i) {
-            bounds.add(valueOf(var.getLowerBounds()[i]));
-        }
-        return (Type<T>) refineBounds(bounds);
-    }
-    
-    /**
-     * 
+     *
      * Finds the Type value of the given wildcard type, using recursiveBounds to
      * limit the recursion.
-     * 
+     *
      * @param var
      * @param recursiveBounds
      * @return the resolved Type instance
      */
     @SuppressWarnings("unchecked")
-    public static <T> Type<T> limitedValueOf(final WildcardType var, final Set<java.lang.reflect.Type> recursiveBounds) {
-        
+    private static <T> Type<T> limitedValueOf(final WildcardType var, final Set<java.lang.reflect.Type> recursiveBounds) {
+
         Set<Type<?>> bounds = new HashSet<Type<?>>(var.getUpperBounds().length + var.getLowerBounds().length);
         for (int i = 0, len = var.getUpperBounds().length; i < len; ++i) {
             bounds.add(limitedValueOf(var.getUpperBounds()[i], recursiveBounds));
@@ -291,10 +347,41 @@ public abstract class TypeFactory {
         }
         return (Type<T>) refineBounds(bounds);
     }
-    
+
+    /**
+     * Return the Type for the given ParameterizedType, resolving actual type
+     * arguments where possible; uses recursiveBounds to limit the recursion.
+     *
+     * @param type
+     * @param recursiveBounds
+     * @return the resolved Type instance
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> Type<T> limitedValueOf(final ParameterizedType type, final Set<java.lang.reflect.Type> recursiveBounds) {
+        return limitedValueOf((Class<T>) type.getRawType(), recursiveBounds, type.getActualTypeArguments());
+    }
+
+    /**
+     * @param rawType
+     * @param recursiveBounds
+     * @param actualTypeArguments
+     * @return the resolved Type instance
+     */
+    private static <E> Type<E> limitedValueOf(final Class<E> rawType, Set<java.lang.reflect.Type> recursiveBounds,
+                                              final java.lang.reflect.Type... actualTypeArguments) {
+        if (rawType == null) {
+            return null;
+        } else if (rawType.isAnonymousClass() && rawType.getGenericSuperclass() instanceof ParameterizedType) {
+            ParameterizedType genericSuper = (ParameterizedType) rawType.getGenericSuperclass();
+            return limitedValueOf(genericSuper, recursiveBounds);
+        } else {
+            return intern(rawType, actualTypeArguments, recursiveBounds);
+        }
+    }
+
     /**
      * Returns the most specific type from the set of provided bounds.
-     * 
+     *
      * @param bounds
      * @return the resolved Type instance
      */
@@ -315,173 +402,84 @@ public abstract class TypeFactory {
                             boundIter.remove();
                         }
                     }
-                    
+
                 }
             }
             if (bounds.size() != 1) {
                 throw new IllegalArgumentException(bounds + " is not refinable");
             }
         }
-        
+
         return bounds.iterator().next();
     }
-    
+
     /**
-     * Return the Type for the given java.lang.reflect.Type, either for a
-     * ParameterizedType or a Class instance
-     * 
-     * @param type
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> valueOf(final java.lang.reflect.Type type) {
-        if (type instanceof Type) {
-            return (Type<T>) type;
-        } else if (type instanceof ParameterizedType) {
-            return valueOf((ParameterizedType) type);
-        } else if (type instanceof Class) {
-            return valueOf((Class<T>) type);
-        } else if (type instanceof TypeVariable) {
-            return valueOf((TypeVariable<?>) type);
-        } else if (type instanceof WildcardType) {
-            return valueOf((WildcardType) type);
-        } else {
-            throw new IllegalArgumentException(type + " is an unsupported type");
-        }
-    }
-    
-    /**
-     * Return the Type for the given java.lang.reflect.Type, limiting the
-     * recursive depth on any type already contained in recursiveBounds.
-     * 
-     * @param type
+     * Store the combination of rawType and type arguments as a Type within the
+     * type cache.<br>
+     * Use the existing type if already available; we try to enforce that Type
+     * should be immutable.
+     *
+     * @param rawType
+     *            the raw class of the type
+     * @param typeArguments
+     *            the type arguments of the type
      * @param recursiveBounds
-     * @return the resolved Type instance
+     *            the limits on recursively nested types
+     * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T> Type<T> limitedValueOf(final java.lang.reflect.Type type, final Set<java.lang.reflect.Type> recursiveBounds) {
-        if (type instanceof Type) {
-            return (Type<T>) type;
-        } else if (type instanceof ParameterizedType) {
-            return limitedValueOf((ParameterizedType) type, recursiveBounds);
-        } else if (type instanceof Class) {
-            return limitedValueOf((Class<T>) type, recursiveBounds, new java.lang.reflect.Type[0]);
-        } else if (type instanceof TypeVariable) {
-            return limitedValueOf((TypeVariable<?>) type, recursiveBounds);
-        } else if (type instanceof WildcardType) {
-            return limitedValueOf((WildcardType) type, recursiveBounds);
-        } else {
-            throw new IllegalArgumentException(type + " is an unsupported type");
+    private static <T> Type<T> intern(final Class<T> rawType, final java.lang.reflect.Type[] typeArguments,
+                                      final Set<java.lang.reflect.Type> recursiveBounds) {
+
+        Type<?>[] convertedArguments = TypeUtil.convertTypeArguments(rawType, typeArguments, recursiveBounds);
+        TypeKey key = TypeKey.valueOf(rawType, convertedArguments);
+
+        WeakReference<Type<?>> mapped = typeCache.get(key);
+        Type<T> typeResult = null;
+        if (mapped != null) {
+            typeResult = (Type<T>) mapped.get();
         }
-    }
-    
-    /**
-     * Resolve the Type for the given ParameterizedType, using the provided
-     * referenceType to resolve any unresolved actual type arguments.
-     * 
-     * @param type
-     * @param referenceType
-     * @return the resolved Type instance
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Type<T> resolveValueOf(final ParameterizedType type, final Type<?> referenceType) {
-        if (type == null) {
-            return null;
-        } else {
-            java.lang.reflect.Type[] actualTypeArguments = TypeUtil.resolveActualTypeArguments(type, referenceType);
-            Type<T> result = intern((Class<T>) type.getRawType(), actualTypeArguments, new HashSet<java.lang.reflect.Type>());
-            
-            return result;
-        }
-    }
-    
-    /**
-     * Resolve the Type for the given Class, using the provided referenceType to
-     * resolve the actual type arguments.
-     * 
-     * @param type
-     * @param referenceType
-     * @return the resolved Type instance
-     */
-    public static <T> Type<T> resolveValueOf(final Class<T> type, final Type<?> referenceType) {
-        if (type == null) {
-            return null;
-        } else {
-            if (type.getTypeParameters() != null && type.getTypeParameters().length > 0) {
-                java.lang.reflect.Type[] actualTypeArguments = TypeUtil.resolveActualTypeArguments(type.getTypeParameters(),
-                        type.getTypeParameters(), referenceType);
-                return valueOf(type, actualTypeArguments);
-            } else {
-                return valueOf(type);
+        if (typeResult == null) {
+            synchronized (rawType) {
+                mapped = typeCache.get(key);
+                if (mapped != null) {
+                    typeResult = (Type<T>) mapped.get();
+                }
+                if (typeResult == null) {
+                    typeResult = createType(key, rawType, convertedArguments);
+                    mapped = new WeakReference<Type<?>>(typeResult);
+                    WeakReference<Type<?>> existing = typeCache.putIfAbsent(key, mapped);
+                    if (existing != null) {
+                        if (existing.get() == null) {
+                            /*
+                             *  Should not be possible, since the references are
+                             *  based on Class objects, which cannot be GC'd until
+                             *  their respective class loader is GC'd, in which case,
+                             *  such a Class could not be passed into this method as
+                             *  an argument, or embedded within an argument
+                             */
+                            typeCache.put(key, mapped);
+                        } else {
+                            mapped = existing;
+                            typeResult = (Type<T>) mapped.get();
+                        }
+                    }
+                }
             }
         }
+        return typeResult;
+
     }
 
-    /**
-     * Constructs a nested type from a string description of that type; allows for package names
-     * to be omitted for 'java.lang' and 'java.util' classes.
-     * 
-     * @param typeDescriptor a string representation of the java declaration of a generic type
-     * @return
-     */
-    public static Type<?> valueOf(final String typeDescriptor) {
-        try {
-            return TypeUtil.parseTypeDescriptor(typeDescriptor);
-        } catch (InvalidTypeDescriptorException e) {
-            throw new IllegalArgumentException(typeDescriptor + " is an invalid type descriptor");
+    private static <T> Type<T> createType(TypeKey key, Class<T> rawType, Type<?>[] typeArguments) {
+        Map<String, Type<?>> typesByVariable = null;
+        if (typeArguments.length > 0) {
+            typesByVariable = new HashMap<String, Type<?>>(typeArguments.length);
+            for (int i = 0, len = typeArguments.length; i < len; ++i) {
+                typesByVariable.put(rawType.getTypeParameters()[i].getName(), typeArguments[i]);
+            }
         }
+        return new Type<T>(key, rawType, typesByVariable, typeArguments);
     }
 
-    /**
-     * Gets the name for a type, using the Simple name when the type does not
-     * match the associated type, but using fully-qualified name when the associated
-     * type has a matching simple name, but is not the same.
-     * 
-     * @param type the type for which to return the name
-     * @param associatedType the associated type, used to decide the level of detail 
-     *  required in the returned name
-     * @return
-     */
-    public static String nameOf(java.lang.reflect.Type type, java.lang.reflect.Type associatedType) {
-    	String shortTypeName;
-    	String longTypeName;
-    	String shortAscTypeName;
-    	String longAscTypeName;
-    	
-    	if (type instanceof Type) {
-    		longTypeName = ((Type<?>)type).toFullyQualifiedString();
-    		shortTypeName = type.toString();
-    	} else if (type instanceof Class) {
-    		longTypeName = ((Class<?>)type).getCanonicalName();
-    		shortTypeName = ((Class<?>)type).getSimpleName();
-    	} else {
-    		longTypeName = String.valueOf(type);
-    		String[] parts = longTypeName.split("\\s+");
-    		longTypeName = parts[parts.length-1];
-    		parts = longTypeName.split("[.]");
-    		shortTypeName = parts[parts.length-1];
-    	}
-    	
-    	if (associatedType instanceof Type) {
-    		longAscTypeName = ((Type<?>)associatedType).toFullyQualifiedString();
-    		shortAscTypeName = associatedType.toString();
-    	} else if (associatedType instanceof Class) {
-    		longAscTypeName = ((Class<?>)associatedType).getCanonicalName();
-    		shortAscTypeName = ((Class<?>)associatedType).getSimpleName();
-    	} else {
-    		longAscTypeName = String.valueOf(associatedType);
-    		String[] parts = longAscTypeName.split("\\s+");
-    		longAscTypeName = parts[parts.length-1];
-    		parts = longAscTypeName.split("[.]");
-    		shortAscTypeName = parts[parts.length-1];
-    	}
-    	
-    	if (shortTypeName.equals(shortAscTypeName) &&
-    			!longTypeName.equals(longAscTypeName)) {
-    		return longTypeName;
-    	} else {
-    		return shortTypeName;
-    	}
-    }
-    
 }
