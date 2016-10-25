@@ -278,7 +278,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             useBuiltinConverters = valueOf(getProperty(USE_BUILTIN_CONVERTERS, "true"));
             useAutoMapping = valueOf(getProperty(USE_AUTO_MAPPING, "true"));
             mapNulls = valueOf(getProperty(MAP_NULLS, "true"));
-            dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "true"));
+            dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "false"));
             favorExtension = valueOf(getProperty(FAVOR_EXTENSION, "false"));
             captureFieldContext = valueOf(getProperty(CAPTURE_FIELD_CONTEXT, "false"));
             codeGenerationStrategy = new DefaultCodeGenerationStrategy();
