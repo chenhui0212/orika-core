@@ -1461,9 +1461,6 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      * .Type, ma.glasnost.orika.metadata.Type, boolean)
      */
     public <S, D> BoundMapperFacade<S, D> getMapperFacade(Type<S> sourceType, Type<D> destinationType, boolean containsCycles) {
-        if (!isBuilt && !isBuilding) {
-            build();
-        }
         getMapperFacade();
         MappingContextFactory ctxFactory = containsCycles ? contextFactory : nonCyclicContextFactory;
         return new DefaultBoundMapperFacade<S, D>(this, ctxFactory, sourceType, destinationType);
