@@ -121,6 +121,38 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         }
     }
 
+    public String add(String value) {
+
+        if (isArray()) {
+            if (!iteratorDeclared) {
+                throw new IllegalStateException("Iterator must be declared in order to add elements to destination array");
+            }
+            return getter() + "[++" + getIteratorName() + "] = " + value;
+        } else if (isMap()) {
+            return getter() + ".put(" + value + ".getKey(), " + value + ".getValue())";
+        } else if (isCollection()) {
+            return getter() + ".add(" + cast(value, type().getNestedType(0)) + ")";
+        } else {
+            throw new IllegalArgumentException(type() + " does not support adding of elements");
+        }
+    }
+
+    public String add(VariableRef value) {
+
+        if (isArray()) {
+            if (!iteratorDeclared) {
+                throw new IllegalStateException("Iterator must be declared in order to add elements to destination array");
+            }
+            return getter() + "[++" + getIteratorName() + "] = " + value;
+        } else if (isMap() && value.isMapEntry()) {
+            return getter() + ".put(" + value + ".getKey(), " + value + ".getValue())";
+        } else if (isCollection()) {
+            return getter() + ".add(" + cast(value, type().getNestedType(0)) + ")";
+        } else {
+            throw new IllegalArgumentException(type() + " does not support adding elements of type " + value.type());
+        }
+    }
+
     /**
      * A convenience function for adding all of one multi-occurrence type to another
      *
@@ -130,6 +162,78 @@ public class MultiOccurrenceVariableRef extends VariableRef {
     public String addAll(VariableRef value) {
         String assignment = addAllByAssign(value);
         return assignment != null ? assignment : addAllButNoAssign(value);
+    }
+
+    /**
+     * A convenience function which adds all of one multi-occurence type to another variable, but without any assignment
+     *
+     * @param value
+     * @return
+     */
+    public String addAllButNoAssign(VariableRef value) {
+        if (isMap() && value.isList()) {
+            return String.format("listToMap(%s, %s)", value, this);
+        } else if (isCollection() && value.isArray()) {
+            if (value.type().getComponentType().isPrimitive()) {
+                return getter() + ".addAll(asList(" + value + "))";
+            } else {
+                return getter() + ".addAll(java.util.Arrays.asList(" + value + ")";
+            }
+        } else if (isMap() && value.isMap()) {
+            return getter() + ".putAll(" + value + ")";
+        } else {
+            return getter() + ".addAll(" + value + ")";
+        }
+    }
+
+    public String collectionType() {
+        String collection;
+        if (isList()) {
+            collection = "List";
+        } else if (isSet()) {
+            collection = "Set";
+        } else if (isCollection()) {
+            // TODO By default we create an ArrayList for collections
+            // Can we introduce a CollectionFactory to enable the user to choose
+            // his own collections
+            collection = "List";
+        } else {
+            throw new IllegalStateException(type() + " is not a collection type");
+        }
+        return collection;
+    }
+
+    public String newCollection() {
+        return newInstance("");
+    }
+
+    public String newInstance(String sizeExpr) {
+        if (isArray()) {
+            return "new " + rawType().getComponentType().getCanonicalName() + "[" + sizeExpr + "]";
+        } else {
+            if (ClassUtil.isConcrete(type())) {
+                return newInstance(type().getRawType());
+            }
+            else {
+                return newInstance(DefaultConcreteTypeMap.get(type().getRawType()));
+            }
+        }
+    }
+
+    public String newMap() {
+        if (SortedMap.class.isAssignableFrom(rawType())) {
+            return "new java.util.TreeMap()";
+        }
+        return "new java.util.LinkedHashMap(" + "" + ")";
+    }
+
+    /**
+     * Generates java code for a reference to the "size" of this VariableRef
+     *
+     * @return
+     */
+    public String size() {
+        return getter() + "." + (rawType().isArray() ? "length" : "size()");
     }
 
     private String addAllByAssign(VariableRef value) {
@@ -164,126 +268,19 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         return iteratorName;
     }
 
-    /**
-     * A convenience function which adds all of one multi-occurence type to another variable, but without any assignment
-     *
-     * @param value
-     * @return
-     */
-    public String addAllButNoAssign(VariableRef value) {
-        if (isMap() && value.isList()) {
-            return String.format("listToMap(%s, %s)", value, this);
-        } else if (isCollection() && value.isArray()) {
-            if (value.type().getComponentType().isPrimitive()) {
-                return getter() + ".addAll(asList(" + value + "))";
-            } else {
-                return getter() + ".addAll(java.util.Arrays.asList(" + value + ")";
-            }
-        } else if (isMap() && value.isMap()) {
-            return getter() + ".putAll(" + value + ")";
-        } else {
-            return getter() + ".addAll(" + value + ")";
-        }
-    }
-    
-    public String add(VariableRef value) {
-        
-        if (isArray()) {
-            if (!iteratorDeclared) {
-                throw new IllegalStateException("Iterator must be declared in order to add elements to destination array");
-            }
-            return getter() + "[++" + getIteratorName() + "] = " + value;
-        } else if (isMap() && value.isMapEntry()) {
-            return getter() + ".put(" + value + ".getKey(), " + value + ".getValue())";
-        } else if (isCollection()) {
-            return getter() + ".add(" + cast(value, type().getNestedType(0)) + ")";
-        } else {
-            throw new IllegalArgumentException(type() + " does not support adding elements of type " + value.type());
-        }
-    }
-    
-    public String add(String value) {
-        
-        if (isArray()) {
-            if (!iteratorDeclared) {
-                throw new IllegalStateException("Iterator must be declared in order to add elements to destination array");
-            }
-            return getter() + "[++" + getIteratorName() + "] = " + value;
-        } else if (isMap()) {
-            return getter() + ".put(" + value + ".getKey(), " + value + ".getValue())";
-        } else if (isCollection()) {
-            return getter() + ".add(" + cast(value, type().getNestedType(0)) + ")";
-        } else {
-            throw new IllegalArgumentException(type() + " does not support adding of elements");
-        }
-    }
-    
-    
-    public String collectionType() {
-        String collection;
-        if (isList()) {
-            collection = "List";
-        } else if (isSet()) {
-            collection = "Set";
-        } else if (isCollection()) {
-            // TODO By default we create an ArrayList for collections
-            // Can we introduce a CollectionFactory to enable the user to choose
-            // his own collections
-            collection = "List";
-        } else {
-            throw new IllegalStateException(type() + " is not a collection type");
-        }
-        return collection;
-    }
-    
-    public String newCollection() {
-        return newInstance("");
-    }
-    
-    public String newInstance(String sizeExpr) {
-        if (isArray()) {
-            return "new " + rawType().getComponentType().getCanonicalName() + "[" + sizeExpr + "]";
-        } else {
-            if (ClassUtil.isConcrete(type())) {
-                return newInstance(type().getRawType());
-            }
-            else {
-                return newInstance(DefaultConcreteTypeMap.get(type().getRawType()));
-            }
-        }
-    }
-
-    public String newMap() {
-        if (SortedMap.class.isAssignableFrom(rawType())) {
-            return "new java.util.TreeMap()";
-        }
-        return "new java.util.LinkedHashMap(" + "" + ")";
-    }
-
-    /**
-     * Generates java code for a reference to the "size" of this VariableRef
-     *
-     * @return
-     */
-    public String size() {
-        return getter() + "." + (rawType().isArray() ? "length" : "size()");
-    }
-
     private String newInstance(Class<?> type) {
-        String result = "";
         try {
             if (type.getConstructor() != null) {
                 return "new " + type.getCanonicalName() + "()";
             }
             else {
-                new IllegalStateException(type + " constructor is null");
+                throw new IllegalStateException(type + " constructor is null");
             }
         } catch (NoSuchMethodException e) {
-            new IllegalStateException(type + " has no default constructor");
+            throw new IllegalStateException(type + " has no default constructor");
         } catch (SecurityException e) {
-            new IllegalStateException(type + " cannot be instanced");
+            throw new IllegalStateException(type + " cannot be instanced");
         }
-        return result;
     }
 
     private static class EntrySetRef extends MultiOccurrenceVariableRef {
