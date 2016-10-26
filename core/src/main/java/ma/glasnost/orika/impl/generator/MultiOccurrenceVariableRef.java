@@ -67,25 +67,6 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         super(type, name);
     }
     
-    private String getIteratorName() {
-        if (iteratorName == null) {
-            String prefix = this.name();
-            if (this.property() != null && this.property().getName().matches("[\\w$]+")) {
-                prefix = this.property().getName();
-            }
-            if ("".equals(prefix) && !"".equals(this.name)) {
-                prefix = this.name;
-            }
-            
-            if (isArray()) {
-                iteratorName = prefix + "_$_index";
-            } else {
-                iteratorName = prefix + "_$_iter";
-            }
-        }
-        return iteratorName;
-    }
-
     public String declareIterator() {
         if (iteratorDeclared) {
             throw new IllegalStateException("Iterator has already been declared");
@@ -101,7 +82,7 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         iteratorDeclared = true;
         return iterator;
     }
-    
+
     public String nextElement() {
         if (!iteratorDeclared) {
             throw new IllegalStateException("Iterator has not been declared");
@@ -114,11 +95,11 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         }
         return next;
     }
-    
+
     public VariableRef nextElementRef() {
         return new VariableRef(elementType(), nextElement());
     }
-    
+
     public String iteratorHasNext() {
         if (!iteratorDeclared) {
             throw new IllegalStateException("Iterator has not been declared");
@@ -139,10 +120,10 @@ public class MultiOccurrenceVariableRef extends VariableRef {
             return "!" + getter() + ".isEmpty()";
         }
     }
-    
+
     /**
      * A convenience function for adding all of one multi-occurrence type to another
-     * 
+     *
      * @param value
      * @return
      */
@@ -162,6 +143,25 @@ public class MultiOccurrenceVariableRef extends VariableRef {
             return assign("listToMap(%s, java.util.LinkedHashMap.class)", value);
         }
         return null;
+    }
+
+    private String getIteratorName() {
+        if (iteratorName == null) {
+            String prefix = this.name();
+            if (this.property() != null && this.property().getName().matches("[\\w$]+")) {
+                prefix = this.property().getName();
+            }
+            if ("".equals(prefix) && !"".equals(this.name)) {
+                prefix = this.name;
+            }
+
+            if (isArray()) {
+                iteratorName = prefix + "_$_index";
+            } else {
+                iteratorName = prefix + "_$_iter";
+            }
+        }
+        return iteratorName;
     }
 
     /**
@@ -253,15 +253,11 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         }
     }
 
-    public String newMap(String sizeExpr) {
+    public String newMap() {
         if (SortedMap.class.isAssignableFrom(rawType())) {
             return "new java.util.TreeMap()";
         }
-        return "new java.util.LinkedHashMap(" + sizeExpr + ")";
-    }
-
-    public String newMap() {
-        return newMap("");
+        return "new java.util.LinkedHashMap(" + "" + ")";
     }
 
     /**
@@ -290,7 +286,7 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         return result;
     }
 
-    public static class EntrySetRef extends MultiOccurrenceVariableRef {
+    private static class EntrySetRef extends MultiOccurrenceVariableRef {
 
         private String name;
         
