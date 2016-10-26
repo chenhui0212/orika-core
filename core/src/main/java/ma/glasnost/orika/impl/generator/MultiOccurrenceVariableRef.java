@@ -62,11 +62,7 @@ public class MultiOccurrenceVariableRef extends VariableRef {
     public MultiOccurrenceVariableRef(Property property, String name) {
         super(property, name);
     }
-    
-    public MultiOccurrenceVariableRef(Property property, MultiOccurrenceVariableRef anchor) {
-        super(property, anchor);
-    }
-    
+
     public MultiOccurrenceVariableRef(Type<?> type, String name) {
         super(type, name);
     }
@@ -89,14 +85,7 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         }
         return iteratorName;
     }
-    
-    public String declareIteratorIfNotDeclared() {
-        if (!iteratorDeclared) {
-            return declareIterator();
-        }
-        return "";
-    }
-    
+
     public String declareIterator() {
         if (iteratorDeclared) {
             throw new IllegalStateException("Iterator has already been declared");
@@ -142,8 +131,7 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         }
         return hasNext;
     }
-    
-    
+
     public String notEmpty() {
         if (isArray()) {
             return getter() + ".length > 0";
@@ -305,10 +293,6 @@ public class MultiOccurrenceVariableRef extends VariableRef {
     public static class EntrySetRef extends MultiOccurrenceVariableRef {
 
         private String name;
-        
-        public EntrySetRef(VariableRef sourceMap) {
-            this(sourceMap, null);
-        }
         
         public EntrySetRef(VariableRef sourceMap, String variableName) {
             super(getSourceEntryType(sourceMap), sourceMap + ".entrySet()");
