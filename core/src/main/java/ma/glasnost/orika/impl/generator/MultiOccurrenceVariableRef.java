@@ -17,13 +17,16 @@
  */
 package ma.glasnost.orika.impl.generator;
 
-import java.util.*;
-
 import ma.glasnost.orika.MapEntry;
+import ma.glasnost.orika.impl.DefaultConcreteTypeMap;
 import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * VariableRef represents a reference to a given variable or property; it
@@ -250,72 +253,57 @@ public class MultiOccurrenceVariableRef extends VariableRef {
     }
     
     public String newInstance(String sizeExpr) {
-        
         if (isArray()) {
             return "new " + rawType().getComponentType().getCanonicalName() + "[" + sizeExpr + "]";
-        } else if (isMap()) {
-            if (SortedMap.class.isAssignableFrom(rawType())) {
-                return "new java.util.TreeMap()";
-            }
-            return "new java.util.LinkedHashMap(" + sizeExpr + ")";
-        } else if ("Set".equals(collectionType())) {
-            if (ClassUtil.isConcrete(type())) {
-                try {
-                    if (type().getRawType().getConstructor() != null) {
-                        return "new " + type().getCanonicalName() + "()";
-                    }
-                } catch (NoSuchMethodException e) {
-                    
-                } catch (SecurityException e) {
-                    
-                }
-                
-            }
-            if (SortedSet.class.isAssignableFrom(rawType())) {
-                return "new java.util.TreeSet()";
-            }
-            return "new java.util.LinkedHashSet(" + sizeExpr + ")";
-            
         } else {
             if (ClassUtil.isConcrete(type())) {
-                try {
-                    if (type().getRawType().getConstructor() != null) {
-                        return "new " + type().getCanonicalName() + "()";
-                    }
-                } catch (NoSuchMethodException e) {
-                    
-                } catch (SecurityException e) {
-                    
-                }
-            } 
-            return "new java.util.ArrayList(" + sizeExpr + ")";
+                return newInstance(type().getRawType());
+            }
+            else {
+                return newInstance(DefaultConcreteTypeMap.get(type().getRawType()));
+            }
         }
     }
-    
+
     public String newMap(String sizeExpr) {
         if (SortedMap.class.isAssignableFrom(rawType())) {
             return "new java.util.TreeMap()";
         }
         return "new java.util.LinkedHashMap(" + sizeExpr + ")";
     }
-    
+
     public String newMap() {
         return newMap("");
     }
-    
-    
-    
+
     /**
      * Generates java code for a reference to the "size" of this VariableRef
-     * 
+     *
      * @return
      */
     public String size() {
         return getter() + "." + (rawType().isArray() ? "length" : "size()");
     }
-    
+
+    private String newInstance(Class<?> type) {
+        String result = "";
+        try {
+            if (type.getConstructor() != null) {
+                return "new " + type.getCanonicalName() + "()";
+            }
+            else {
+                new IllegalStateException(type + " constructor is null");
+            }
+        } catch (NoSuchMethodException e) {
+            new IllegalStateException(type + " has no default constructor");
+        } catch (SecurityException e) {
+            new IllegalStateException(type + " cannot be instanced");
+        }
+        return result;
+    }
+
     public static class EntrySetRef extends MultiOccurrenceVariableRef {
-        
+
         private String name;
         
         public EntrySetRef(VariableRef sourceMap) {
