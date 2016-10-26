@@ -159,11 +159,10 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          * Register default concrete types for common collection types; these
          * can be overridden as needed by user code.
          */
-        this.registerConcreteType(Collection.class, ArrayList.class);
-        this.registerConcreteType(List.class, ArrayList.class);
-        this.registerConcreteType(Set.class, LinkedHashSet.class);
-        this.registerConcreteType(Map.class, LinkedHashMap.class);
-        this.registerConcreteType(Map.Entry.class, MapEntry.class);
+        for (Entry<Class, Class> concreteTypeMap : DefaultConcreteTypeMap.getAll()) {
+            this.registerConcreteType(concreteTypeMap.getKey(), concreteTypeMap.getValue());
+        }
+
     }
     
     /**
