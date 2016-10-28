@@ -180,15 +180,20 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 strategyRecorder.setInstantiate(true);
                 Type<? extends D> resolvedDestinationType = mapperFactory.lookupConcreteDestinationType(resolvedSourceType, destinationType, context);
                 if (resolvedDestinationType == null) {
-                    if (!ClassUtil.isConcrete(destinationType)) {
-                        MappingException e = new MappingException("No concrete class mapping defined for source class "
-                                + resolvedSourceType.getName());
-                        e.setDestinationType(destinationType);
-                        e.setSourceType(resolvedSourceType);
-                        throw exceptionUtil.decorate(e);
+                    if (destinationType.isAssignableFrom(sourceType)) {
+                        resolvedDestinationType = (Type<? extends D>) resolvedSourceType;
                     } else {
-                        resolvedDestinationType = destinationType;
+                        if (!ClassUtil.isConcrete(destinationType)) {
+                            MappingException e = new MappingException("No concrete class mapping defined for source class "
+                                    + resolvedSourceType.getName());
+                            e.setDestinationType(destinationType);
+                            e.setSourceType(resolvedSourceType);
+                            throw exceptionUtil.decorate(e);
+                        } else {
+                            resolvedDestinationType = destinationType;
+                        }
                     }
+
                 }
 
                 strategyRecorder.setResolvedDestinationType(resolvedDestinationType);
