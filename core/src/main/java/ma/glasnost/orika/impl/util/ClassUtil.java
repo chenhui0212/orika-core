@@ -24,31 +24,6 @@ public final class ClassUtil {
         
     }
 
-	/**
-     * Verifies whether the passed type has a static valueOf method available for
-     * converting a String into an instance of the type.<br>
-     * Note that this method will also return true for primitive types whose
-     * corresponding wrapper types have a static valueOf method.
-     * 
-     * @param type
-     * @return
-     */
-    public static boolean isConvertibleFromString(Class<?> type) {
-    	
-    	if (type.isPrimitive()) {
-    		type = getWrapperType(type);
-    	}
-    	
-    	try {
-			type.getMethod("valueOf", String.class);
-			return true;
-		} catch (NoSuchMethodException e) {
-			return false;
-		} catch (SecurityException e) {
-			return false;
-		}
-    }
-    
     /**
      * Returns the corresponding wrapper type for the given primitive,
      * or null if the type is not primitive.

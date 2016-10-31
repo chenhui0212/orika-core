@@ -434,10 +434,30 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         return TypeFactory.valueOf(ClassUtil.getPrimitiveType(rawType));
     }
     
+    /**
+     * Verifies whether the Type has a static valueOf method available for
+     * converting a String into an instance of the type.<br>
+     * Note that this method will also return true for primitive types whose
+     * corresponding wrapper types have a static valueOf method.
+     *
+     * @return
+     */
     public boolean isConvertibleFromString() {
-        return ClassUtil.isConvertibleFromString(getRawType());
+        Class<?> rawType = getRawType();
+        if (isPrimitive()) {
+            rawType = ClassUtil.getWrapperType(rawType);
+        }
+
+        try {
+            rawType.getMethod("valueOf", String.class);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        } catch (SecurityException e) {
+            return false;
+        }
     }
-    
+
     @Override
     public String toString() {
         StringBuilder stringValue = new StringBuilder();
