@@ -30,7 +30,6 @@ import ma.glasnost.orika.impl.generator.CompilerStrategy;
 import ma.glasnost.orika.impl.generator.CompilerStrategy.SourceCodeGenerationException;
 import ma.glasnost.orika.impl.generator.MapperGenerator;
 import ma.glasnost.orika.impl.generator.ObjectFactoryGenerator;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.inheritance.DefaultSuperTypeResolverStrategy;
 import ma.glasnost.orika.inheritance.SuperTypeResolverStrategy;
 import ma.glasnost.orika.metadata.*;
@@ -700,7 +699,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                          * registered for the immutable type, which would be
                          * valid.
                          */
-                        if (ClassUtil.isImmutable(mapperKey.getBType()) && !objectFactoryRegistry.containsKey(mapperKey.getBType())) {
+                        if (mapperKey.getBType().isImmutable() && !objectFactoryRegistry.containsKey(mapperKey.getBType())) {
                             throw new MappingException("No converter registered for conversion from " + mapperKey.getAType() + " to "
                                     + mapperKey.getBType() + ", nor any ObjectFactory which can generate " + mapperKey.getBType()
                                     + " from " + mapperKey.getAType());
@@ -950,7 +949,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         if (result == null) {
             // Check if we can use default constructor...
             synchronized (this) {
-                if (!ClassUtil.isConcrete(targetType)) {
+                if (!targetType.isConcrete()) {
                     targetType = (Type<T>) resolveConcreteType(targetType, targetType);
                 }
                 
@@ -1025,9 +1024,9 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         Set<Type<?>> destinationSet = explicitAToBRegistry.get(sourceType);
         if (destinationSet != null && !destinationSet.isEmpty()) {
             for (final Type<?> type : destinationSet) {
-                if (destinationType.isAssignableFrom(type) && ClassUtil.isConcrete(type)) {
+                if (destinationType.isAssignableFrom(type) && type.isConcrete()) {
                     if (type.equals(destinationType) || existsRegisteredMapper(sourceType, type, false)
-                            || !ClassUtil.isConcrete(destinationType)) {
+                            || !destinationType.isConcrete()) {
                         return (Type<? extends D>) type;
                     }
                 }
@@ -1037,7 +1036,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         /*
          * Return the original destinationType if it's concrete
          */
-        if (ClassUtil.isConcrete(destinationType)) {
+        if (destinationType.isConcrete()) {
             return destinationType;
         }
         
@@ -1047,9 +1046,9 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         destinationSet = dynamicAToBRegistry.get(sourceType);
         if (destinationSet != null && !destinationSet.isEmpty()) {
             for (final Type<?> type : destinationSet) {
-                if (destinationType.isAssignableFrom(type) && ClassUtil.isConcrete(type)) {
+                if (destinationType.isAssignableFrom(type) && type.isConcrete()) {
                     if (type.equals(destinationType) || existsRegisteredMapper(sourceType, type, false)
-                            || !ClassUtil.isConcrete(destinationType)) {
+                            || !destinationType.isConcrete()) {
                         return (Type<? extends D>) type;
                     }
                 }
@@ -1062,7 +1061,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             if (registeredMapper != null) {
                 concreteType = (Type<? extends D>) (registeredMapper.getAType().isAssignableFrom(sourceType) ? registeredMapper.getBType()
                         : registeredMapper.getAType());
-                if (!ClassUtil.isConcrete(concreteType)) {
+                if (!concreteType.isConcrete()) {
                     concreteType = (Type<? extends D>) resolveConcreteType(concreteType, destinationType);
                 } else {
                     return null;
@@ -1090,7 +1089,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         Type<?> concreteType = concreteTypeOf(type);
         
         if (concreteType != null && !concreteType.isAssignableFrom(originalType)) {
-            if (ClassUtil.isConcrete(originalType)) {
+            if (originalType.isConcrete()) {
                 concreteType = originalType;
             } else {
                 concreteType = concreteTypeOf(originalType);

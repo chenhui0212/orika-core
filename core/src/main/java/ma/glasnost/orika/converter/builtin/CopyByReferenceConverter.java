@@ -19,7 +19,6 @@
 package ma.glasnost.orika.converter.builtin;
 
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.Type;
 
 /**
@@ -39,8 +38,8 @@ public class CopyByReferenceConverter extends BuiltinCustomConverter<Object, Obj
      * ma.glasnost.orika.metadata.Type)
      */
     public boolean canConvert(Type<?> sourceType, Type<?> destinationType) {
-        
-        return (ClassUtil.isImmutable(sourceType) && (sourceType.equals(destinationType) || sourceType.isWrapperFor(destinationType) || destinationType.isWrapperFor(sourceType)));
+
+        return (sourceType.isImmutable() && (sourceType.equals(destinationType) || sourceType.isWrapperFor(destinationType) || destinationType.isWrapperFor(sourceType)));
     }
     
     public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {

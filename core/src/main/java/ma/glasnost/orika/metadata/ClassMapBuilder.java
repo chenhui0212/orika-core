@@ -37,7 +37,6 @@ import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.impl.UtilityResolver;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.property.PropertyResolver;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
 
@@ -164,7 +163,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
             if (!entry.getKey().equals("class")) {
                 Property owningProperty = entry.getValue();
                 Type<?> propertyType = owningProperty.getType();
-                if (!ClassUtil.isImmutable(propertyType)) {
+                if (!propertyType.isImmutable()) {
                     Map<String, Property> props = propertyResolver.getProperties(propertyType);
                     if (propertyType.isMap()) {
                         Map<String, Property> valueProperties = getPropertyExpressions(propertyType.getNestedType(1));

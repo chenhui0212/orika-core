@@ -18,7 +18,6 @@
 
 package ma.glasnost.orika.impl;
 
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.FieldMap;
 
 public final class Specifications {
@@ -127,7 +126,7 @@ public final class Specifications {
     private static final Specification IS_IMMUTABLE = new Specification() {
         
         public boolean apply(FieldMap fieldMap) {
-            return ClassUtil.isImmutable(fieldMap.getSource().getType())
+            return fieldMap.getSource().getType().isImmutable()
                     && fieldMap.getDestination().isAssignableFrom(fieldMap.getSource());
         }
     };
@@ -226,7 +225,7 @@ public final class Specifications {
         
         public boolean apply(FieldMap fieldMap) {
             return fieldMap.getSource().isMapKey()
-                    && (ClassUtil.isImmutable(fieldMap.getDestination().getType()) || (!fieldMap.getDestination().isCollection()
+                    && (fieldMap.getDestination().getType().isImmutable() || (!fieldMap.getDestination().isCollection()
                             && !fieldMap.getDestination().isArray() && !fieldMap.getDestination().isMap() && !fieldMap.getDestination()
                             .isEnum()));
         }
@@ -236,7 +235,7 @@ public final class Specifications {
         
         public boolean apply(FieldMap fieldMap) {
             return (fieldMap.getSource().isListElement() || fieldMap.getSource().isArrayElement())
-                    && (ClassUtil.isImmutable(fieldMap.getDestination().getType()) || (!fieldMap.getDestination().isCollection()
+                    && (fieldMap.getDestination().getType().isImmutable() || (!fieldMap.getDestination().isCollection()
                             && !fieldMap.getDestination().isArray() && !fieldMap.getDestination().isMap() && !fieldMap.getDestination()
                             .isEnum()));
         }
@@ -252,9 +251,9 @@ public final class Specifications {
     private static final Specification BEAN_TO_MAP = new Specification() {
         
         public boolean apply(FieldMap fieldMap) {
-            
+
             return fieldMap.getDestination().isMapKey()
-                    && (ClassUtil.isImmutable(fieldMap.getSource().getType()) || (!fieldMap.getSource().isCollection()
+                    && (fieldMap.getSource().getType().isImmutable() || (!fieldMap.getSource().isCollection()
                             && !fieldMap.getSource().isArray() && !fieldMap.getSource().isMap() && !fieldMap.getSource().isEnum()));
         }
     };
@@ -262,9 +261,9 @@ public final class Specifications {
     private static final Specification BEAN_TO_ARRAY_OR_LIST = new Specification() {
         
         public boolean apply(FieldMap fieldMap) {
-            
+
             return (fieldMap.getDestination().isListElement() || fieldMap.getDestination().isArrayElement())
-                    && (ClassUtil.isImmutable(fieldMap.getSource().getType()) || (!fieldMap.getSource().isCollection()
+                    && (fieldMap.getSource().getType().isImmutable() || (!fieldMap.getSource().isCollection()
                             && !fieldMap.getSource().isArray() && !fieldMap.getSource().isMap() && !fieldMap.getSource().isEnum()));
         }
     };
