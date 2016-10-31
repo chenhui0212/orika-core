@@ -19,10 +19,6 @@
 package ma.glasnost.orika.impl.util;
 
 public final class ClassUtil {
-    
-    private static final String CGLIB_ID = "$$EnhancerByCGLIB$$";
-    private static final String JAVASSIST_PACKAGE = "org.javassist.tmp.";
-    private static final String JAVASSIST_NAME = "_$$_javassist_";
 
     private ClassUtil() {
         
@@ -109,14 +105,6 @@ public final class ClassUtil {
 		} else {
 			return null;
 		}
-    }
-    
-    public static boolean isProxy(Class<?> clazz) {
-        if (clazz.isInterface()) {
-            return false;
-        }
-        final String className = clazz.getName();
-        return className.contains(CGLIB_ID) || className.startsWith(JAVASSIST_PACKAGE) || className.contains(JAVASSIST_NAME);
     }
 
 }
