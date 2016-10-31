@@ -18,17 +18,13 @@
 
 package ma.glasnost.orika.metadata;
 
+import ma.glasnost.orika.impl.util.ClassUtil;
+
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import ma.glasnost.orika.impl.util.ClassUtil;
 
 /**
  * Type is an implementation of ParameterizedType which may be used in various
@@ -350,17 +346,7 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         }
         return TypeFactory.valueOf(ClassUtil.getWrapperType(rawType));
     }
-    
-    /**
-     * Finds a class or interface which is an ancestor of this type
-     * 
-     * @param ancestor
-     * @return
-     */
-    public Type<?> findAncestor(final Type<?> ancestor) {
-        return findAncestor(ancestor.getRawType());
-    }
-    
+
     /**
      * Finds a class or interface which is an ancestor of this type
      * 
@@ -384,7 +370,6 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     /**
      * Locates a particular interface within the type's object hierarchy
      * 
-     * @param type
      * @param theInterface
      * @return
      */
