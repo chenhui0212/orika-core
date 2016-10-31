@@ -20,6 +20,7 @@ package ma.glasnost.orika.converter.builtin;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.Type;
+import ma.glasnost.orika.metadata.TypeFactory;
 
 /**
  * ConstructorConverter will converter from one type to another if there exists
@@ -51,15 +52,16 @@ public class ConstructorConverter extends BuiltinCustomConverter<Object, Object>
         }
     }
     
-    public Object convert(Object source, Type<? extends Object> destinationType, MappingContext context) {
+    public Object convert(Object source, Type<?> destinationType, MappingContext context) {
         try {
             return destinationType.getRawType().getConstructor(source.getClass()).newInstance(source);
         } catch (NoSuchMethodException e) {
+            Type<?> sourceType = TypeFactory.valueOf(source.getClass());
             try {
-                if (source.getClass().isPrimitive()) {
-                    return destinationType.getRawType().getConstructor(ClassUtil.getWrapperType(source.getClass())).newInstance(source);
-                } else if (ClassUtil.isPrimitiveWrapper(source.getClass())) {
-                    return destinationType.getRawType().getConstructor(ClassUtil.getPrimitiveType(source.getClass())).newInstance(source);
+                if (sourceType.isPrimitive()) {
+                    return destinationType.getRawType().getConstructor(ClassUtil.getWrapperType(sourceType.getRawType())).newInstance(source);
+                } else if (sourceType.isPrimitiveWrapper()) {
+                    return destinationType.getRawType().getConstructor(ClassUtil.getPrimitiveType(sourceType.getRawType())).newInstance(source);
                 } else {
                     return false;
                 }

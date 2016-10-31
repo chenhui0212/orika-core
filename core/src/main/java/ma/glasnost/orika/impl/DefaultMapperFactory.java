@@ -30,7 +30,6 @@ import ma.glasnost.orika.impl.generator.CompilerStrategy;
 import ma.glasnost.orika.impl.generator.CompilerStrategy.SourceCodeGenerationException;
 import ma.glasnost.orika.impl.generator.MapperGenerator;
 import ma.glasnost.orika.impl.generator.ObjectFactoryGenerator;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.inheritance.DefaultSuperTypeResolverStrategy;
 import ma.glasnost.orika.inheritance.SuperTypeResolverStrategy;
 import ma.glasnost.orika.metadata.*;
@@ -700,7 +699,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                          * registered for the immutable type, which would be
                          * valid.
                          */
-                        if (ClassUtil.isImmutable(mapperKey.getBType()) && !objectFactoryRegistry.containsKey(mapperKey.getBType())) {
+                        if (mapperKey.getBType().isImmutable() && !objectFactoryRegistry.containsKey(mapperKey.getBType())) {
                             throw new MappingException("No converter registered for conversion from " + mapperKey.getAType() + " to "
                                     + mapperKey.getBType() + ", nor any ObjectFactory which can generate " + mapperKey.getBType()
                                     + " from " + mapperKey.getAType());

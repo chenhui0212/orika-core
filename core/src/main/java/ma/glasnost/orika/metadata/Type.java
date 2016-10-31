@@ -18,11 +18,13 @@
 
 package ma.glasnost.orika.metadata;
 
+import com.google.common.collect.ImmutableSet;
 import ma.glasnost.orika.impl.util.ClassUtil;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,7 +59,32 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     private Type<?> componentType;
     private final TypeKey key;
     private final int uniqueIndex;
-    
+
+    private static final Set<Class<?>> PRIMITIVE_WRAPPER_TYPES = ImmutableSet.<Class<?>>builder()
+            .add(Byte.class)
+            .add(Short.class)
+            .add(Integer.class)
+            .add(Long.class)
+            .add(Boolean.class)
+            .add(Character.class)
+            .add(Float.class)
+            .add(Double.class)
+            .build();
+
+    private static final Set<Class<?>> IMMUTABLE_WRAPPER_TYPES = ImmutableSet.<Class<?>>builder()
+            .addAll(PRIMITIVE_WRAPPER_TYPES)
+            .add(String.class)
+            .add(BigDecimal.class)
+            .add(Byte.TYPE)
+            .add(Short.TYPE)
+            .add(Integer.TYPE)
+            .add(Long.TYPE)
+            .add(Boolean.TYPE)
+            .add(Character.TYPE)
+            .add(Float.TYPE)
+            .add(Double.TYPE)
+            .build();
+
     /**
      * @param rawType
      * @param actualTypeArguments
@@ -317,15 +344,19 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     }
     
     public boolean isPrimitiveWrapper() {
-        return ClassUtil.isPrimitiveWrapper(getRawType());
+        return PRIMITIVE_WRAPPER_TYPES.contains(getRawType());
     }
-    
+
     public boolean isWrapperFor(final Type<?> primitive) {
         return primitive != null && isPrimitiveWrapper() && ClassUtil.getPrimitiveType(this.rawType).equals(primitive.getRawType());
     }
     
     public boolean isPrimitiveFor(final Type<?> wrapper) {
         return wrapper != null && isPrimitive() && ClassUtil.getPrimitiveType(wrapper.rawType).equals(getRawType());
+    }
+
+    public boolean isImmutable() {
+        return isPrimitive() || IMMUTABLE_WRAPPER_TYPES.contains(getRawType()) || isEnum();
     }
 
     public boolean isConcrete() {
@@ -397,7 +428,7 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     }
     
     public Type<?> getPrimitiveType() {
-        if (!ClassUtil.isPrimitiveWrapper(rawType)) {
+        if (!isPrimitiveWrapper()) {
             throw new IllegalStateException(rawType + " is not a primitive wrapper");
         }
         return TypeFactory.valueOf(ClassUtil.getPrimitiveType(rawType));

@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.ConstructorParameter;
 import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;
@@ -53,7 +52,7 @@ public class ConstructorParameterResolver {
         if (properties == null) {
             
             Type<?> resolvedType = TypeFactory.valueOf(type);
-            if (resolvedType.isConcrete() && !ClassUtil.isImmutable(resolvedType)) {
+            if (resolvedType.isConcrete() && !resolvedType.isImmutable()) {
                 synchronized (resolvedType) {
                     Map<Constructor<?>, List<Property>> constructors = new ConcurrentHashMap<Constructor<?>, List<Property>>();
                     Map<Property, Map<Constructor<?>, Integer>> constructorsByProperty = new ConcurrentHashMap<Property, Map<Constructor<?>, Integer>>();

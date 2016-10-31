@@ -24,7 +24,6 @@ import ma.glasnost.orika.impl.generator.Node;
 import ma.glasnost.orika.impl.generator.Node.NodeList;
 import ma.glasnost.orika.impl.generator.SourceCodeContext;
 import ma.glasnost.orika.impl.generator.VariableRef;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.*;
 
 import java.util.*;
@@ -209,7 +208,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
                 String or = (!"".equals(currentElementNull) && !"".equals(currentElementComparator)) ? " || " : "";
 
                 if (mapperFactory.getConverterFactory().canConvert(srcNode.elementRef.type(), currentNode.elementRef.type())
-                        || ClassUtil.isImmutable(currentNode.elementRef.type())) {
+                        || currentNode.elementRef.type().isImmutable()) {
 
                     append(out,
                             (currentNode.elementRef.isPrimitive() ? currentNode.nullCheckFlag.assign("false") : ""),
@@ -323,7 +322,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
 
         String mapStmt = statement(code.mapFields(currentNode.value, s, d));
         VariableRef elRef = currentNode.parent != null ? currentNode.parent.elementRef : null;
-        if (elRef != null && !elRef.isPrimitive() && !ClassUtil.isImmutable(elRef.type()) && srcNode.parent != null) {
+        if (elRef != null && !elRef.isPrimitive() && !elRef.type().isImmutable() && srcNode.parent != null) {
             // assure instance exists for the element reference
             append(out, format("if((%s)) { \n", elRef.isNull()), elRef.assign(code.newObject(srcNode.parent.elementRef, elRef.type())), "}");
         }
@@ -384,8 +383,8 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
                 /*
                  *
                  */
-                if (!ClassUtil.isImmutable(key.getAType())
-                        && !ClassUtil.isImmutable(key.getBType())
+                if (!key.getAType().isImmutable()
+                        && !key.getBType().isImmutable()
                         && !mapperFactory.existsRegisteredMapper(key.getAType(), key.getBType(), true)
                         && mapperFactory.getClassMap(key) == null) {
                     ClassMapBuilder<?,?> builder = builders.get(key);

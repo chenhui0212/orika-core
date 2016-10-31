@@ -18,56 +18,17 @@
 
 package ma.glasnost.orika.impl.util;
 
-import ma.glasnost.orika.metadata.Type;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 public final class ClassUtil {
     
     private static final String CGLIB_ID = "$$EnhancerByCGLIB$$";
     private static final String JAVASSIST_PACKAGE = "org.javassist.tmp.";
     private static final String JAVASSIST_NAME = "_$$_javassist_";
-    private static final Set<Class<?>> IMMUTABLES_TYPES = getImmutablesTypes();
-    private static final Set<Class<?>> PRIMITIVE_WRAPPER_TYPES = getWrapperTypes();
-    
+
     private ClassUtil() {
         
     }
-    
-    private static Set<Class<?>> getWrapperTypes() {
-    	return new HashSet<Class<?>>(Arrays.<Class<?>>asList(Byte.class, Short.class, Integer.class, 
-    			Long.class, Boolean.class, Character.class, Float.class, Double.class ));
-    }
-    
-    private static Set<Class<?>> getImmutablesTypes() {
-        Set<Class<?>> immutables = new HashSet<Class<?>>(Arrays.<Class<?>>asList(String.class, BigDecimal.class,
-        		Byte.TYPE, Short.TYPE, Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Float.TYPE, Double.TYPE ));
-        immutables.addAll(getWrapperTypes());
-        return immutables;
-    }
-    
-    public static boolean isImmutable(Class<?> clazz) {
-        return clazz.isPrimitive() || IMMUTABLES_TYPES.contains(clazz) || clazz.isEnum();
-    }
-    
-    public static boolean isImmutable(Type<?> type) {
-        return isImmutable(type.getRawType());
-    }
 
 	/**
-     * Verifies whether a given type is one of the wrapper classes for a primitive type.
-     * 
-     * @param type
-     * @return
-     */
-    public static boolean isPrimitiveWrapper(Class<?> type) {
-    	return PRIMITIVE_WRAPPER_TYPES.contains(type);
-    }
-    
-    /**
      * Verifies whether the passed type has a static valueOf method available for
      * converting a String into an instance of the type.<br>
      * Note that this method will also return true for primitive types whose
@@ -157,4 +118,5 @@ public final class ClassUtil {
         final String className = clazz.getName();
         return className.contains(CGLIB_ID) || className.startsWith(JAVASSIST_PACKAGE) || className.contains(JAVASSIST_NAME);
     }
+
 }

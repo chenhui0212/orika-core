@@ -28,7 +28,6 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.MappingException;
 import ma.glasnost.orika.impl.GeneratedMapperBase;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.ClassMap;
 import ma.glasnost.orika.metadata.FieldMap;
 import ma.glasnost.orika.metadata.MapperKey;
@@ -224,8 +223,8 @@ public final class MapperGenerator {
         final VariableRef sourceProperty = new VariableRef(fieldMap.getSource(), "source");
         final VariableRef destinationProperty = new VariableRef(fieldMap.getDestination(), "destination");
         destinationProperty.setOwner(destination);
-        
-        if (!sourceProperty.isReadable() || ((!destinationProperty.isAssignable()) && ClassUtil.isImmutable(destinationProperty.type()))) {
+
+        if (!sourceProperty.isReadable() || ((!destinationProperty.isAssignable()) && destinationProperty.type().isImmutable())) {
             if (logDetails != null) {
                 code.debugField(fieldMap, "excluding because ");
                 if (!sourceProperty.isReadable()) {

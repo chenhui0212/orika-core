@@ -740,8 +740,8 @@ public class SourceCodeContext {
         
         StringBuilder out = new StringBuilder();
         StringBuilder closing = new StringBuilder();
-        
-        if (destination.isAssignable() || destination.type().isMultiOccurrence() || !ClassUtil.isImmutable(destination.type())) {
+
+        if (destination.isAssignable() || destination.type().isMultiOccurrence() || !destination.type().isImmutable()) {
             
             if (source.isNestedProperty()) {
                 out.append(source.ifPathNotNull());
