@@ -18,13 +18,12 @@
 
 package ma.glasnost.orika.impl.util;
 
-import java.lang.reflect.Modifier;
+import ma.glasnost.orika.metadata.Type;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import ma.glasnost.orika.metadata.Type;
 
 public final class ClassUtil {
     
@@ -57,27 +56,8 @@ public final class ClassUtil {
     public static boolean isImmutable(Type<?> type) {
         return isImmutable(type.getRawType());
     }
-    /**
-     * Verifies whether a given type is non-abstract and not an interface.
-     * 
-     * @param type
-     * @return true if the passed type is not abstract and not an interface; false otherwise.
-     */
-    public static boolean isConcrete(Class<?> type) {
-    	return !type.isInterface() && (type.isPrimitive() || type.isArray() || !Modifier.isAbstract(type.getModifiers()));
-    }
-    
-    /**
-     * Verifies whether a given type is non-abstract and not an interface.
-     * 
-     * @param type
-     * @return true if the passed type is not abstract and not an interface; false otherwise.
-     */
-    public static boolean isConcrete(Type<?> type) {
-    	return isConcrete(type.getRawType());
-    }
-    
-    /**
+
+	/**
      * Verifies whether a given type is one of the wrapper classes for a primitive type.
      * 
      * @param type

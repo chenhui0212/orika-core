@@ -97,7 +97,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 if (sourceType.isAssignableFrom(sourceObject.getClass())) {
                     sourceType = (Type<S>) TypeFactory.valueOf(sourceObject.getClass());
                 }
-                if (ClassUtil.isConcrete(sourceType)) {
+                if (sourceType.isConcrete()) {
                     resolvedType = unenhanceStrategy.unenhanceType(sourceObject, sourceType);
                 } else {
                     resolvedType = unenhanceStrategy.unenhanceType(sourceObject, resolveTypeOf(sourceObject, sourceType));
@@ -207,7 +207,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             if (destinationType.isAssignableFrom(sourceType)) {
                 resolvedDestinationType = (Type<? extends D>) resolvedSourceType;
             } else {
-                if (!ClassUtil.isConcrete(destinationType)) {
+                if (!destinationType.isConcrete()) {
                     MappingException e = new MappingException("No concrete class mapping defined for source class " + resolvedSourceType.getName());
                     e.setDestinationType(destinationType);
                     e.setSourceType(resolvedSourceType);

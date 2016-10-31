@@ -18,6 +18,7 @@
 
 package ma.glasnost.orika.metadata;
 
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
@@ -330,7 +331,19 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     public boolean isPrimitiveFor(final Type<?> wrapper) {
         return wrapper != null && isPrimitive() && ClassUtil.getPrimitiveType(wrapper.rawType).equals(getRawType());
     }
-    
+
+    public boolean isConcrete() {
+        return !isInterface() && (isPrimitive() || isArray() || isAbstract());
+    }
+
+    private boolean isAbstract() {
+        return !Modifier.isAbstract(getRawType().getModifiers());
+    }
+
+    private boolean isInterface() {
+        return getRawType().isInterface();
+    }
+
     public Type<?> getWrapperType() {
         if (!rawType.isPrimitive()) {
             throw new IllegalStateException(rawType + " is not primitive");
@@ -482,4 +495,5 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         }
         return buildClassInheritanceChain(type.getSuperType()).append('/').append(type.getName());
     }
+
 }

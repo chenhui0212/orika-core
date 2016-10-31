@@ -53,7 +53,7 @@ public class ConstructorParameterResolver {
         if (properties == null) {
             
             Type<?> resolvedType = TypeFactory.valueOf(type);
-            if (ClassUtil.isConcrete(resolvedType) && !ClassUtil.isImmutable(resolvedType)) {
+            if (resolvedType.isConcrete() && !ClassUtil.isImmutable(resolvedType)) {
                 synchronized (resolvedType) {
                     Map<Constructor<?>, List<Property>> constructors = new ConcurrentHashMap<Constructor<?>, List<Property>>();
                     Map<Property, Map<Constructor<?>, Integer>> constructorsByProperty = new ConcurrentHashMap<Property, Map<Constructor<?>, Integer>>();

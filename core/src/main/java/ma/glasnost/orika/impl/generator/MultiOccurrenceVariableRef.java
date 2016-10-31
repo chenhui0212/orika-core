@@ -19,7 +19,6 @@ package ma.glasnost.orika.impl.generator;
 
 import ma.glasnost.orika.MapEntry;
 import ma.glasnost.orika.impl.DefaultConcreteTypeMap;
-import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
@@ -211,7 +210,7 @@ public class MultiOccurrenceVariableRef extends VariableRef {
         if (isArray()) {
             return "new " + rawType().getComponentType().getCanonicalName() + "[" + sizeExpr + "]";
         } else {
-            if (ClassUtil.isConcrete(type())) {
+            if (type().isConcrete()) {
                 return newInstance(type().getRawType());
             }
             else {
