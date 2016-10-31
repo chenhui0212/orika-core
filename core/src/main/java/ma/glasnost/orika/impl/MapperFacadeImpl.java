@@ -178,23 +178,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 
             } else {
                 strategyRecorder.setInstantiate(true);
-                Type<? extends D> resolvedDestinationType = mapperFactory.lookupConcreteDestinationType(resolvedSourceType, destinationType, context);
-                if (resolvedDestinationType == null) {
-                    if (destinationType.isAssignableFrom(sourceType)) {
-                        resolvedDestinationType = (Type<? extends D>) resolvedSourceType;
-                    } else {
-                        if (!ClassUtil.isConcrete(destinationType)) {
-                            MappingException e = new MappingException("No concrete class mapping defined for source class "
-                                    + resolvedSourceType.getName());
-                            e.setDestinationType(destinationType);
-                            e.setSourceType(resolvedSourceType);
-                            throw exceptionUtil.decorate(e);
-                        } else {
-                            resolvedDestinationType = destinationType;
-                        }
-                    }
-
-                }
+                Type<? extends D> resolvedDestinationType = resolveDestinationType(context, sourceType, destinationType, resolvedSourceType);
 
                 strategyRecorder.setResolvedDestinationType(resolvedDestinationType);
                 strategyRecorder.setResolvedMapper(resolveMapper(resolvedSourceType, resolvedDestinationType));
@@ -222,7 +206,27 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         
         return strategy;
     }
-    
+
+    private <S, D> Type<? extends D> resolveDestinationType(MappingContext context, Type<S> sourceType, Type<D> destinationType, Type<S> resolvedSourceType) {
+        Type<? extends D> resolvedDestinationType = mapperFactory.lookupConcreteDestinationType(resolvedSourceType, destinationType, context);
+        if (resolvedDestinationType == null) {
+            if (destinationType.isAssignableFrom(sourceType)) {
+                resolvedDestinationType = (Type<? extends D>) resolvedSourceType;
+            } else {
+                if (!ClassUtil.isConcrete(destinationType)) {
+                    MappingException e = new MappingException("No concrete class mapping defined for source class " + resolvedSourceType.getName());
+                    e.setDestinationType(destinationType);
+                    e.setSourceType(resolvedSourceType);
+                    throw exceptionUtil.decorate(e);
+                } else {
+                    resolvedDestinationType = destinationType;
+                }
+            }
+
+        }
+        return resolvedDestinationType;
+    }
+
     public <S, D> D map(final S sourceObject, final Type<S> sourceType, final Type<D> destinationType, final MappingContext context) {
         return map(sourceObject, sourceType, destinationType, context, null);
     }
