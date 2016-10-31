@@ -119,10 +119,6 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
     }
     
-    protected synchronized void clearStrategyCache() {
-        strategyCache.clear();
-    }
-    
     /**
      * Get the class for the specified object, accounting for unwrapping
      * 
@@ -583,53 +579,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
         return mapper;
     }
-    
-    /**
-     * Maps the declared properties of the source object into the destination
-     * object, using the specified mapper.
-     * 
-     * @param sourceObject
-     *            the source object from which to map property values
-     * @param destinationObject
-     *            the destination object onto which the source object's property
-     *            values will be mapped
-     * @param sourceType
-     *            the type of the source object
-     * @param destinationType
-     *            the type of the destination object
-     * @param context
-     *            the current mapping context
-     * @param mapper
-     *            the mapper to use for mapping the source property values onto
-     *            the destination
-     * @param strategyBuilder
-     *            the strategy builder used to record the mapping strategy taken
-     */
-    void mapDeclaredProperties(final Object sourceObject, final Object destinationObject, final Type<?> sourceType,
-            final Type<?> destinationType, final MappingContext context, final Mapper<Object, Object> mapper,
-            final MappingStrategyRecorder strategyBuilder) {
-        
-        if (mapper.getAType().equals(sourceType)) {
-            mapper.mapAtoB(sourceObject, destinationObject, context);
-        } else if (mapper.getAType().equals(destinationType)) {
-            mapper.mapBtoA(sourceObject, destinationObject, context);
-            if (strategyBuilder != null) {
-                strategyBuilder.setMapReverse(true);
-            }
-        } else if (mapper.getAType().isAssignableFrom(sourceType)) {
-            mapper.mapAtoB(sourceObject, destinationObject, context);
-        } else if (mapper.getAType().isAssignableFrom(destinationType)) {
-            mapper.mapBtoA(sourceObject, destinationObject, context);
-            if (strategyBuilder != null) {
-                strategyBuilder.setMapReverse(true);
-            }
-        } else {
-            throw new IllegalStateException(String.format("Source object type's must be one of '%s' or '%s'.", mapper.getAType(),
-                    mapper.getBType()));
-            
-        }
-    }
-    
+
     private <S, D> D newObject(final S sourceObject, final Type<? extends D> destinationType, final MappingContext context,
             final MappingStrategyRecorder strategyBuilder) {
         
