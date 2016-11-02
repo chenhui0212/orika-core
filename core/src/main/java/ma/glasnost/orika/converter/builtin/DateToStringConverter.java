@@ -17,14 +17,14 @@
  */
 package ma.glasnost.orika.converter.builtin;
 
+import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.converter.BidirectionalConverter;
+import ma.glasnost.orika.metadata.Type;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.converter.BidirectionalConverter;
-import ma.glasnost.orika.metadata.Type;
 
 /**
  * DateToStringConverter provides custom conversion from String values to and
@@ -88,4 +88,18 @@ public class DateToStringConverter extends BidirectionalConverter<Date, String> 
             return null;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        DateToStringConverter that = (DateToStringConverter) o;
+
+        if (pattern != null ? !pattern.equals(that.pattern) : that.pattern != null) return false;
+        return locale != null ? locale.equals(that.locale) : that.locale == null;
+
+    }
+
 }
