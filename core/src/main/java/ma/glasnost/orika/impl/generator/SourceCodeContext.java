@@ -262,7 +262,7 @@ public class SourceCodeContext {
         T instance = (T) compileClass().newInstance();
         
         Type<Object>[] usedTypesArray = usedTypes.toArray();
-        Converter<Object, Object>[] usedConvertersArray = usedConverters.toArray();
+        Converter[] usedConvertersArray = usedConverters.toArray();
         BoundMapperFacade<Object, Object>[] usedMapperFacadesArray = usedMapperFacades.toArray();
         Filter<Object, Object>[] usedFiltersArray = usedFilters.toArray();
         if (logDetails != null) {
