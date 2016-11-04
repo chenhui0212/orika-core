@@ -26,8 +26,7 @@ import ma.glasnost.orika.metadata.TypeFactory;
  * @param <C>
  * @param <D>
  */
-abstract class BuiltinBidirectionalConverter<C, D> extends
-		BidirectionalConverter<C, D> {
+abstract class BuiltinBidirectionalConverter<C, D> extends BidirectionalConverter<C, D> {
 
 	private final String description;
 	private volatile Reversed<D, C> reversed;
@@ -40,10 +39,6 @@ abstract class BuiltinBidirectionalConverter<C, D> extends
         + srcName + ", " + dstName + ">";
 	}
 	
-	public String toString() {
-		return description;
-	}
-	
 	public BidirectionalConverter<D, C> reverse() {
 	    if (reversed == null) {
 	        synchronized(this) {
@@ -54,8 +49,23 @@ abstract class BuiltinBidirectionalConverter<C, D> extends
 	    }
 	    return reversed;
 	}
-	
-	public static class Reversed<D, C> extends BidirectionalConverter.Reversed<D, C> {
+
+	public String toString() {
+		return description;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+
+		BuiltinBidirectionalConverter<?, ?> that = (BuiltinBidirectionalConverter<?, ?>) o;
+
+		return description != null ? description.equals(that.description) : that.description == null;
+	}
+
+	private static class Reversed<D, C> extends BidirectionalConverter.Reversed<D, C> {
 
 	    private final String description;
 	    
