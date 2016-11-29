@@ -18,6 +18,9 @@
 package ma.glasnost.orika;
 
 import java.lang.reflect.ParameterizedType;
+import ma.glasnost.orika.converter.BidirectionalConverter;
+import ma.glasnost.orika.converter.builtin.CloneableConverter;
+import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
@@ -42,8 +45,40 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     protected MapperFacade mapperFacade;
 
     public CustomConverter() {
-        sourceType = (Type<S>) TypeFactory.valueOf(ClassHelper.findParameterClass(0,getClass(),CustomConverter.class));
-        destinationType = (Type<D>) TypeFactory.valueOf(ClassHelper.findParameterClass(1,getClass(),CustomConverter.class));
+//        java.lang.reflect.Type genericSuperclass = getClass().getGenericSuperclass();
+//        while (genericSuperclass instanceof Class) {
+//        	genericSuperclass = ((Class<?>)genericSuperclass).getGenericSuperclass();
+//        }
+//        if (genericSuperclass != null && genericSuperclass instanceof ParameterizedType) {
+//            ParameterizedType superType = (ParameterizedType)genericSuperclass;
+//            sourceType = TypeFactory.valueOf(superType.getActualTypeArguments()[0]);
+//            destinationType = TypeFactory.valueOf(superType.getActualTypeArguments()[1]);
+//        } else {
+//            throw new IllegalStateException("When you subclass CustomConverter S and D type-parameters are required.");
+//        }
+        /* Now the correct types are determined, but....
+         * BidirectionalConverter (and others) extends CustomConverter using <Object, Object>. This enables a call to convert with any type of source and destination.
+         * At runtime the arguments passed to convert are used to decide to call either convertTo or convertFrom.
+         * This fails because the source and destination (now correctly determined) are both Object.
+         * I realy don't like the <Object, Object> construct and the way this is used in the class hierarchy.
+         * Generics are only in the way in this design.
+         * Consider a redesign: use generics more transparently in a way that helps and don't try to dynamically overload convert at runtime.
+         * I think encapsulation and the decoration pattern will help, each decorator for a converter is responsible for only one aspect such as bidirectionality.
+         * 
+         */
+        if (this instanceof BidirectionalConverter) {
+            sourceType = (Type<S>) TypeFactory.valueOf(ClassHelper.findParameterClassOrObjectClass(0,getClass(),BidirectionalConverter.class));
+            destinationType = (Type<D>) TypeFactory.valueOf(ClassHelper.findParameterClassOrObjectClass(1,getClass(),BidirectionalConverter.class));
+        } else if (this instanceof CloneableConverter) {
+            sourceType = (Type<S>) TypeFactory.valueOf(Object.class);
+            destinationType = (Type<D>) TypeFactory.valueOf(Object.class);
+        } else if (this instanceof PassThroughConverter) {
+            sourceType = (Type<S>) TypeFactory.valueOf(Object.class);
+            destinationType = (Type<D>) TypeFactory.valueOf(Object.class);
+        } else {
+            sourceType = (Type<S>) TypeFactory.valueOf(ClassHelper.findParameterClassOrObjectClass(0,getClass(),CustomConverter.class));
+            destinationType = (Type<D>) TypeFactory.valueOf(ClassHelper.findParameterClassOrObjectClass(1,getClass(),CustomConverter.class));
+        }
         if (sourceType==null || destinationType == null) {
             throw new IllegalStateException("When you subclass CustomConverter S and D type-parameters are required.");
         }

@@ -156,8 +156,13 @@ public class ClassHelper {
     * @param classWithParameter the class that contains the parameter whose class we are lokking for
     * @return
     */
-   public static <T> Class<?> findParameterClass(int paramNum, Class<? extends T> subclass, Class<T> classWithParameter) {
+   public static <T> Class<?> findParameterClass(int paramNum, Class<? extends T> subclass, Class<? extends T> classWithParameter) {
       return findParameterClasses(subclass, classWithParameter).get(paramNum);
+   }
+
+   public static <T> Class<?> findParameterClassOrObjectClass(int paramNum, Class<? extends T> subclass, Class<? extends T> classWithParameter) {
+       Class<?> clazz = findParameterClass(paramNum, subclass, classWithParameter);
+       return clazz != null ? clazz : Object.class;
    }
 
    /**
@@ -169,7 +174,7 @@ public class ClassHelper {
     * @param classWithParameter the parametrized class
     * @return a List of java class for the class parameters, or null
     */
-   public static <T> List<Class<?>> findParameterClasses(Class<? extends T> subclass, Class<T> classWithParameter) {
+   public static <T> List<Class<?>> findParameterClasses(Class<? extends T> subclass, Class<? extends T> classWithParameter) {
       List<Class<?>> parameterClasses = null;
       // conditions
       TypeVariable[] params = classWithParameter.getTypeParameters();
@@ -221,7 +226,7 @@ public class ClassHelper {
     * @param classWithParameter
     * @return
     */
-   public static <T> Type getGenericSuperType(Class<? extends T> subclass, Class<T> classWithParameter) {
+   public static <T> Type getGenericSuperType(Class<? extends T> subclass, Class<? extends T> classWithParameter) {
       if (subclass.getSuperclass() != null && classWithParameter.isAssignableFrom(subclass.getSuperclass())) {
          return subclass.getGenericSuperclass();
       } else {
