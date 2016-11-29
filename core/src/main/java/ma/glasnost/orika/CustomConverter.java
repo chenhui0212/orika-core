@@ -21,6 +21,7 @@ import java.lang.reflect.ParameterizedType;
 
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
+import ma.glasnost.orika.util.ClassHelper;
 
 /**
  * CustomConverterBase provides a utility base for creating customized converters,
@@ -39,17 +40,11 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     protected Type<S> sourceType;
     protected Type<D> destinationType;
     protected MapperFacade mapperFacade;
-    
+
     public CustomConverter() {
-        java.lang.reflect.Type genericSuperclass = getClass().getGenericSuperclass();
-        while (genericSuperclass instanceof Class) {
-        	genericSuperclass = ((Class<?>)genericSuperclass).getGenericSuperclass();
-        }
-        if (genericSuperclass != null && genericSuperclass instanceof ParameterizedType) {
-            ParameterizedType superType = (ParameterizedType)genericSuperclass;
-            sourceType = TypeFactory.valueOf(superType.getActualTypeArguments()[0]);
-            destinationType = TypeFactory.valueOf(superType.getActualTypeArguments()[1]);
-        } else {
+        sourceType = (Type<S>) TypeFactory.valueOf(ClassHelper.findParameterClass(0,getClass(),CustomConverter.class));
+        destinationType = (Type<D>) TypeFactory.valueOf(ClassHelper.findParameterClass(1,getClass(),CustomConverter.class));
+        if (sourceType==null || destinationType == null) {
             throw new IllegalStateException("When you subclass CustomConverter S and D type-parameters are required.");
         }
     }
