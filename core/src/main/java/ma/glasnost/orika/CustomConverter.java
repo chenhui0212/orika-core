@@ -21,6 +21,7 @@ import java.lang.reflect.ParameterizedType;
 
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
+import ma.glasnost.orika.util.ClassHelper;
 
 /**
  * CustomConverterBase provides a utility base for creating customized converters,
@@ -39,17 +40,44 @@ public abstract class CustomConverter<S, D> implements ma.glasnost.orika.Convert
     protected Type<S> sourceType;
     protected Type<D> destinationType;
     protected MapperFacade mapperFacade;
-    
+
     public CustomConverter() {
         java.lang.reflect.Type genericSuperclass = getClass().getGenericSuperclass();
         while (genericSuperclass instanceof Class) {
         	genericSuperclass = ((Class<?>)genericSuperclass).getGenericSuperclass();
         }
         if (genericSuperclass != null && genericSuperclass instanceof ParameterizedType) {
+            /*
+            this remains tricky because even if we found a ParameterizedType with exactly 2 arguments, the arguments may be swapped
+            but for now this solves the issue 129
+            unconditionaly  using ClassHelper makes issue 99 fail with a ClassCast, cause see comment a bit lower
+            trying to solve that leads to all kind of other issues
+            */
             ParameterizedType superType = (ParameterizedType)genericSuperclass;
-            sourceType = TypeFactory.valueOf(superType.getActualTypeArguments()[0]);
-            destinationType = TypeFactory.valueOf(superType.getActualTypeArguments()[1]);
+            java.lang.reflect.Type[] actualTypeArguments = superType.getActualTypeArguments();
+            if (actualTypeArguments.length==2) {
+                sourceType = TypeFactory.valueOf(superType.getActualTypeArguments()[0]);
+                destinationType = TypeFactory.valueOf(superType.getActualTypeArguments()[1]);
+            } else {
+                // here we do need a recursive way to try and find classes of type arguments
+                sourceType = (Type<S>) TypeFactory.valueOf(ClassHelper.findParameterClass(0,getClass(),CustomConverter.class));
+                destinationType = (Type<D>) TypeFactory.valueOf(ClassHelper.findParameterClass(1,getClass(),CustomConverter.class));
+            }
         } else {
+            throw new IllegalStateException("When you subclass CustomConverter S and D type-parameters are required.");
+        }
+        /* 
+         * BidirectionalConverter (and others) extends CustomConverter using <Object, Object>. This enables a call to convert with any type of source and destination.
+         * At runtime the arguments passed to convert are used to decide to call either convertTo or convertFrom.
+         * This may fail when source and destination are equal.
+         * I realy don't like the <Object, Object> construct and the way this is used in the class hierarchy.
+         * Generics are only in the way in this design.
+         * Consider a redesign: use generics more transparently in a way that helps and don't try to dynamically overload convert at runtime.
+         * I think encapsulation and the decoration pattern will help, each decorator for a converter is responsible for only one aspect such as bidirectionality.
+         * 
+         */
+
+        if (sourceType==null || destinationType == null) {
             throw new IllegalStateException("When you subclass CustomConverter S and D type-parameters are required.");
         }
     }
