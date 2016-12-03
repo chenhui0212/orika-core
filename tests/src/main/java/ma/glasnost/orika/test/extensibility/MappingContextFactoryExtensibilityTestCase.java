@@ -106,11 +106,18 @@ public class MappingContextFactoryExtensibilityTestCase {
             
             public Person convert(Person source, Type<? extends Person> destType, MappingContext mappingContext) {
                 final BoundMapperFacade<Person, Person> boundMapperFacadePerson = factory.getMapperFacade(Person.class, Person.class);
+                final BoundMapperFacade<Child, Child> boundMapperFacadeChild = factory.getMapperFacade(Child.class, Child.class);
                 Person destination = boundMapperFacadePerson.newObject(source, mappingContext);
                 destination.setName(source.getName());
-                // TODO brabenetz 03.12.2016 : with boundMapperFacadePerson the children will not be mapped. Is this a bug?
-                // destination.setDependsOn(boundMapperFacadePerson.map(source.getDependsOn(), mappingContext));
-                destination.setDependsOn(factory.getMapperFacade().map(source.getDependsOn(), Person.class, mappingContext));
+                destination.setDependsOn(boundMapperFacadePerson.map(source.getDependsOn(), mappingContext));
+                if (source instanceof Parent && destination instanceof Parent) {
+                    Set<Child> srcChildren = ((Parent) source).getChildren();
+                    Set<Child> destChildren = ((Parent) destination).getChildren();
+                    for (Child srcChild : srcChildren) {
+                        destChildren.add(boundMapperFacadeChild.map(srcChild, mappingContext));
+                    }
+                    
+                }
                 return destination;
             }
         });
@@ -316,8 +323,8 @@ public class MappingContextFactoryExtensibilityTestCase {
         
     }
     
-    public static final class Man extends Person {
-        private Set<Person> children;
+    public static final class Man extends Person implements Parent {
+        private Set<Child> children = new HashSet<Child>();
         
         public Man() {
             super();
@@ -327,11 +334,11 @@ public class MappingContextFactoryExtensibilityTestCase {
             super(name);
         }
         
-        public Set<Person> getChildren() {
+        public Set<Child> getChildren() {
             return children;
         }
         
-        public void setChildren(Set<Person> children) {
+        public void setChildren(Set<Child> children) {
             this.children = children;
         }
 
