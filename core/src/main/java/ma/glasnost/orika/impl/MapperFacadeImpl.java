@@ -176,9 +176,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                         resolvedSourceType);
                 
                 strategyRecorder.setResolvedDestinationType(resolvedDestinationType);
-                strategyRecorder.setResolvedMapper(resolveMapper(resolvedSourceType, resolvedDestinationType));
+                strategyRecorder.setResolvedMapper(resolveMapper(resolvedSourceType, resolvedDestinationType, context));
                 if (!mapInPlace) {
-                    strategyRecorder.setResolvedObjectFactory(mapperFactory.lookupObjectFactory(resolvedDestinationType, resolvedSourceType));
+                    strategyRecorder.setResolvedObjectFactory(
+                            mapperFactory.lookupObjectFactory(resolvedDestinationType, resolvedSourceType, context));
                 }
             }
             strategy = strategyRecorder.playback();
@@ -566,9 +567,9 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         }
     }
     
-    private Mapper<Object, Object> resolveMapper(final Type<?> sourceType, final Type<?> destinationType) {
+    private Mapper<Object, Object> resolveMapper(final Type<?> sourceType, final Type<?> destinationType, final MappingContext context) {
         final MapperKey mapperKey = new MapperKey(sourceType, destinationType);
-        Mapper<Object, Object> mapper = mapperFactory.lookupMapper(mapperKey);
+        Mapper<Object, Object> mapper = mapperFactory.lookupMapper(mapperKey, context);
         
         if (mapper == null) {
             throw new IllegalStateException(String.format("Cannot create a mapper for classes : %s, %s", destinationType, sourceType));
@@ -585,7 +586,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             final MappingStrategyRecorder strategyBuilder) {
         
         final ObjectFactory<? extends D> objectFactory = mapperFactory.lookupObjectFactory(destinationType,
-                TypeFactory.valueOf(sourceObject.getClass()));
+            TypeFactory.valueOf(sourceObject.getClass()), context);
         
         if (strategyBuilder != null) {
             strategyBuilder.setResolvedObjectFactory(objectFactory);
