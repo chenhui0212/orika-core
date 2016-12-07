@@ -181,11 +181,6 @@ public class MappingContext {
             }
             localCache.put(source, destination);
             
-            // Quick fix for Issue 68
-            for (Type<Object> t : (Type<Object>[]) destinationType.getInterfaces()) {
-                cacheMappedObject(source, t, destination);
-            }
-            
             isNew = false;
         }
     }

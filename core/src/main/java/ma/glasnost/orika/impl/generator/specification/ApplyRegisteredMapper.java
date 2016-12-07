@@ -39,7 +39,7 @@ public class ApplyRegisteredMapper extends ObjectToObject {
         
         if (code.isDebugEnabled()) {
             Mapper<Object, Object> mapper = mapperFactory.lookupMapper(
-                    new MapperKey(source.type(), destination.type()));
+                    new MapperKey(source.type(), destination.type()), code.getMappingContext());
             Type<?> sourceType;
             Type<?> destType;
             if (mapper.getAType().isAssignableFrom(source.type())) {

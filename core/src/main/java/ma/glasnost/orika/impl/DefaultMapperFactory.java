@@ -716,7 +716,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                         
                         buildObjectFactories(classMap, context);
                         mapper = buildMapper(classMap, true, context);
-                        initializeUsedMappers(classMap);
+                        initializeUsedMappers(classMap, context);
                     } catch (MappingException e) {
                         e.setSourceType(mapperKey.getAType());
                         e.setDestinationType(mapperKey.getBType());
@@ -1123,7 +1123,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 isBuilding, context);
                 
                 buildObjectFactories(classMap, context);
-                initializeUsedMappers(classMap);
+                initializeUsedMappers(classMap, context);
                 mapperFacade.factoryModified(this);
             } finally {
                 contextFactory.release(context);
@@ -1162,7 +1162,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
   
                 for (final ClassMap<?, ?> classMap : classMapRegistry.values()) {
                     buildObjectFactories(classMap, context);
-                    initializeUsedMappers(classMap);
+                    initializeUsedMappers(classMap, context);
                 }
                 
             } finally {
@@ -1251,15 +1251,15 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     }
     
     @SuppressWarnings("unchecked")
-    private void initializeUsedMappers(ClassMap<?, ?> classMap) {
-        
-        Mapper<Object, Object> mapper = lookupMapper(new MapperKey(classMap.getAType(), classMap.getBType()));
-        
+    private void initializeUsedMappers(ClassMap<?, ?> classMap, MappingContext context) {
+
+        Mapper<Object, Object> mapper = lookupMapper(new MapperKey(classMap.getAType(), classMap.getBType()), context);
+
         Set<Mapper<Object, Object>> parentMappers = new LinkedHashSet<Mapper<Object, Object>>();
-        
+
         if (!classMap.getUsedMappers().isEmpty()) {
             for (MapperKey parentMapperKey : classMap.getUsedMappers()) {
-                collectUsedMappers(classMap, parentMappers, parentMapperKey);
+                collectUsedMappers(classMap, parentMappers, parentMapperKey, context);
             }
         }
         
@@ -1269,7 +1269,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             if (!GeneratedMapperBase.isUsedMappersInitialized(curParrentMapper)) {
                 initializeUsedMappers(getClassMap(new MapperKey(
                         curParrentMapper.getAType(),
-                        curParrentMapper.getBType())));
+                    curParrentMapper.getBType())), context);
             }
         }
 
@@ -1308,17 +1308,17 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         mapper.setUsedMappers(usedMappers);
     }
     
-    private void collectUsedMappers(ClassMap<?, ?> classMap, Set<Mapper<Object, Object>> parentMappers, MapperKey parentMapperKey) {
-        Mapper<Object, Object> parentMapper = lookupMapper(parentMapperKey);
+    private void collectUsedMappers(ClassMap<?, ?> classMap, Set<Mapper<Object, Object>> parentMappers, MapperKey parentMapperKey, MappingContext context) {
+        Mapper<Object, Object> parentMapper = lookupMapper(parentMapperKey, context);
         if (parentMapper == null) {
             throw exceptionUtil.newMappingException("Cannot find used mappers for : " + classMap.getMapperClassName());
         }
         parentMappers.add(parentMapper);
-        
+
         Set<ClassMap<Object, Object>> usedClassMapSet = usedMapperMetadataRegistry.get(parentMapperKey);
         if (usedClassMapSet != null) {
             for (ClassMap<Object, Object> cm : usedClassMapSet) {
-                collectUsedMappers(cm, parentMappers, new MapperKey(cm.getAType(), cm.getBType()));
+                collectUsedMappers(cm, parentMappers, new MapperKey(cm.getAType(), cm.getBType()), context);
             }
         }
     }

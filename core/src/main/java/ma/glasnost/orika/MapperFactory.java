@@ -49,6 +49,19 @@ public interface MapperFactory {
     <A, B> Mapper<A, B> lookupMapper(MapperKey mapperKey);
     
     /**
+     * Get the Mapper (if any) which has been associated with the given
+     * MapperKey. If one does not exist, and the Mapper supports automatic
+     * generation, an appropriate mapper will be generated.
+     * 
+     * @param mapperKey
+     *            the MapperKey for which to look up an associated Mapper
+     * @param context
+     *            the current mapping context
+     * @return the Mapper associated with <code>mapperKey</code>;
+     */
+    <A, B> Mapper<A, B> lookupMapper(MapperKey mapperKey, final MappingContext context);
+    
+    /**
      * Tests for the existence of a registered mapper which corresponds to the
      * supplied mapperKey
      * 
@@ -157,6 +170,22 @@ public interface MapperFactory {
      *         given type.
      */
     <T, S> ObjectFactory<T> lookupObjectFactory(Type<T> targetType, Type<S> sourceType);
+    
+    /**
+     * Return the object factory (if any) which has been registered for the
+     * given type.
+     * 
+     * @param targetType
+     *            the type for which to lookup a registered ObjectFactory.
+     * @param sourceType
+     *            the source type from which the target is mapped
+     * @param context
+     *            the current mapping context
+     * @return the ObjectFactory registered for the given targetType;
+     *         <code>null</code> if no ObjectFactory has been registered for the
+     *         given type.
+     */
+    <T, S> ObjectFactory<T> lookupObjectFactory(Type<T> targetType, Type<S> sourceType, final MappingContext context);
     
     /**
      * @param sourceType
