@@ -1,5 +1,5 @@
 Orika - simpler, better and faster Java bean mapping
-Copyright (C) 2011  Sidi Mohamed El Aatifi <elaatifi@gmail.com>
+Copyright (C) 2011-2017  Sidi Mohamed El Aatifi <elaatifi@gmail.com>
 ----------------------------------------------------------------------
 
 Authors
@@ -10,3 +10,5 @@ Amine Moukhliss	        <moukhlissamine@gmail.com>
 Matt DeBoer	            <matt.deboer@gmail.com>
 Ilya Krokhmalyov        <jad7kii@gmail.com>
 Emond Papegaaij         <emond.papegaaij@topicus.nl>
+Andrea Bertagnolli      <andrea.bertagnolli@gmail.com>
+
