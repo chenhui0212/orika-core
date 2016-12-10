@@ -136,12 +136,28 @@ public abstract class TypeFactory {
         if (var.getBounds().length > 0) {
             Set<Type<?>> bounds = new HashSet<Type<?>>(var.getBounds().length);
             for (int i = 0, len = var.getBounds().length; i < len; ++i) {
-                bounds.add(valueOf(var.getBounds()[i]));
+                java.lang.reflect.Type bound = var.getBounds()[i];
+                if (isBoundCycleGenerics(var, bound)) {
+                    // prevent recursions like "class Enum<E extends Enum<E>>"
+                    bounds.add(TYPE_OF_OBJECT);
+                } else {
+                    bounds.add(valueOf(bound));
+                }
             }
             return (Type<T>) refineBounds(bounds);
         } else {
             return (Type<T>) TYPE_OF_OBJECT;
         }
+    }
+
+    private static boolean isBoundCycleGenerics(TypeVariable<?> var, java.lang.reflect.Type bound) {
+        if (bound instanceof ParameterizedType) {
+            ParameterizedType parameterizedBound = (ParameterizedType) bound;
+            if (var.getGenericDeclaration().equals(parameterizedBound.getRawType())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
