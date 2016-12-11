@@ -174,13 +174,21 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
                         resolvedType = TypeFactory.valueOf(t);
                     }
                 } else if (hasTypeParameters(owningType) && owningType.isInterface()) {
-                    referenceInterface = reference.findInterface(TypeFactory.valueOf(owningType));
+                    Type<?> foundInterface = reference.findInterface(TypeFactory.valueOf(owningType));
+                    if (!reference.equals(foundInterface)) {
+                        referenceInterface = foundInterface;
+                    }
                 }
             } else if (genericType instanceof ParameterizedType) {
                 if (reference.isSelfOrAncestorParameterized()) {
                     resolvedType = TypeFactory.resolveValueOf((ParameterizedType) genericType, reference);
                 } else if (hasTypeParameters(owningType) && owningType.isInterface()) {
-                    referenceInterface = reference.findInterface(TypeFactory.valueOf(owningType));
+                    Type<?> foundInterface = reference.findInterface(TypeFactory.valueOf(owningType));
+                    if (!reference.equals(foundInterface)) {
+                        referenceInterface = foundInterface;
+                    } else {
+                        resolvedType = TypeFactory.valueOf((ParameterizedType) genericType);
+                    }
                 } else {
                     resolvedType = TypeFactory.valueOf((ParameterizedType) genericType);
                 }
