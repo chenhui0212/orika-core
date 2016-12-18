@@ -58,9 +58,11 @@ public abstract class UseCustomMapperStrategy extends AbstractMappingStrategy {
         
         Object resolvedSourceObject = unenhancer.unenhanceObject(sourceObject, sourceType);
         
-        Object cachedObject = context.getMappedObject(sourceObject, destinationType);
-        if (cachedObject != null) {
-            return cachedObject;
+        if (destinationObject == null) {
+            Object cachedObject = context.getMappedObject(sourceObject, destinationType);
+            if (cachedObject != null) {
+                return cachedObject;
+            }
         }
         
         Object newInstance = getInstance(resolvedSourceObject, destinationObject, context);

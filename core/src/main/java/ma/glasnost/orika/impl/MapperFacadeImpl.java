@@ -309,13 +309,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             final MappingContext context, final MappingStrategy suggestedStrategy) {
         MappingStrategy strategy = suggestedStrategy;
         try {
-            
-            if (context.getMappedObject(sourceObject, destinationType) == null) {
-                if (strategy == null) {
-                    strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, true, context);
-                }
-                strategy.map(sourceObject, destinationObject, context);
+            if (strategy == null) {
+                strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, true, context);
             }
+            strategy.map(sourceObject, destinationObject, context);
             
         } catch (MappingException e) {
             throw exceptionUtil.decorate(e);
@@ -367,9 +364,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             if (strategy == null) {
                 strategy = resolveMappingStrategy(sourceObject, null, destinationObject.getClass(), true, context);
             }
-            if (null == context.getMappedObject(sourceObject, strategy.getBType())) {
-                strategy.map(sourceObject, destinationObject, context);
-            }
+            strategy.map(sourceObject, destinationObject, context);
             
         } catch (MappingException e) {
             /* don't wrap our own exceptions */
