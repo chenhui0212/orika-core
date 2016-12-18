@@ -40,6 +40,35 @@ public class Issue160TestCase {
         assertThat(mappedX.getY2().getValue2(), is("testValue2"));
 	}
     
+    @Test
+    public void testIssue160WithCycle() {
+        
+        final MapperFactory factory = new DefaultMapperFactory.Builder().build();
+        factory.classMap(A.class, ZCycle.class)
+                .customize(new CustomMapper<A, ZCycle>() {
+                    
+                    @Override
+                    public void mapAtoB(A a, ZCycle b, MappingContext context) {
+                        factory.getMapperFacade().map(a, b.getZcycle(), context);
+                    }
+                })
+                .byDefault()
+                .register();
+        
+        A a = new A();
+        a.setValue1("testValue1");
+        a.setValue2("testValue2");
+        
+        BoundMapperFacade<A, ZCycle> mapperFacade = factory.getMapperFacade(A.class, ZCycle.class);
+        ZCycle mappedZ = mapperFacade.map(a);
+        
+        assertThat(mappedZ.getValue1(), is("testValue1"));
+        assertThat(mappedZ.getValue2(), is("testValue2"));
+        assertThat(mappedZ.getZcycle().getValue1(), is("testValue1"));
+        assertThat(mappedZ.getZcycle().getValue2(), is("testValue2"));
+        assertThat(mappedZ.getZcycle().getZcycle().getValue1(), is("testValue1"));
+        assertThat(mappedZ.getZcycle().getZcycle().getValue2(), is("testValue2"));
+    }
     public static class A {
         private String value1;
         private String value2;
@@ -94,6 +123,37 @@ public class Issue160TestCase {
         
         public void setValue2(String value2) {
             this.value2 = value2;
+        }
+        
+    }
+    
+    public static class ZCycle {
+        private String value1;
+        private String value2;
+        
+        private ZCycle zcycle;
+        
+        public String getValue1() {
+            return value1;
+        }
+        
+        public void setValue1(String value1) {
+            this.value1 = value1;
+        }
+        
+        public String getValue2() {
+            return value2;
+        }
+        
+        public void setValue2(String value2) {
+            this.value2 = value2;
+        }
+        
+        public ZCycle getZcycle() {
+            if (zcycle == null) {
+                zcycle = this;
+            }
+            return zcycle;
         }
         
     }
