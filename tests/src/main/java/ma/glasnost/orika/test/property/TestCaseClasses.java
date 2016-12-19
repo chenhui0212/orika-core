@@ -313,6 +313,130 @@ public interface TestCaseClasses {
         public String postalCode;
         public String country;
     }
+
+    public static class C {
+		private final String foo;
+		private final int bar;
+
+
+		private C(String foo, int bar) {
+			this.foo = foo;
+			this.bar = bar;
+		}
+
+		public String getFoo() {
+			return foo;
+		}
+
+		public int getBar() {
+			return bar;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			C c = (C) o;
+
+			if (bar != c.bar) return false;
+			return foo != null ? foo.equals(c.foo) : c.foo == null;
+
+		}
+
+		@Override
+		public int hashCode() {
+			int result = foo != null ? foo.hashCode() : 0;
+			result = 31 * result + bar;
+			return result;
+		}
+
+		public static class Builder {
+			private String foo;
+			private int bar;
+
+			public Builder() {
+			}
+
+			public Builder withFoo(String foo) {
+				this.foo = foo;
+				return this;
+			}
+
+			public Builder withBar(int bar) {
+				this.bar = bar;
+				return this;
+			}
+
+
+			public C build() {
+				return new C(foo, bar);
+			}
+		}
+	}
+
+	public static class D {
+		private final String foo;
+		private final int bar;
+
+
+		private D(String foo, int bar) {
+			this.foo = foo;
+			this.bar = bar;
+		}
+
+		public String getFoo() {
+			return foo;
+		}
+
+		public int getBar() {
+			return bar;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			D d = (D) o;
+
+			if (bar != d.bar) return false;
+			return foo != null ? foo.equals(d.foo) : d.foo == null;
+
+		}
+
+		@Override
+		public int hashCode() {
+			int result = foo != null ? foo.hashCode() : 0;
+			result = 31 * result + bar;
+			return result;
+		}
+
+		public static class Builder {
+			private String foo;
+			private int bar;
+
+			public Builder() {
+			}
+
+			public Builder setFoo(String foo) {
+				this.foo = foo;
+				return this;
+			}
+
+			public Builder setBar(int bar) {
+				this.bar = bar;
+				return this;
+			}
+
+
+			public D build() {
+				return new D(foo, bar);
+			}
+		}
+	}
+
+
     
     public static class Name {
         private String firstName;
