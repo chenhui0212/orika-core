@@ -17,6 +17,9 @@
  */
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -97,8 +100,7 @@ public class Issue17TestCase {
         Assert.assertNotNull(converted);
         Assert.assertNotNull(converted.getList());
         List<String> convertedList = Arrays.asList(converted.getList());
-        Assert.assertTrue(convertedList.containsAll(a.getList()));
-        Assert.assertTrue(a.getList().containsAll(convertedList));
+        assertThat(convertedList, contains("One", "Two", "Three"));
     }
     
     @Test

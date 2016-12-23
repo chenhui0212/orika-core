@@ -17,7 +17,8 @@
  */
 package ma.glasnost.orika.test.community;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +39,6 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.UtilityResolver;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeBuilder;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.test.community.issue25.BaseManufacturingFacilityTest;
 import ma.glasnost.orika.test.community.issue25.CustomOrikaMapper;
@@ -82,7 +82,7 @@ public class Issue25TestCase extends BaseManufacturingFacilityTest{
 
         ManufacturingFacilityDTS betriebsstaetteDTSMapped = mapper.map(manufacturingFacility, ManufacturingFacilityDTS.class);
         ManufacturingFacility betriebsstaetteMappedBack = mapper.map(betriebsstaetteDTSMapped, ManufacturingFacility.class);
-        assertTrue(manufacturingFacility.equals(betriebsstaetteMappedBack));
+        assertThat(manufacturingFacility, is(betriebsstaetteMappedBack));
     }
     
     @Test
@@ -97,7 +97,7 @@ public class Issue25TestCase extends BaseManufacturingFacilityTest{
 
         ManufacturingFacilityDTS betriebsstaetteDTSMapped = mapper.map(manufacturingFacility, ManufacturingFacilityDTS.class);
         ManufacturingFacility betriebsstaetteMappedBack = mapper.map(betriebsstaetteDTSMapped, ManufacturingFacility.class);
-        assertTrue(manufacturingFacility.equals(betriebsstaetteMappedBack));
+        assertThat(manufacturingFacility, is(betriebsstaetteMappedBack));
     }
     
     @Test
@@ -114,7 +114,7 @@ public class Issue25TestCase extends BaseManufacturingFacilityTest{
 
         ManufacturingFacilityDTS betriebsstaetteDTSMapped = mapper.map(manufacturingFacility, ManufacturingFacilityDTS.class);
         ManufacturingFacility betriebsstaetteMappedBack = mapper.map(betriebsstaetteDTSMapped, ManufacturingFacility.class);
-        assertTrue(manufacturingFacility.equals(betriebsstaetteMappedBack));
+        assertThat(manufacturingFacility, is(betriebsstaetteMappedBack));
     }
     
     @Test
@@ -160,24 +160,23 @@ public class Issue25TestCase extends BaseManufacturingFacilityTest{
         mapper.map(manufacturingFacilityToEdit, prototype);
         
         // Do some checks.
-        assertTrue("IdNumber was not kept after merge.", 
-        			4L == prototype.getIdNumber());
+        assertThat("IdNumber was not kept after merge.", prototype.getIdNumber(), is(4L));
         
         // Check name of street
-        assertTrue("Street new".equals(prototype.getAddressL().get(0).getStreet()));
+        assertThat(prototype.getAddressL().get(0).getStreet(), is("Street new"));
         
         // Amount of addresses
         List<AddressDTO> addressesFromPrototype = prototype.getAddressL();
-        assertTrue("An address was removed. In the merged DS this address does still exist.", 
-                   addressesFromPrototype.size() == 2);
+        assertThat("An address was removed. In the merged DS this address does still exist.",
+                addressesFromPrototype.size(), is(2));
         
         // land check
         List<AddressDTO> addressesAfterMerge = prototype.getAddressL();
         AddressDTO addressOne = addressesAfterMerge.get(0);
         AddressDTO addressTwo = addressesAfterMerge.get(1);
 
-        assertTrue("Land after merge is wrong.", Character.valueOf('D').equals(addressOne.getLand()));
-        assertTrue("Land after merge is wrong.", Character.valueOf('D').equals(addressTwo.getLand()));
+        assertThat("Land after merge is wrong.", addressOne.getLand(), is(Character.valueOf('D')));
+        assertThat("Land after merge is wrong.", addressTwo.getLand(), is(Character.valueOf('D')));
     }
     
     

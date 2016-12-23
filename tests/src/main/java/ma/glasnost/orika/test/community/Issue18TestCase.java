@@ -17,16 +17,18 @@
  */
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
-
-import org.junit.Test;
 
 public class Issue18TestCase {
 
@@ -41,7 +43,7 @@ public class Issue18TestCase {
 		List<Object> listB = mapperFactory.getMapperFacade().mapAsList(listA, Object.class);
 		
 		Assert.assertNotNull(listB);
-		Assert.assertTrue(listB.isEmpty());
+        Assert.assertThat(listB, is(empty()));
 	}
 	
 }

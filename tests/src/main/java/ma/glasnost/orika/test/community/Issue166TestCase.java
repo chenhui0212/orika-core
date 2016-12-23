@@ -25,7 +25,7 @@ public class Issue166TestCase {
         MapperFacade beanMapper = factory.getMapperFacade();
         
         SimpleBeanResource sbr = beanMapper.map(SimpleEnumBean.E1, SimpleBeanResource.class);
-        Assert.assertTrue(sbr.getName().equals(SimpleEnumBean.E1.getName()));
+        Assert.assertEquals(sbr.getName(), SimpleEnumBean.E1.getName());
     }
     
     @Test

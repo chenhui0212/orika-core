@@ -17,10 +17,14 @@
  */
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
@@ -162,11 +166,10 @@ public class Issue30TestCase {
 				InventoryDTO.class);
 		
 		
-		Assert.assertTrue(inventory.getItems().size() == inventoryDTO
-				.getItems().size());
+        assertThat(inventory.getItems(), hasSize(inventoryDTO.getItems().size()));
 		
 		for (Object o: inventoryDTO.getItems()) {
-			Assert.assertTrue(o instanceof ComputerPartDTO);
+            assertThat(o, is(instanceOf(ComputerPartDTO.class)));
 		}
 	}
 }

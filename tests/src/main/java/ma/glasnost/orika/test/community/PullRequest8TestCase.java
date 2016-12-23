@@ -24,7 +24,10 @@ import ma.glasnost.orika.impl.DefaultConstructorObjectFactory;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
-import org.junit.Assert;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Test;
 
 public class PullRequest8TestCase {
@@ -52,6 +55,6 @@ public class PullRequest8TestCase {
 		ObjectFactory<MyType> myFactory = factory.lookupObjectFactory(
 				TypeFactory.valueOf(MyType.class),
 				TypeFactory.valueOf(MySourceType.class));
-		Assert.assertTrue(myFactory instanceof MyObjectFactory);
+        assertThat(myFactory, is(instanceOf(MyObjectFactory.class)));
 	}
 }
