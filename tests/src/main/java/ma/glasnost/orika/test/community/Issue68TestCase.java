@@ -17,6 +17,10 @@
  */
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,11 +60,14 @@ public class Issue68TestCase {
 
 		invoiceitemVO.getProjectItems().add(projectItemVO);
 
-		InvoiceItemProxy invoiceItemProxy = BeanFactory
-				.createInvoiceItemProxy();
+        InvoiceItemProxy invoiceItemProxy = BeanFactory.createInvoiceItemProxy();
 		mapper.map(invoiceitemVO, invoiceItemProxy);
 
+        ProjectProxy projectProxy = BeanFactory.createProjectProxy();
+        mapper.map(projectVO, projectProxy);
 
+        assertThat(projectVO.getName(), is(projectProxy.getName()));
+        assertThat(projectVO.getProjectItems(), hasSize(projectProxy.getProjectItems().size()));
 	}
 
 	public static class BeanFactory {
