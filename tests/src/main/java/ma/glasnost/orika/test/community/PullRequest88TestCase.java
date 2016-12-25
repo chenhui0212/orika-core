@@ -16,7 +16,12 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-
+/**
+ * Do not loose Map instance when mapping MultiOccurenceVariable to a Map.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/pull/88">https://github.com/orika-mapper/orika</a>
+ */
 public class PullRequest88TestCase {
     public static final Type<Set<A>> SET = new TypeBuilder<Set<A>>() {}.build();
     public static final Type<Map<String, String>> MAP = new TypeBuilder<Map<String, String>>() {}.build();

@@ -19,10 +19,16 @@ import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.property.IntrospectorPropertyResolver;
 import ma.glasnost.orika.property.PropertyResolver;
 
+/**
+ * DefaultMapperFactory.classMap got in infinity loop when using F-bounded polymorphism.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/167">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue167TestCase {
     
     @Test
-    public void testIssue166() throws Exception {
+    public void testIssue167() throws Exception {
         
         MapperFactory factory = new DefaultMapperFactory.Builder().build();
         

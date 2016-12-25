@@ -6,6 +6,12 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Exclude() does not work if the field is not present in both classes.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/126">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue126TestCase {
     
     public static class A {

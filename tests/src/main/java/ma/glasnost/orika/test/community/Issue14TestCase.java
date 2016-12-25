@@ -31,6 +31,12 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Calendar as destination throwing exception.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/14">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue14TestCase {
     
     public static class Product {

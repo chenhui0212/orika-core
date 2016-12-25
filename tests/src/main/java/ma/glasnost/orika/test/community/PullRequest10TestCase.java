@@ -29,7 +29,13 @@ import ma.glasnost.orika.metadata.TypeFactory;
 
 import org.junit.Test;
 
-public class PullRequest9TestCase {
+/**
+ * Correctly implement compareTo contract for Type.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/pull/10">https://github.com/orika-mapper/orika</a>
+ */
+public class PullRequest10TestCase {
 	public static class Base {
 	}
 

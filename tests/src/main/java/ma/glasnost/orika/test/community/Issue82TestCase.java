@@ -35,6 +35,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * MappingException on customization the default field-name mapping.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/82">https://code.google.com/archive/p/orika/</a>
  * @author Alexey Salnikov
  */
 public class Issue82TestCase {

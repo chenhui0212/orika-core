@@ -33,6 +33,13 @@ import ma.glasnost.orika.metadata.TypeBuilder;
 
 import org.junit.Test;
 
+/**
+ * MappingException: cannot determine runtime type of destination collection.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/30">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue30TestCase {
 
 	public static abstract class ComputerPart {

@@ -11,6 +11,12 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Registering map with multiple converters does not work.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/99">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue99Test {
     @Test
     public void testDateMapping() throws Exception {

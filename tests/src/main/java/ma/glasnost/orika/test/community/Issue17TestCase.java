@@ -36,6 +36,13 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Mapping for Collection&lt;String&gt; --&gt; String[] is not working.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/17">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue17TestCase {
     
     public static class A {

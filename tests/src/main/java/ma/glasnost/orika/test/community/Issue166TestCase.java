@@ -16,6 +16,12 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
+/**
+ * StackOverflowError exception when mapping enum.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/166">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue166TestCase {
 
     @Test

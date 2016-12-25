@@ -31,6 +31,13 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Test;
 
+/**
+ * A sub type is not being mapped to the configured mapping type.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/77">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue77TestCase {
     
     public static class A1 {

@@ -25,6 +25,12 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.test.MappingUtil;
 
+/**
+ * Want to have option to not set target object property when property value in the source object is null.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/38">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue38TestCase {
 
 	@Test

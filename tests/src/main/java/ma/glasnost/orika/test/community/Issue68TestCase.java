@@ -33,6 +33,13 @@ import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.junit.Test;
 
 
+/**
+ * How to handle infinit recursion for entities with bidirectional many-to-many relations.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/68">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue68TestCase {
 
 	@Test

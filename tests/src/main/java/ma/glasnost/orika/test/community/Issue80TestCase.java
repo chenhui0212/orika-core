@@ -27,6 +27,14 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * There is a bug for JavaBean to Map.
+ * <p>
+ * I define a class like this: public class JsonObject extends HashMap<String,Object>{...}. Orika can not map JavaBean to JsonObject.
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/80">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue80TestCase {
     
     public static class JsonObject extends HashMap<String,Object> {

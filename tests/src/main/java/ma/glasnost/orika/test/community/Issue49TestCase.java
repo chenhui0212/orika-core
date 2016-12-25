@@ -26,8 +26,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Verify that we use Enum.name istead of Enum.toString
+ * MappingException when enum toString() is overridden.
+ * <p>
+ * Verify that we use Enum.name instead of Enum.toString
  * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/49">https://code.google.com/archive/p/orika/</a>
  * @author Dmitriy Khomyakov
  */
 public class Issue49TestCase {

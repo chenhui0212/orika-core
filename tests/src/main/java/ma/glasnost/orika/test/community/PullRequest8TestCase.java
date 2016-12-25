@@ -30,6 +30,12 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
 
+/**
+ * lookupObjectFactory should consider superclasses for source type.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/pull/8">https://github.com/orika-mapper/orika</a>
+ */
 public class PullRequest8TestCase {
 	public static class MySourceType {
 	}

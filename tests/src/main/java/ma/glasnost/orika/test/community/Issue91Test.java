@@ -6,17 +6,20 @@ import ma.glasnost.orika.OrikaSystemProperties;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
+/**
+ * No concrete class mapping defined error mapping a list of interfaces.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/91">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue91Test {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MapperFacade mapperFacade;
 
     @Before

@@ -30,6 +30,13 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
 
+/**
+ * NoSuchElementException mapping empty lists.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/18">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue18TestCase {
 
 	

@@ -19,7 +19,6 @@
 package ma.glasnost.orika.test.community;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -30,6 +29,13 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Test;
 
+/**
+ * I'm not able to set map type using orika.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/102">https://code.google.com/archive/p/orika/</a>
+ * 
+ */
 public class Issue102TestCase {
     
     @Test

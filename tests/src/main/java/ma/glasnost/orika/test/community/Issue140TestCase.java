@@ -13,6 +13,12 @@ import ma.glasnost.orika.metadata.TypeBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * mapAsMap breaks Object graphs.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/140">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue140TestCase {
 	public static class ParentA {
 		public ChildA child;

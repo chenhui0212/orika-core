@@ -24,6 +24,14 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 
+/**
+ * Property with no getter (null readMethod) is not being excluded/ignored
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/67">https://code.google.com/archive/p/orika/</a>
+ * @author matt.deboer@gmail.com
+ *
+ */
 public class Issue67TestCase {
 
 	@Test

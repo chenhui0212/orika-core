@@ -26,9 +26,10 @@ import ma.glasnost.orika.unenhance.HibernateUnenhanceStrategy;
 import org.junit.Test;
 
 /**
+ * The mapper create a child's instance instead of a parent's instance.
  * <p>
- * </p>
  * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/34">https://code.google.com/archive/p/orika/</a>
  * @author Dmitriy Khomyakov
  */
 public class Issue34TestCase {

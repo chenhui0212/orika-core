@@ -28,13 +28,15 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Test;
 
 /**
+ * NullPointerException in MultiOccurrenceToMultiOccurrence.mapFields.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/85">https://code.google.com/archive/p/orika/</a>
  * @author conleym
  * 
  */
 public final class Issue85TestCase {
-    /**
-     * @param args
-     */
+    
     @Test
     public void test() {
         MapperFactory f = MappingUtil.getMapperFactory();

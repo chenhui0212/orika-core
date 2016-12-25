@@ -12,6 +12,12 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+/**
+ * NPE on VariableRef.isPrimitive() with map of map.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/67">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue67Test {
 
     private MapperFactory mapperFactory;

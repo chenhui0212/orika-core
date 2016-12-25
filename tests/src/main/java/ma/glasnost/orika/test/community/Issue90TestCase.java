@@ -24,6 +24,25 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Test;
 
+/**
+ * Simple mappings fail.
+ * <p>
+ * I am trying to map type A to C, then B to C. I could reproduce with really simple classes, A, B, C being a class with a single string
+ * attribute named "s".
+ * <p>
+ * This fails with exception "B is an unsupported source class". Looks like Orika uses the first converter: it expects A and gets B instead.
+ * <p>
+ * The exception goes away when I explicitly register the mappings A->C, B->C. This is tedious because this forces me to register all
+ * possible mappings (a lot in my case!) during initialization.
+ * <p>
+ * Please check out attached test case.
+ * <p>
+ * I could reproduce the issue with Orika 1.4.1 and 1.4.2-SNAPSHOT.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/90">https://code.google.com/archive/p/orika/</a>
+ * 
+ */
 public class Issue90TestCase {
 
     public static class A {

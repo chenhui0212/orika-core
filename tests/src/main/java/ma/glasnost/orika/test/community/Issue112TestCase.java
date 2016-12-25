@@ -30,11 +30,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * Class cast exception to MapEntry.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/112">https://code.google.com/archive/p/orika/</a>
  * @author: ikrokhmalyov@griddynamics.com
  * @since: 7/1/13
  */
-
-
 public class Issue112TestCase {
     
     @Test

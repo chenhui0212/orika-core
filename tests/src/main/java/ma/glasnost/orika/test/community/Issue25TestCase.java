@@ -52,6 +52,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+/**
+ * Add customization of collection mapping.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/25">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue25TestCase extends BaseManufacturingFacilityTest{
 
 	private MapperFacade mapper = null; 

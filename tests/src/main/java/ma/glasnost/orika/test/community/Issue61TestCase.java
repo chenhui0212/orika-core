@@ -27,9 +27,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * StackOverflowError on circle association
  * <p>
- * </p>
  * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/61">https://code.google.com/archive/p/orika/</a>
  * @author Dmitriy Khomyakov
  */
 public class Issue61TestCase {
