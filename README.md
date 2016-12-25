@@ -1,4 +1,10 @@
-Orika ! [![Build Status](https://secure.travis-ci.org/orika-mapper/orika.png)](http://travis-ci.org/orika-mapper/orika)
+[![Build Status](https://secure.travis-ci.org/orika-mapper/orika.png)](http://travis-ci.org/orika-mapper/orika)
+[![GitHub site](https://img.shields.io/badge/GitHub-site-blue.svg)](http://orika-mapper.github.com/orika-docs/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ma.glasnost.orika/orika-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ma.glasnost.orika/orika-core)
+[![Javadocs](http://www.javadoc.io/badge/ma.glasnost.orika/orika-core.svg)](http://www.javadoc.io/doc/ma.glasnost.orika/orika-core)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-brightgreen.svg)](https://github.com/orika-mapper/orika/blob/master/LICENSE)
+
+Orika !
 -----------------------------------------------------------------------
 
 **NEW** We are pleased to announce the release of Orika **1.5.0** ! _This version is available on Maven central repository_ 
