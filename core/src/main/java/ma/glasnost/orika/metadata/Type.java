@@ -47,8 +47,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     
-    private static final AtomicInteger nextUniqueIndex = new AtomicInteger();
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(Type.class);
     
+    private static final AtomicInteger nextUniqueIndex = new AtomicInteger();
+
     private final Class<T> rawType;
     private final Type<?>[] actualTypeArguments;
     private final boolean isParameterized;
@@ -61,7 +63,7 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
 
     private static final Set<Class<?>> PRIMITIVE_WRAPPER_TYPES;
 
-    private static final Set<Class<?>> IMMUTABLE_WRAPPER_TYPES;
+    private static final Set<Class<?>> IMMUTABLE_TYPES;
     
     static {
         Set<Class<?>> tmpPrimitiveWrapperTypes = new HashSet<Class<?>>();
@@ -75,19 +77,42 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         tmpPrimitiveWrapperTypes.add(Double.class);
         PRIMITIVE_WRAPPER_TYPES = Collections.unmodifiableSet(tmpPrimitiveWrapperTypes);
         
-        Set<Class<?>> tmpImmutableWrapperTypes = new HashSet<Class<?>>();
-        tmpImmutableWrapperTypes.addAll(PRIMITIVE_WRAPPER_TYPES);
-        tmpImmutableWrapperTypes.add(String.class);
-        tmpImmutableWrapperTypes.add(BigDecimal.class);
-        tmpImmutableWrapperTypes.add(Byte.TYPE);
-        tmpImmutableWrapperTypes.add(Short.TYPE);
-        tmpImmutableWrapperTypes.add(Integer.TYPE);
-        tmpImmutableWrapperTypes.add(Long.TYPE);
-        tmpImmutableWrapperTypes.add(Boolean.TYPE);
-        tmpImmutableWrapperTypes.add(Character.TYPE);
-        tmpImmutableWrapperTypes.add(Float.TYPE);
-        tmpImmutableWrapperTypes.add(Double.TYPE);
-        IMMUTABLE_WRAPPER_TYPES = Collections.unmodifiableSet(tmpImmutableWrapperTypes);
+        Set<Class<?>> tmpImmutableJdk8Types = new HashSet<Class<?>>();
+        // TemporalAccessor
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.Instant");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.LocalDate");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.LocalDateTime");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.LocalTime");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.MonthDay");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.OffsetDateTime");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.OffsetTime");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.Year");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.YearMonth");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.ZoneOffset");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.ZonedDateTime");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.chrono.HijrahDate");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.chrono.JapaneseDate");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.chrono.JapaneseEra");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.chrono.MinguoDate");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.chrono.ThaiBuddhistDate");
+        // TemporalAmount
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.Duration");
+        addClassIfExists(tmpImmutableJdk8Types, "java.time.Period");
+        
+        Set<Class<?>> tmpImmutableTypes = new HashSet<Class<?>>();
+        tmpImmutableTypes.addAll(PRIMITIVE_WRAPPER_TYPES);
+        tmpImmutableTypes.addAll(tmpImmutableJdk8Types);
+        tmpImmutableTypes.add(String.class);
+        tmpImmutableTypes.add(BigDecimal.class);
+        tmpImmutableTypes.add(Byte.TYPE);
+        tmpImmutableTypes.add(Short.TYPE);
+        tmpImmutableTypes.add(Integer.TYPE);
+        tmpImmutableTypes.add(Long.TYPE);
+        tmpImmutableTypes.add(Boolean.TYPE);
+        tmpImmutableTypes.add(Character.TYPE);
+        tmpImmutableTypes.add(Float.TYPE);
+        tmpImmutableTypes.add(Double.TYPE);
+        IMMUTABLE_TYPES = Collections.unmodifiableSet(tmpImmutableTypes);
     }
 
     /**
@@ -102,6 +127,14 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         this.typesByVariable = typesByVariable;
         this.isParameterized = rawType.getTypeParameters().length > 0;
         this.uniqueIndex = nextUniqueIndex.getAndIncrement();
+    }
+    
+    private static void addClassIfExists(Set<Class<?>> classesContainer, String className) {
+        try {
+            classesContainer.add(Class.forName(className));
+        } catch (ClassNotFoundException exc) {
+            LOG.debug("Class '{}' not found and will be ignored. {}", className, exc.getMessage());
+        }
     }
     
     /**
@@ -361,7 +394,7 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
     }
 
     public boolean isImmutable() {
-        return isPrimitive() || IMMUTABLE_WRAPPER_TYPES.contains(getRawType()) || isEnum();
+        return isPrimitive() || IMMUTABLE_TYPES.contains(getRawType()) || isEnum();
     }
 
     public boolean isConcrete() {
