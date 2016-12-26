@@ -417,58 +417,57 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
      */
     private boolean iterates(NodeList nodes, StringBuilder out, StringBuilder endWhiles) {
 
-        if (!nodes.isEmpty()) {
-            for (Node srcRef : nodes) {
-                if (!srcRef.isLeaf()) {
-                    out.append(srcRef.multiOccurrenceVar.ifNotNull()).append(" {\n");
-                    endWhiles.append("\n}");
-                    out.append(statement(srcRef.multiOccurrenceVar.declareIterator()));
-                }
-            }
-
-            StringBuilder loopSource = new StringBuilder();
-            /*
-             * Create while loop for the top level multi-occurrence objects
-             */
-            loopSource.append("while (");
-            Iterator<Node> sourcesIter = nodes.iterator();
-            boolean atLeastOneIter = false;
-            while (sourcesIter.hasNext()) {
-                Node ref = sourcesIter.next();
-                if (!ref.isLeaf()) {
-                    if (atLeastOneIter) {
-                        loopSource.append(" && ");
-                    }
-                    loopSource.append(ref.multiOccurrenceVar.iteratorHasNext());
-                    atLeastOneIter = true;
-                }
-            }
-            loopSource.append(") {");
-
-            if (atLeastOneIter) {
-                out.append("\n");
-                out.append(loopSource.toString());
-            }
-            for (Node node : nodes) {
-
-                if (!node.isLeaf()) {
-
-                    if (node.elementRef.isDeclared()) {
-                        out.append(statement(node.elementRef.assignIfPossible(node.multiOccurrenceVar.nextElementRef())));
-                    }
-                    else {
-                        out.append(statement(node.elementRef.declare(node.multiOccurrenceVar.nextElementRef())));
-                    }
-
-                    iterates(node.children, out, endWhiles);
-                }
-            }
-            if (atLeastOneIter) {
-                endWhiles.append("}\n");
-            }
-
-            return atLeastOneIter;
+        if (nodes.isEmpty()) {
+            return false;
         }
-        return false;
+
+        for (Node node : nodes) {
+            if (!node.isLeaf()) {
+                out.append(node.multiOccurrenceVar.ifNotNull())
+                    .append(" {\n")
+                    .append(statement(node.multiOccurrenceVar.declareIterator()));
+                endWhiles.append("\n}");
+            }
+        }
+
+        StringBuilder loopSource = new StringBuilder("while (");
+        boolean atLeastOneIter = false;
+        for (Node node : nodes) {
+            if (!node.isLeaf()) {
+                if (atLeastOneIter) {
+                    loopSource.append(" && ");
+                }
+                loopSource.append(node.multiOccurrenceVar.iteratorHasNext());
+                atLeastOneIter = true;
+            }
+
+        }
+        loopSource.append(") {");
+
+        if (atLeastOneIter) {
+            out.append("\n");
+            out.append(loopSource.toString());
+        }
+
+        for (Node node : nodes) {
+
+            if (!node.isLeaf()) {
+                VariableRef nextElementRef = node.multiOccurrenceVar.nextElementRef();
+                if (node.elementRef.isDeclared()) {
+                    out.append(statement(node.elementRef.assignIfPossible(nextElementRef)));
+                }
+                else {
+                    out.append(statement(node.elementRef.declare(nextElementRef)));
+                }
+
+                iterates(node.children, out, endWhiles);
+            }
+        }
+
+        if (atLeastOneIter) {
+            endWhiles.append("}\n");
+        }
+
+        return atLeastOneIter;
     }
 }
