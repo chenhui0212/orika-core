@@ -29,6 +29,10 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Test;
 
 /**
+ * SimpleConstructorResolverStrategy ignores generic parameter types
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/64">https://code.google.com/archive/p/orika/</a>
  * @author matt.deboer@gmail.com
  *
  */

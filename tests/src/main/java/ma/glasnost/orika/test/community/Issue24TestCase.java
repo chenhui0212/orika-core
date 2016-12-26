@@ -19,7 +19,6 @@
 package ma.glasnost.orika.test.community;
 
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
@@ -28,10 +27,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Issue 24:    
- *      lookupConcreteDestinationType should return the most specific type, 
- *      not the first that is assignable
+ * lookupConcreteDestinationType should return the most specific type, not the first that is assignable.
+ * <p>
  * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/24">https://code.google.com/archive/p/orika/</a>
  * @author mattdeboer
  *
  */

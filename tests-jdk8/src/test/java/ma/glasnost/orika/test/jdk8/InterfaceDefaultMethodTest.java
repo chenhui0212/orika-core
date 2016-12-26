@@ -16,26 +16,23 @@ public class InterfaceDefaultMethodTest {
         
         mapperFactory.classMap(A.class, B.class).byDefault().register();
         
-        A a = new A();
-        B b = new B();
-        
-        mapperFactory.getMapperFacade().map(a, b);
+        B b = mapperFactory.getMapperFacade().map(new A(), B.class);
         assertThat(b, notNullValue());
         assertThat(b.getId(), is("test"));
     }
     
-    public interface BaseA {
+    public static interface BaseA {
         
         default String getId() {
             return "test";
         }
     }
     
-    public class A implements BaseA {
+    public static class A implements BaseA {
         // inherited default methods from Interface
     }
     
-    public class B {
+    public static class B {
         String id;
         
         public String getId() {

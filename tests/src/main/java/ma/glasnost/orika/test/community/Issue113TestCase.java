@@ -29,6 +29,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * Cannot find a mapper when a child bean infers a generic type of its parent bean.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/113">https://code.google.com/archive/p/orika/</a>
  * @author Arnaud Jasselette
  * 
  */

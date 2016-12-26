@@ -28,6 +28,12 @@ import ma.glasnost.orika.test.MappingUtil;
 
 import org.junit.Test;
 
+/**
+ * Class-cast exception for mapped objects.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/46">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue46TestCase {
     public static class One {
         public List<Two> getTwos() {

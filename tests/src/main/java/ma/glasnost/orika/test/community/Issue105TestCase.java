@@ -7,6 +7,13 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 
+/**
+ * Circular reference mapping with classes that extend an abstract class fail.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/143">https://code.google.com/archive/p/orika/</a>
+ * @see <a href="https://github.com/orika-mapper/orika/issues/105">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue105TestCase {
     @Test
     public void test() {

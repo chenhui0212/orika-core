@@ -33,6 +33,10 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Test;
 
 /**
+ * Orika fails to map classes with lists which do not return internal references.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/69">https://code.google.com/archive/p/orika/</a>
  * @author matt.deboer@gmail.com
  *
  */

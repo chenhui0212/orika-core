@@ -28,6 +28,12 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Mapping for multi-occurrence elements doesn't trigger auto-generated mappings.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/109">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue109TestCase {
  
     public static class Element {

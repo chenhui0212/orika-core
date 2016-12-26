@@ -28,7 +28,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * resolveSourceType does not distinguish by destinationType.
+ * <p>
  * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/45">https://code.google.com/archive/p/orika/</a>
  */
 public class Issue45TestCase {
     

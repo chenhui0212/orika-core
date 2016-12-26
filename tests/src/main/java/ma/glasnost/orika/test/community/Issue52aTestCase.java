@@ -24,6 +24,10 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.junit.Test;
 
 /**
+ * StackOverflowError when using inheritance mapping.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/52">https://code.google.com/archive/p/orika/</a>
  * @author matt.deboer@gmail.com
  *
  */

@@ -14,6 +14,12 @@ import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Invalid code generated when embedded field name not a valid java variable name.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/77">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue77Test {
 
     @Test

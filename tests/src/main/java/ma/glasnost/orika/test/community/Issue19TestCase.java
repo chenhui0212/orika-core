@@ -23,6 +23,13 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Test;
 
+/**
+ * Copying objects works only first time.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/19">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue19TestCase {
 	
 	@Test

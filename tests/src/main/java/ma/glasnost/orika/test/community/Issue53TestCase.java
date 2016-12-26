@@ -20,11 +20,17 @@ package ma.glasnost.orika.test.community;
 import static org.junit.Assert.assertEquals;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
 import org.junit.Test;
 
+/**
+ * Dynamic mapping always uses existing parent mapper even if it doesn't map all fields.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/53">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue53TestCase {
     
     @Test

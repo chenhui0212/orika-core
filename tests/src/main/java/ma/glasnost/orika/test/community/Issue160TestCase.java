@@ -11,6 +11,12 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 
+/**
+ * MapperFacade.map does not map into destination instance when context has already mapped the source Object.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/160">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue160TestCase {
 
 	@Test

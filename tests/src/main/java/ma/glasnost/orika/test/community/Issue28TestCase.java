@@ -30,6 +30,13 @@ import ma.glasnost.orika.test.community.issue28.OrderData;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * StackoverflowException on recursively-defined generic type.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/28">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue28TestCase {
     @Test
     public void testMapping() {

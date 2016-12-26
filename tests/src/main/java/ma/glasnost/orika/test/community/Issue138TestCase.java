@@ -1,7 +1,6 @@
 package ma.glasnost.orika.test.community;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
@@ -11,6 +10,12 @@ import ma.glasnost.orika.test.MappingUtil;
 
 import org.junit.Test;
 
+/**
+ * Mapping of Lists are not functioning correctly with fieldAToB.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/138">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue138TestCase {
 
     @Test

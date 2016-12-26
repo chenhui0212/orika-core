@@ -26,6 +26,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Nested properties: Allow abstract nested property's fields mapping.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/87">https://code.google.com/archive/p/orika/</a>
+ * 
+ */
 public class Issue87TestCase {
 
     private MapperFactory mapperFactory;

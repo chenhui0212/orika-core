@@ -16,6 +16,12 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
+/**
+ * StackOverflowError exception when mapping enum.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/166">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue166TestCase {
 
     @Test
@@ -25,7 +31,7 @@ public class Issue166TestCase {
         MapperFacade beanMapper = factory.getMapperFacade();
         
         SimpleBeanResource sbr = beanMapper.map(SimpleEnumBean.E1, SimpleBeanResource.class);
-        Assert.assertTrue(sbr.getName().equals(SimpleEnumBean.E1.getName()));
+        Assert.assertEquals(sbr.getName(), SimpleEnumBean.E1.getName());
     }
     
     @Test

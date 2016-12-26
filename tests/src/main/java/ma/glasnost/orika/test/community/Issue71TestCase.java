@@ -27,7 +27,10 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.junit.Test;
 
 /**
- * @author 
+ * Orika maps enum to enum, but not List&lt;enum&gt; to List&lt;enum&gt;.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/71">https://code.google.com/archive/p/orika/</a>
  *
  */
 public class Issue71TestCase {

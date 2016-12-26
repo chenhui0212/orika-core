@@ -17,6 +17,9 @@
  */
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +36,13 @@ import ma.glasnost.orika.test.MappingUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Mapping for Collection&lt;String&gt; --&gt; String[] is not working.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/17">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue17TestCase {
     
     public static class A {
@@ -97,8 +107,7 @@ public class Issue17TestCase {
         Assert.assertNotNull(converted);
         Assert.assertNotNull(converted.getList());
         List<String> convertedList = Arrays.asList(converted.getList());
-        Assert.assertTrue(convertedList.containsAll(a.getList()));
-        Assert.assertTrue(a.getList().containsAll(convertedList));
+        assertThat(convertedList, contains("One", "Two", "Three"));
     }
     
     @Test

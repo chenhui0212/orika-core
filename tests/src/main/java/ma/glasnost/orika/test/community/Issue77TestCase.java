@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -29,6 +31,13 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Test;
 
+/**
+ * A sub type is not being mapped to the configured mapping type.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/77">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue77TestCase {
     
     public static class A1 {
@@ -106,8 +115,8 @@ public class Issue77TestCase {
         final Container2 c2 = mapper.map(c1, Container2.class);
 
         // check
-        assertTrue(c1.singleElement instanceof B1);
-        assertTrue(c2.singleElement instanceof B2);
-        assertTrue(c2.elements.get(0) instanceof B2);
+        assertThat(c1.singleElement, is(instanceOf(B1.class)));
+        assertThat(c2.singleElement, is(instanceOf(B2.class)));
+        assertThat(c2.elements.get(0), is(instanceOf(B2.class)));
     }  
 }

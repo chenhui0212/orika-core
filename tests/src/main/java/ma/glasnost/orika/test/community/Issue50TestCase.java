@@ -25,6 +25,10 @@ import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 import org.junit.Test;
 
 /**
+ * Exclusions are ignored when combined with used mappers.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/50">https://code.google.com/archive/p/orika/</a>
  * @author matt.deboer@gmail.com
  * 
  */

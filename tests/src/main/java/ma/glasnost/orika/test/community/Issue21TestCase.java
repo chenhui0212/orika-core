@@ -47,10 +47,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-
 /**
+ * NPE when collection is changed.
  * <p>
- * </p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/21">https://code.google.com/archive/p/orika/</a>
  * 
  * @author Dmitriy Khomyakov
  * @author matt.deboer@gmail.com
@@ -72,7 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @DirtiesContext
 public class Issue21TestCase {
-
+    
 	@Autowired
 	private SessionFactory sessionFactory;
 	private Serializable user1Id;

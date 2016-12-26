@@ -21,7 +21,6 @@ package ma.glasnost.orika.test.community;
 import org.junit.Assert;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.test.ConcurrentRule.Concurrent;
 import ma.glasnost.orika.test.community.issue41.MyEnum;
 import ma.glasnost.orika.test.community.issue41.MyEnumConverter;
@@ -30,6 +29,12 @@ import ma.glasnost.orika.test.community.issue41.MyTargetObject;
 
 import org.junit.Test;
 
+/**
+ * StackOverflowError for nested Enum.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/41">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue41TestCase {
     
     @Test

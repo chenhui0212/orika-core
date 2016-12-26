@@ -17,6 +17,10 @@
  */
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +33,13 @@ import ma.glasnost.orika.impl.ConfigurableMapper;
 import org.junit.Test;
 
 
+/**
+ * How to handle infinit recursion for entities with bidirectional many-to-many relations.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/68">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue68TestCase {
 
 	@Test
@@ -56,11 +67,14 @@ public class Issue68TestCase {
 
 		invoiceitemVO.getProjectItems().add(projectItemVO);
 
-		InvoiceItemProxy invoiceItemProxy = BeanFactory
-				.createInvoiceItemProxy();
+        InvoiceItemProxy invoiceItemProxy = BeanFactory.createInvoiceItemProxy();
 		mapper.map(invoiceitemVO, invoiceItemProxy);
 
+        ProjectProxy projectProxy = BeanFactory.createProjectProxy();
+        mapper.map(projectVO, projectProxy);
 
+        assertThat(projectVO.getName(), is(projectProxy.getName()));
+        assertThat(projectVO.getProjectItems(), hasSize(projectProxy.getProjectItems().size()));
 	}
 
 	public static class BeanFactory {

@@ -8,6 +8,12 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 import org.junit.Test;
 
+/**
+ * Usage of .constructorA/B results in NullPointerException.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/132">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue132TestCase {
 
     @Test(expected=MappingException.class)

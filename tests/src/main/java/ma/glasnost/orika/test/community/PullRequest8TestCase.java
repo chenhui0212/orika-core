@@ -24,9 +24,18 @@ import ma.glasnost.orika.impl.DefaultConstructorObjectFactory;
 import ma.glasnost.orika.metadata.TypeFactory;
 import ma.glasnost.orika.test.MappingUtil;
 
-import org.junit.Assert;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Test;
 
+/**
+ * lookupObjectFactory should consider superclasses for source type.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/pull/8">https://github.com/orika-mapper/orika</a>
+ */
 public class PullRequest8TestCase {
 	public static class MySourceType {
 	}
@@ -52,6 +61,6 @@ public class PullRequest8TestCase {
 		ObjectFactory<MyType> myFactory = factory.lookupObjectFactory(
 				TypeFactory.valueOf(MyType.class),
 				TypeFactory.valueOf(MySourceType.class));
-		Assert.assertTrue(myFactory instanceof MyObjectFactory);
+        assertThat(myFactory, is(instanceOf(MyObjectFactory.class)));
 	}
 }

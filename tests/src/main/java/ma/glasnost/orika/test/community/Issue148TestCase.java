@@ -30,6 +30,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
+ * Orika fails to map converter result to string (double cast).
+ * <p>
+ * I am trying to map an object to a string via a custom converter, with the converter returning null (e.g. because the source object is
+ * null)
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/148">https://code.google.com/archive/p/orika/</a>
  * @author dbb
  * @since 07.03.14
  */

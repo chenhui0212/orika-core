@@ -30,6 +30,13 @@ import ma.glasnost.orika.impl.ConfigurableMapper;
 
 import org.junit.Test;
 
+/**
+ * ClassCastException when mapping list of subtypes.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/98">https://code.google.com/archive/p/orika/</a>
+ * 
+ */
 public class Issue98TestCase {
     
     @Test

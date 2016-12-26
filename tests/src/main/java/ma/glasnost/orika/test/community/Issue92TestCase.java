@@ -33,6 +33,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * NPE when mapping a class implementing a map.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/92">https://code.google.com/archive/p/orika/</a>
+ * 
+ */
 public class Issue92TestCase {
 
         private MapperFactory factory;

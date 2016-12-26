@@ -18,6 +18,8 @@
 
 package ma.glasnost.orika.test.community;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +29,13 @@ import ma.glasnost.orika.metadata.TypeFactory;
 
 import org.junit.Test;
 
-public class PullRequest9TestCase {
+/**
+ * Correctly implement compareTo contract for Type.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/pull/10">https://github.com/orika-mapper/orika</a>
+ */
+public class PullRequest10TestCase {
 	public static class Base {
 	}
 
@@ -62,25 +70,26 @@ public class PullRequest9TestCase {
 		
 		for (Type<?> x : types) {
 			for (Type<?> y : types) {
-				assertTrue("sgn(x.compareTo(y)) == -sgn(y.compareTo(x)) for x="
-						+ x.getSimpleName() + ", y=" + y.getSimpleName(),
-						sgn(x.compareTo(y)) == -sgn(y.compareTo(x)));
+                assertThat("sgn(x.compareTo(y)) == -sgn(y.compareTo(x)) for x="
+                        + x.getSimpleName() + ", y=" + y.getSimpleName(),
+                        sgn(x.compareTo(y)), is(-sgn(y.compareTo(x))));
 				
 				for (Type<?> z : types) {
 					if (x.compareTo(y) > 0 && y.compareTo(z) > 0) {
-						assertTrue(
+                        assertThat(
 								"(x.compareTo(y)>0 && y.compareTo(z)>0) implies x.compareTo(z)>0 for x="
 										+ x.getSimpleName() + ", y="
 										+ y.getSimpleName() + ", z="
-										+ z.getSimpleName(), x.compareTo(z) > 0);
+                                        + z.getSimpleName(),
+                                x.compareTo(z), is(greaterThan(0)));
 					}
 					if (x.compareTo(y) == 0) {
-						assertTrue(
+                        assertThat(
 								"x.compareTo(y)==0 implies sgn(x.compareTo(z)) == sgn(y.compareTo(z)) for x="
 										+ x.getSimpleName() + ", y="
 										+ y.getSimpleName() + ", z="
 										+ z.getSimpleName(),
-								sgn(x.compareTo(z)) == sgn(y.compareTo(z)));
+                                sgn(x.compareTo(z)), is(sgn(y.compareTo(z))));
 					}
 				}
 			}

@@ -13,6 +13,12 @@ import ma.glasnost.orika.test.MappingUtil;
 
 import org.junit.Test;
 
+/**
+ * Mapping to Map&lt;String, List&lt;String&gt;&gt; only maps keys. Map&lt;String, ArrayList&lt;String&gt;&gt; works..
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/128">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue128TestCase {
     
     public static class A {

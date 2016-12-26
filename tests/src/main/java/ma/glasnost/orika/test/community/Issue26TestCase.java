@@ -29,6 +29,13 @@ import ma.glasnost.orika.test.community.issue26.OrderIDConverter;
 
 import org.junit.Test;
 
+/**
+ * Generic super-type not recognized.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/26">https://code.google.com/archive/p/orika/</a>
+ *
+ */
 public class Issue26TestCase {
 
 	@Test

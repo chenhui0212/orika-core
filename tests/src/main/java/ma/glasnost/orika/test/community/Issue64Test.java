@@ -13,6 +13,12 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+/**
+ * Orika does not create intermediate property when mapping lists.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/64">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue64Test {
 
     private final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();

@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
-import ma.glasnost.orika.impl.generator.VariableRef;
 import ma.glasnost.orika.metadata.CaseInsensitiveClassMapBuilder;
-import ma.glasnost.orika.metadata.NestedProperty;
-import ma.glasnost.orika.metadata.Property;
-import ma.glasnost.orika.property.IntrospectorPropertyResolver;
-import ma.glasnost.orika.property.PropertyResolver;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+/**
+ * Compilation Error when referencing collection on class property.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/141">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue141TestCase {
 
 	public static class Clazz {

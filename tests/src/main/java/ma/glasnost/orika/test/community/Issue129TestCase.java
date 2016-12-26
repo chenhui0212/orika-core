@@ -5,6 +5,12 @@ import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.metadata.Type;
 import org.junit.Test;
 
+/**
+ * problem generic types when subclassing.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/129">https://github.com/orika-mapper/orika/issues</a>
+ */
 public class Issue129TestCase {
     
     @Test

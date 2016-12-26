@@ -36,6 +36,12 @@ import ma.glasnost.orika.metadata.Type;
 
 import org.junit.Test;
 
+/**
+ * Allow converters for Lists (or other collections).
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/44">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue44TestCase {
     
     @Test

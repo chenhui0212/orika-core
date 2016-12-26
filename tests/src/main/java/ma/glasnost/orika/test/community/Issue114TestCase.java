@@ -7,6 +7,12 @@ import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 
 import org.junit.Test;
 
+/**
+ * NPE on mapNulls in 1.4.3.
+ * <p>
+ * 
+ * @see <a href="https://code.google.com/archive/p/orika/issues/114">https://code.google.com/archive/p/orika/</a>
+ */
 public class Issue114TestCase {
     
     
