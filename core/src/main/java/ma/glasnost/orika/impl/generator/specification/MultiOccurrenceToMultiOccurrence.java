@@ -180,7 +180,10 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
 
         StringBuilder endWhiles = new StringBuilder();
 
-        iterateSources(sourceNodes, destNodes, out, endWhiles);
+        boolean iteratedSource = iterates(sourceNodes, out, endWhiles);
+        if (!iteratedSource) {
+           iterates(destNodes, out, endWhiles);
+       }
 
         LinkedList<Node> stack = new LinkedList<Node>(destNodes);
         while (!stack.isEmpty()) {
@@ -408,15 +411,14 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
     /**
      * Creates the looping constructs for nested source variables
      *
-     * @param sourceNodes
-     * @param destNodes
+     * @param nodes
      * @param out
      * @param endWhiles
      */
-    private void iterateSources(NodeList sourceNodes, NodeList destNodes, StringBuilder out, StringBuilder endWhiles) {
+    private boolean iterates(NodeList nodes, StringBuilder out, StringBuilder endWhiles) {
 
-        if (!sourceNodes.isEmpty()) {
-            for (Node srcRef : sourceNodes) {
+        if (!nodes.isEmpty()) {
+            for (Node srcRef : nodes) {
                 if (!srcRef.isLeaf()) {
                     out.append(srcRef.multiOccurrenceVar.ifNotNull()).append(" {\n");
                     endWhiles.append("\n}");
@@ -429,7 +431,7 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
              * Create while loop for the top level multi-occurrence objects
              */
             loopSource.append("while (");
-            Iterator<Node> sourcesIter = sourceNodes.iterator();
+            Iterator<Node> sourcesIter = nodes.iterator();
             boolean atLeastOneIter = false;
             while (sourcesIter.hasNext()) {
                 Node ref = sourcesIter.next();
@@ -447,16 +449,26 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
                 out.append("\n");
                 out.append(loopSource.toString());
             }
-            for (Node srcRef : sourceNodes) {
+            for (Node node : nodes) {
 
-                if (!srcRef.isLeaf()) {
-                    out.append(statement(srcRef.elementRef.declare(srcRef.multiOccurrenceVar.nextElementRef())));
-                    iterateSources(srcRef.children, destNodes, out, endWhiles);
+                if (!node.isLeaf()) {
+
+                    if (node.elementRef.isDeclared()) {
+                        out.append(statement(node.elementRef.assignIfPossible(node.multiOccurrenceVar.nextElementRef())));
+                    }
+                    else {
+                        out.append(statement(node.elementRef.declare(node.multiOccurrenceVar.nextElementRef())));
+                    }
+
+                    iterates(node.children, out, endWhiles);
                 }
             }
             if (atLeastOneIter) {
                 endWhiles.append("}\n");
             }
+
+            return atLeastOneIter;
         }
+        return false;
     }
 }
