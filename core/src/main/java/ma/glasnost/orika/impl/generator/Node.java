@@ -18,13 +18,6 @@
 
 package ma.glasnost.orika.impl.generator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import ma.glasnost.orika.MapEntry;
 import ma.glasnost.orika.impl.util.StringUtil;
 import ma.glasnost.orika.metadata.FieldMap;
@@ -32,21 +25,23 @@ import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
+import java.util.*;
+
 public class Node {
-    
-    public Property property;
+
+    public final Node parent;
+    private final boolean isSource;
+    public final Property property;
+    public final FieldMap value;
+    public final NodeList children;
+
     public MultiOccurrenceVariableRef multiOccurrenceVar;
     public MultiOccurrenceVariableRef newDestination;
     public VariableRef elementRef;
     public VariableRef nullCheckFlag;
     public VariableRef shouldAddToCollectorFlag;
-    public FieldMap value;
-    public NodeList children;
-    public Node parent;
-    public Set<Node> mapped = new HashSet<Node>();
     public boolean addedToCollector;
-    private boolean isSource;
-    
+
     private Node(Property property, FieldMap fieldMap, Node parent, NodeList nodes, boolean isSource, int uniqueIndex) {
         
         this.isSource = isSource;
@@ -139,11 +134,6 @@ public class Node {
         return parent == null;
     }
 
-    /**
-     * @param type
-     * @param isSource
-     * @return
-     */
     public FieldMap getMap() {
         TreeMap<Integer, FieldMap> nodes = new TreeMap<Integer, FieldMap>();
 
@@ -168,10 +158,6 @@ public class Node {
         } else {
             return null;
         }
-    }
-
-    public void mapped(Node node) {
-        mapped.add(node);
     }
 
     public String toString() {
