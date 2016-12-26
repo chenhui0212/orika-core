@@ -58,39 +58,17 @@ public class Node {
         
         
         if (property.isMultiOccurrence()) {
-            Type<?> elementType = null;
-            if (property.isMap()) {
-                if (isSource) {
-                    @SuppressWarnings("unchecked")
-                    Type<?> entryType = MapEntry.entryType((Type<Map<Object,Object>>) property.getType());
-                    elementType = entryType;
-                } else {
-                    @SuppressWarnings("unchecked")
-                    Type<?> entryType = MapEntry.concreteEntryType((Type<Map<Object,Object>>) property.getType());
-                    elementType = entryType;
-                }
-            } else if (property.isCollection()) {
-                elementType = property.getElementType();
-            } else if (property.isArray()) {
-                elementType = property.getType().getComponentType();
-            } 
-            
+
             /*
              * Use a List for storing elements intended for an Array; this allows flexibility in case we
              * can't (or it's too difficult to) determine the total size up front.
-             * 
+             *
              * Also, use a List (of Map.Entry) for elements intended for a Map; since we need to add the
              * Entry as soon as it's created (while it has null key and value), we can't put() it into
              * it's destination map until the other properties have been given values.
              */
-            Type<?> destinationType;
-            if (property.getType().isArray()) {
-                destinationType = TypeFactory.valueOf(ArrayList.class, primitiveSafeListType(property.getType().getComponentType()));
-            } else if (property.getType().isMap()) {
-                destinationType = TypeFactory.valueOf(ArrayList.class, elementType);
-            } else {
-                destinationType = property.getType();
-            }
+            Type<?> elementType = buildElementType(property, isSource);
+            Type<?> destinationType = buildDestinationType(property, elementType);
             
             this.newDestination = new MultiOccurrenceVariableRef(destinationType, "new_" + name + propertySuffix + uniqueIndex);  
             String multiOccurrenceName;
@@ -108,7 +86,7 @@ public class Node {
                     property.getName() + "_" + name+ uniqueIndex + "ElementShouldBeAddedToCollector");
         } 
         
-        if (nodes !=null) {
+        if (nodes != null) {
             nodes.add(this);
             this.children = new NodeList(nodes);
         } else if (parent != null) {
@@ -118,7 +96,7 @@ public class Node {
             this.children = new NodeList();
         }
     }
-    
+
     private Type<?> primitiveSafeListType(Type<?> type) {
         if (type.isPrimitive()) {
             return type.getWrapperType();
@@ -126,19 +104,19 @@ public class Node {
             return type;
         }
     }
-    
+
     private Node(Property property, Node parent, boolean isSource, int uniqueIndex) {
         this(property, null, parent, null, isSource, uniqueIndex);
     }
-    
+
     private Node(Property property, FieldMap fieldMap, Node parent, boolean isSource, int uniqueIndex) {
         this(property, fieldMap, parent, null, isSource, uniqueIndex);
     }
-    
+
     private Node(Property property, FieldMap fieldMap, NodeList nodes, boolean isSource, int uniqueIndex) {
         this(property, fieldMap, null, nodes, isSource, uniqueIndex);
     }
-    
+
     private String name(String value1, String defaultValue) {
         if (value1 != null && !"".equals(value1)) {
             return value1;
@@ -146,21 +124,21 @@ public class Node {
             return defaultValue;
         }
     }
-    
+
     /**
      * @return true if this Node has no children
      */
     public boolean isLeaf() {
         return children.isEmpty();
     }
-    
+
     /**
      * @return true if this Node has no parent
      */
     public boolean isRoot() {
         return parent == null;
     }
-    
+
     /**
      * @param type
      * @param isSource
@@ -168,10 +146,10 @@ public class Node {
      */
     public FieldMap getMap() {
         TreeMap<Integer, FieldMap> nodes = new TreeMap<Integer, FieldMap>();
-        
+
         for (Node child: children) {
             if (child.value != null) {
-                
+
                 int depth = 0;
                 FieldMap value = child.value;
                 Property prop = isSource ? value.getSource() : value.getDestination();
@@ -179,7 +157,7 @@ public class Node {
                     ++depth;
                     prop = prop.getContainer();
                 }
-                
+
                 if (!nodes.containsKey(Integer.valueOf(depth))) {
                     nodes.put(Integer.valueOf(depth), value);
                 }
@@ -191,25 +169,21 @@ public class Node {
             return null;
         }
     }
-    
-    public boolean isMapped(Node node) {
-        return mapped.contains(node);
-    }
-    
+
     public void mapped(Node node) {
         mapped.add(node);
     }
-    
+
     public String toString() {
         return toString("");
     }
-    
+
     private String toString(String indent) {
         StringBuilder out = new StringBuilder();
         out.append(indent + this.property.toString());
         if (!this.children.isEmpty()) {
             out.append(" {");
-            
+
             for (Node child: children) {
                 out.append("\n" + child.toString("  " + indent));
             }
@@ -217,7 +191,7 @@ public class Node {
         }
         return out.toString();
     }
-    
+
     public static Node findFieldMap(final FieldMap map, final NodeList nodes, boolean useSource) {
         LinkedList<Property> path = new LinkedList<Property>();
         Property root = useSource ? map.getSource() : map.getDestination();
@@ -228,7 +202,7 @@ public class Node {
         }
         Node currentNode = null;
         NodeList children = nodes;
-        
+
         for(int p = 0, len=path.size(); p < len; ++p) {
             Property pathElement = path.get(p);
             currentNode = null;
@@ -243,7 +217,7 @@ public class Node {
                 return null;
             }
         }
-        
+
         for (Node node: children) {
             if (map.equals(node.value)) {
                 return node;
@@ -251,12 +225,12 @@ public class Node {
         }
         return null;
     }
-    
+
     public static Node addFieldMap(final FieldMap map, final NodeList nodes, boolean useSource) {
         LinkedList<Property> path = new LinkedList<Property>();
         Property root = useSource ? map.getSource() : map.getDestination();
         Property container = root;
-        
+
         while (container.getContainer() != null) {
             path.addFirst(container.getContainer());
             container = container.getContainer();
@@ -268,10 +242,10 @@ public class Node {
         Node currentNode = null;
         Node parentNode = null;
         NodeList children = nodes;
-        
+
         for(int p = 0, len=path.size(); p < len; ++p) {
             Property pathElement = path.get(p);
-            
+
             for (Node node: children) {
                 if (node.property.equals(pathElement)) {
                    currentNode = node;
@@ -280,7 +254,7 @@ public class Node {
                 }
             }
             if (currentNode == null) {
-                
+
                 currentNode = new Node(pathElement, parentNode, useSource, nodes.getTotalNodeCount());
                 if (parentNode == null) {
                     children.add(currentNode);
@@ -305,10 +279,10 @@ public class Node {
             root = innermostElement(root);
             currentNode = new Node(root, map, parentNode, useSource, nodes.getTotalNodeCount());
         }
-            
+
         return currentNode;
     }
-    
+
     private static Property innermostElement(final Property p) {
         Property result = p;
         while (result.getElement() != null) {
@@ -316,22 +290,52 @@ public class Node {
         }
         return result;
     }
-    
+
+    private Type<?> buildElementType(Property property, boolean isSource) {
+        Type<?> elementType = null;
+        if (property.isMap()) {
+            if (isSource) {
+                @SuppressWarnings("unchecked")
+                Type<?> entryType = MapEntry.entryType((Type<Map<Object,Object>>) property.getType());
+                elementType = entryType;
+            } else {
+                @SuppressWarnings("unchecked")
+                Type<?> entryType = MapEntry.concreteEntryType((Type<Map<Object,Object>>) property.getType());
+                elementType = entryType;
+            }
+        } else if (property.isCollection()) {
+            elementType = property.getElementType();
+        } else if (property.isArray()) {
+            elementType = property.getType().getComponentType();
+        }
+        return elementType;
+    }
+
+    private Type<?> buildDestinationType(Property property, Type<?> elementType) {
+        if (property.getType().isArray()) {
+            return TypeFactory.valueOf(ArrayList.class, primitiveSafeListType(property.getType().getComponentType()));
+        } else if (property.getType().isMap()) {
+            return TypeFactory.valueOf(ArrayList.class, elementType);
+        } else {
+            return property.getType();
+        }
+    }
+
     public static class NodeList extends ArrayList<Node> {
-        
+
         private static final long serialVersionUID = 1L;
-        
+
         private int totalNodes = 0;
         private final NodeList parent;
-        
+
         public NodeList() {
             this.parent = null;
         }
-        
+
         private NodeList(NodeList parent) {
             this.parent = parent;
         }
-        
+
         public String toString() {
             StringBuilder out = new StringBuilder();
             out.append("{");
