@@ -65,9 +65,8 @@ public class MultiOccurrenceToMultiOccurrence implements AggregateSpecification 
 
             for (FieldMap map : associated) {
 
-                Node.addFieldMap(map, sourceNodes, true);
-                Node.addFieldMap(map, destNodes, false);
-
+                sourceNodes.addFieldMap(map, true);
+                destNodes.addFieldMap(map, false);
             }
 
             registerClassMaps(sourceNodes, destNodes);

@@ -212,71 +212,6 @@ public class Node {
         return null;
     }
 
-    public static Node addFieldMap(final FieldMap map, final NodeList nodes, boolean useSource) {
-        LinkedList<Property> path = new LinkedList<Property>();
-        Property root = useSource ? map.getSource() : map.getDestination();
-        Property container = root;
-
-        while (container.getContainer() != null) {
-            path.addFirst(container.getContainer());
-            container = container.getContainer();
-        }
-        /*
-         * Attempt to locate the path within the tree of nodes
-         * under which this fieldMap should be placed
-         */
-        Node currentNode = null;
-        Node parentNode = null;
-        NodeList children = nodes;
-
-        for(int p = 0, len=path.size(); p < len; ++p) {
-            Property pathElement = path.get(p);
-
-            for (Node node: children) {
-                if (node.property.equals(pathElement)) {
-                   currentNode = node;
-                   children = currentNode.children;
-                   break;
-                }
-            }
-            if (currentNode == null) {
-
-                currentNode = new Node(pathElement, parentNode, useSource, nodes.getTotalNodeCount());
-                if (parentNode == null) {
-                    children.add(currentNode);
-                }
-                parentNode = currentNode;
-                for (p+=1; p < len; ++p) {
-                    currentNode = new Node(path.get(p), parentNode, useSource, nodes.getTotalNodeCount());
-                    parentNode = currentNode;
-                }
-            } else {
-                parentNode = currentNode;
-                currentNode = null;
-            }
-        }
-        /*
-         * Finally add a node for the fieldMap at the end
-         */
-        if (parentNode == null) {
-            root = innermostElement(root);
-            currentNode = new Node(root, map, nodes, useSource, nodes.getTotalNodeCount());
-        } else {
-            root = innermostElement(root);
-            currentNode = new Node(root, map, parentNode, useSource, nodes.getTotalNodeCount());
-        }
-
-        return currentNode;
-    }
-
-    private static Property innermostElement(final Property p) {
-        Property result = p;
-        while (result.getElement() != null) {
-            result = result.getElement();
-        }
-        return result;
-    }
-
     private Type<?> buildElementType(Property property, boolean isSource) {
         Type<?> elementType = null;
         if (property.isMap()) {
@@ -320,6 +255,71 @@ public class Node {
 
         private NodeList(NodeList parent) {
             this.parent = parent;
+        }
+
+        public Node addFieldMap(final FieldMap map, boolean useSource) {
+            LinkedList<Property> path = new LinkedList<Property>();
+            Property root = useSource ? map.getSource() : map.getDestination();
+            Property container = root;
+
+            while (container.getContainer() != null) {
+                path.addFirst(container.getContainer());
+                container = container.getContainer();
+            }
+        /*
+         * Attempt to locate the path within the tree of nodes
+         * under which this fieldMap should be placed
+         */
+            Node currentNode = null;
+            Node parentNode = null;
+            NodeList children = this;
+
+            for(int p = 0, len=path.size(); p < len; ++p) {
+                Property pathElement = path.get(p);
+
+                for (Node node: children) {
+                    if (node.property.equals(pathElement)) {
+                        currentNode = node;
+                        children = currentNode.children;
+                        break;
+                    }
+                }
+                if (currentNode == null) {
+
+                    currentNode = new Node(pathElement, parentNode, useSource, this.getTotalNodeCount());
+                    if (parentNode == null) {
+                        children.add(currentNode);
+                    }
+                    parentNode = currentNode;
+                    for (p+=1; p < len; ++p) {
+                        currentNode = new Node(path.get(p), parentNode, useSource, this.getTotalNodeCount());
+                        parentNode = currentNode;
+                    }
+                } else {
+                    parentNode = currentNode;
+                    currentNode = null;
+                }
+            }
+        /*
+         * Finally add a node for the fieldMap at the end
+         */
+            if (parentNode == null) {
+                root = innermostElement(root);
+                currentNode = new Node(root, map, this, useSource, this.getTotalNodeCount());
+            } else {
+                root = innermostElement(root);
+                currentNode = new Node(root, map, parentNode, useSource, this.getTotalNodeCount());
+            }
+
+            return currentNode;
+        }
+
+        private Property innermostElement(final Property p) {
+            Property result = p;
+            while (result.getElement() != null) {
+                result = result.getElement();
+            }
+            return result;
         }
 
         public String toString() {
