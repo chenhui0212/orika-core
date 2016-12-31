@@ -2,6 +2,8 @@ package ma.glasnost.orika.test.community;
 
 import ma.glasnost.orika.OrikaSystemProperties;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class Issue175Test {
 
     @Test
-    public void maps_one_value_to_all_elements_in_collection() {
+    public void maps_one_value_to_all_elements_in_collection_and_back() {
         System.setProperty(OrikaSystemProperties.WRITE_SOURCE_FILES,"true");
         DefaultMapperFactory mapper = new DefaultMapperFactory.Builder().build();
 
@@ -39,6 +41,10 @@ public class Issue175Test {
         assertEquals("two", destination.getNested().get(1).getId());
         assertEquals("some data", destination.getNested().get(2).getValue());
         assertEquals("three", destination.getNested().get(2).getId());
+
+        Source newSource = mapper.getMapperFacade().map(destination, Source.class);
+
+        assertEquals(source, newSource);
     }
 
     private NestedSource aNestedSource(String id) {
@@ -67,6 +73,11 @@ public class Issue175Test {
         public List<NestedSource> getNested() {
             return nested;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            return EqualsBuilder.reflectionEquals(this, obj);
+        }
     }
 
     public static class Destination {
@@ -92,6 +103,11 @@ public class Issue175Test {
 
         public String getId() {
             return id;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return EqualsBuilder.reflectionEquals(this, obj);
         }
     }
 
