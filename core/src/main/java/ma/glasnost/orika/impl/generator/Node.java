@@ -148,8 +148,8 @@ public class Node {
                     prop = prop.getContainer();
                 }
 
-                if (!nodes.containsKey(Integer.valueOf(depth))) {
-                    nodes.put(Integer.valueOf(depth), value);
+                if (!nodes.containsKey(depth)) {
+                    nodes.put(depth, value);
                 }
             }
         }
@@ -180,8 +180,7 @@ public class Node {
 
     public static Node findFieldMap(final FieldMap map, final NodeList nodes, boolean useSource) {
         LinkedList<Property> path = new LinkedList<Property>();
-        Property root = useSource ? map.getSource() : map.getDestination();
-        Property container = root;
+        Property container = useSource ? map.getSource() : map.getDestination();
         while (container.getContainer() != null) {
             path.addFirst(container.getContainer());
             container = container.getContainer();
@@ -189,14 +188,13 @@ public class Node {
         Node currentNode = null;
         NodeList children = nodes;
 
-        for(int p = 0, len=path.size(); p < len; ++p) {
-            Property pathElement = path.get(p);
+        for (Property pathElement : path) {
             currentNode = null;
-            for (Node node: children) {
+            for (Node node : children) {
                 if (node.property.equals(pathElement)) {
-                   currentNode = node;
-                   children = currentNode.children;
-                   break;
+                    currentNode = node;
+                    children = currentNode.children;
+                    break;
                 }
             }
             if (currentNode == null) {
@@ -286,13 +284,13 @@ public class Node {
                 }
                 if (currentNode == null) {
 
-                    currentNode = new Node(pathElement, parentNode, useSource, this.getTotalNodeCount());
+                    currentNode = new Node(pathElement, parentNode, useSource, totalNodes);
                     if (parentNode == null) {
                         children.add(currentNode);
                     }
                     parentNode = currentNode;
                     for (p+=1; p < len; ++p) {
-                        currentNode = new Node(path.get(p), parentNode, useSource, this.getTotalNodeCount());
+                        currentNode = new Node(path.get(p), parentNode, useSource, totalNodes);
                         parentNode = currentNode;
                     }
                 } else {
@@ -305,10 +303,10 @@ public class Node {
          */
             if (parentNode == null) {
                 root = innermostElement(root);
-                currentNode = new Node(root, map, this, useSource, this.getTotalNodeCount());
+                currentNode = new Node(root, map, this, useSource, totalNodes);
             } else {
                 root = innermostElement(root);
-                currentNode = new Node(root, map, parentNode, useSource, this.getTotalNodeCount());
+                currentNode = new Node(root, map, parentNode, useSource, totalNodes);
             }
 
             return currentNode;
@@ -335,14 +333,7 @@ public class Node {
             }
             return out.toString();
         }
-        /**
-         * @return the total number of nodes contained by this NodeList, including
-         * all ancestors of all contained nodes.
-         */
-        public int getTotalNodeCount() {
-            return totalNodes;
-        }
-        
+
         private void incrementTotalNodes() {
             if (parent != null) {
                 parent.incrementTotalNodes();
