@@ -7,10 +7,22 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Property types are not correctly resolved from generic interfaces.
+ * <p>
+ * 
+ * @see <a href="https://github.com/orika-mapper/orika/issues/131">https://github.com/orika-mapper/orika/issues</a>
+ * 
+ */
 public class Issue131Test {
 
     private MapperFacade mapper;
@@ -90,6 +102,7 @@ public class Issue131Test {
     }
 
     private static void assertElementOfType(Collection<?> collection, Class<?> expectedType) {
+        assertThat(collection, is(not(empty())));
         for (Object e : collection) {
             Class<?> elementType = e.getClass();
             Assert.assertTrue("element '" + e + "' should be assignable to '" + expectedType + " but is of " + elementType,

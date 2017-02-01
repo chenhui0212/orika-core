@@ -190,7 +190,13 @@ abstract class TypeUtil {
             
             for (int i = 0; i < actualTypeArguments.length; i++) {
                 java.lang.reflect.Type t = actualTypeArguments[i];
-                resultTypeArguments[i] = TypeFactory.limitedValueOf(t, recursiveBounds);
+                if (t instanceof TypeVariable) {
+                    recursiveBounds.add(rawType);
+                    resultTypeArguments[i] = TypeFactory.limitedValueOf(t, recursiveBounds);
+                    recursiveBounds.remove(rawType);
+                } else {
+                    resultTypeArguments[i] = TypeFactory.limitedValueOf(t, recursiveBounds);
+                }
             }
         }
         return resultTypeArguments;

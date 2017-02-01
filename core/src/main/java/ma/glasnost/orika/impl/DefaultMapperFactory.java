@@ -38,6 +38,7 @@ import ma.glasnost.orika.unenhance.BaseUnenhancer;
 import ma.glasnost.orika.unenhance.UnenhanceStrategy;
 import ma.glasnost.orika.util.Ordering;
 import ma.glasnost.orika.util.SortedCollection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +86,8 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     protected final CompilerStrategy compilerStrategy;
     protected final PropertyResolverStrategy propertyResolverStrategy;
     protected final Map<java.lang.reflect.Type, Type<?>> concreteTypeRegistry;
+    /** @see MapperFactoryBuilder#alwaysCreateMultipleMapperWrapper */
+    protected boolean alwaysCreateMultipleMapperWrapper;
     protected final ClassMapBuilderFactory classMapBuilderFactory;
     protected ClassMapBuilderFactory chainClassMapBuilderFactory;
     protected final Map<MapperKey, Set<ClassMap<Object, Object>>> usedMapperMetadataRegistry;
@@ -121,6 +124,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         this.exceptionUtil = new ExceptionUtility(this, builder.dumpStateOnException);
         this.mapperFacade = buildMapperFacade(contextFactory, unenhanceStrategy);
         this.concreteTypeRegistry = new ConcurrentHashMap<java.lang.reflect.Type, Type<?>>();
+        this.alwaysCreateMultipleMapperWrapper = builder.alwaysCreateMultipleMapperWrapper;
         
         if (builder.classMaps != null) {
             for (final ClassMap<?, ?> classMap : builder.classMaps) {
@@ -261,6 +265,16 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          * upon mapping of every field.
          */
         protected Boolean captureFieldContext;
+        /**
+         * Internal Property to always use {@link MultipleMapperWrapper} even if there are no custom ObjectFactory and only one Mapper
+         * found.
+         * <p>
+         * This makes no sense for production: Because of the (small) performance penalty the {@link MultipleMapperWrapper} should only be
+         * use when necessary.
+         * <p>
+         * But for Testing the MultipleMapperWrapper should be use in one TestSuite for all TestCase to test as much scenarios as possible.
+         */
+        protected boolean alwaysCreateMultipleMapperWrapper;
         
         /**
          * Instantiates a new MapperFactoryBuilder
@@ -279,6 +293,8 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             dumpStateOnException = valueOf(getProperty(DUMP_STATE_ON_EXCEPTION, "false"));
             favorExtension = valueOf(getProperty(FAVOR_EXTENSION, "false"));
             captureFieldContext = valueOf(getProperty(CAPTURE_FIELD_CONTEXT, "false"));
+            alwaysCreateMultipleMapperWrapper = valueOf(
+                    getProperty("ma.glasnost.orika.alwaysCreateMultipleMapperWrapper", "false"));
             codeGenerationStrategy = new DefaultCodeGenerationStrategy();
         }
         
@@ -684,9 +700,16 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     public Mapper<Object, Object> lookupMapper(MapperKey mapperKey, MappingContext context) {
         
         Mapper<?, ?> mapper = getRegisteredMapper(mapperKey.getAType(), mapperKey.getBType(), false);
+        if (internalMapperMustBeGenerated(mapper, mapperKey)) {
+            mapper = null;
+        }
         if (mapper == null && useAutoMapping) {
             synchronized (this) {
                 mapper = getRegisteredMapper(mapperKey.getAType(), mapperKey.getBType(), false);
+                boolean internalMapperMustBeGenerated = internalMapperMustBeGenerated(mapper, mapperKey);
+                if (internalMapperMustBeGenerated) {
+                    mapper = null;
+                }
                 if (mapper == null) {
                     try {
                         /*
@@ -705,9 +728,8 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                                     + " from " + mapperKey.getAType());
                         }
                         
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("No mapper registered for " + mapperKey + ": attempting to generate");
-                        }
+                        LOGGER.debug("No mapper registered for {}: attempting to generate", mapperKey);
+                        
                         ClassMapBuilder<?, ?> builder = classMap(mapperKey.getAType(), mapperKey.getBType()).byDefault();
                         for (MapperKey key : discoverUsedMappers(builder)) {
                             builder.use(key.getAType(), key.getBType());
@@ -716,7 +738,11 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                         
                         buildObjectFactories(classMap, context);
                         mapper = buildMapper(classMap, true, context);
-                        initializeUsedMappers(classMap, context);
+                        initializeUsedMappers(mapper, classMap, context);
+                        if (internalMapperMustBeGenerated || alwaysCreateMultipleMapperWrapper) {
+                            // regenerate MultipleMapperWrapper.
+                            mapper = getRegisteredMapper(mapperKey.getAType(), mapperKey.getBType(), false);
+                        }
                     } catch (MappingException e) {
                         e.setSourceType(mapperKey.getAType());
                         e.setDestinationType(mapperKey.getBType());
@@ -727,6 +753,18 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             
         }
         return (Mapper<Object, Object>) mapper;
+    }
+
+    private boolean internalMapperMustBeGenerated(Mapper<?, ?> mapper, MapperKey mapperKey) {
+        boolean internalMapperMustBeGenerated = false;
+        if (mapperKey.getBType().isConcrete() && mapper instanceof MultipleMapperWrapper) {
+            MultipleMapperWrapper mapperWrapper = (MultipleMapperWrapper) mapper;
+            Mapper<Object, Object> internalMapper = mapperWrapper.findMapperFor(mapperKey);
+            if (internalMapper == null) {
+                internalMapperMustBeGenerated = true;
+            }
+        }
+        return internalMapperMustBeGenerated;
     }
     
     /*
@@ -753,30 +791,55 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      * @param typeA
      * @param typeB
      * @param includeAutoGeneratedMappers
-     *            whether auto-generated mappers should be included in the
-     *            lookup
+     *            whether auto-generated mappers should be included in the lookup
      * 
      * @return a registered Mapper which is able to map the specified types
      */
     @SuppressWarnings("unchecked")
-    protected <A, B> Mapper<A, B> getRegisteredMapper(Type<A> typeA, Type<B> typeB, boolean includeAutoGeneratedMappers) {
+    private <A, B> Mapper<A, B> getRegisteredMapper(Type<A> typeA, Type<B> typeB, boolean includeAutoGeneratedMappers) {
+        List<Mapper<A, B>> foundMappers = new ArrayList<Mapper<A, B>>();
+        
+        boolean objFactoryBExists = customObjectFactoryForDestinationExists(typeA, typeB);
+        boolean objFactoryAExists = customObjectFactoryForDestinationExists(typeB, typeA);
         
         for (Mapper<?, ?> mapper : mappersRegistry) {
             if ((mapper.getAType().equals(typeA) && mapper.getBType().equals(typeB))
                     || (mapper.getAType().equals(typeB) && mapper.getBType().equals(typeA))) {
-                
-                return (Mapper<A, B>) mapper;
+                foundMappers.add((Mapper<A, B>) mapper);
             } else if ((mapper.getAType().isAssignableFrom(typeA) && mapper.getBType().isAssignableFrom(typeB))
-                    || (mapper.getAType().isAssignableFrom(typeB) && mapper.getBType().isAssignableFrom(typeA))) {
+                    || (mapper.getBType().isAssignableFrom(typeA) && mapper.getAType().isAssignableFrom(typeB))
+                    || (mapper.getAType().isAssignableFrom(typeA) && typeB.isAssignableFrom(mapper.getBType()) && objFactoryBExists)
+                    || (mapper.getBType().isAssignableFrom(typeA) && typeB.isAssignableFrom(mapper.getAType()) && objFactoryAExists)) {
                 if (!favorsExtension(mapper) || !canBeExtended(typeA, typeB, mapper)) {
                     if (includeAutoGeneratedMappers || !(mapper instanceof GeneratedMapperBase)) {
-                        return (Mapper<A, B>) mapper;
+                        foundMappers.add((Mapper<A, B>) mapper);
                     } else if (!((GeneratedMapperBase) mapper).isFromAutoMapping()) {
-                        return (Mapper<A, B>) mapper;
+                        foundMappers.add((Mapper<A, B>) mapper);
                     }
                 }
             }
         }
+        if ((objFactoryBExists || objFactoryAExists) && foundMappers.size() > 1) {
+            if (LOGGER.isDebugEnabled()) {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Found Multiple Mappers:\n");
+                for (Mapper<A, B> mapper : foundMappers) {
+                    msg.append("\t");
+                    msg.append(mapper.getAType());
+                    msg.append(" <-> ");
+                    msg.append(mapper.getBType());
+                    msg.append("\n");
+                }
+                LOGGER.debug(msg.toString());
+            }
+            return (Mapper<A, B>) new MultipleMapperWrapper((Type<Object>) typeA, (Type<Object>) typeB, (List) foundMappers);
+        } else if (foundMappers.size() > 0) {
+            if (alwaysCreateMultipleMapperWrapper) {
+                return (Mapper<A, B>) new MultipleMapperWrapper((Type<Object>) typeA, (Type<Object>) typeB, (List) foundMappers);
+            }
+            return foundMappers.get(0);
+        }
+        
         return null;
     }
     
@@ -832,7 +895,11 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> localCache = objectFactoryRegistry.get(destinationType);
         if (localCache == null) {
             localCache = new ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>();
-            objectFactoryRegistry.put(destinationType, localCache);
+            ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> existing = objectFactoryRegistry.putIfAbsent(
+                    destinationType, localCache);
+            if (existing != null) {
+                localCache = existing;
+            }
         }
         localCache.put(sourceType, objectFactory);
         if (isBuilding || isBuilt) {
@@ -896,34 +963,61 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
      * @return an object factory capable of generating the provided destination
      *         type, if any exists.
      */
-    @SuppressWarnings("unchecked")
     protected <T, S> ObjectFactory<T> lookupExistingObjectFactory(final Type<T> destinationType, final Type<S> sourceType,
             final MappingContext context) {
         
         if (destinationType == null || sourceType == null) {
             return null;
         }
-        ObjectFactory<T> result;
-        Type<T> targetType = destinationType;
         
-        ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> localCache = objectFactoryRegistry.get(targetType);
-        if (localCache == null) {
-            localCache = new ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>>();
-            ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> existing = objectFactoryRegistry.putIfAbsent(
-                    targetType, localCache);
-            if (existing != null) {
-                localCache = existing;
+        Set<Type<? extends Object>> objFactoryDestTypes = getKeys(objectFactoryRegistry);
+        for (Type<? extends Object> objFactoryDestType : objFactoryDestTypes) {
+            ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> objFactoryCachePerSrcType = objectFactoryRegistry
+                    .get(objFactoryDestType);
+            
+            if (destinationType.equals(objFactoryDestType)) {
+                ObjectFactory<T> result = findObjectFactory(objFactoryCachePerSrcType, sourceType, false);
+                if (result != null) {
+                    return result;
+                }
+            } else if (destinationType.isAssignableFrom(objFactoryDestType)) {
+                ObjectFactory<T> result = findObjectFactory(objFactoryCachePerSrcType, sourceType, true);
+                if (result != null) {
+                    return result;
+                }
             }
-            result = null;
-        } else {
-            Type<?> checkSourceType = sourceType;
-            do {
-                result = (ObjectFactory<T>) localCache.get(checkSourceType);
-                checkSourceType = checkSourceType.getSuperType();
-            } while (result == null && !TypeFactory.TYPE_OF_OBJECT.equals(checkSourceType));
-            if (result == null) {
-                result = (ObjectFactory<T>) localCache.get(TypeFactory.TYPE_OF_OBJECT);
+        }
+        return null;
+    }
+
+    /**
+     * {@link ConcurrentHashMap#keySet()} returns with java 8 a new Class KeySetView which doesn't exist in older JDKs which can produce
+     * compile issues.
+     * 
+     * @param concurrentHashMap
+     *            {@link ConcurrentHashMap}
+     * @return a {@link Set} of K
+     */
+    private <K, V> Set<K> getKeys(ConcurrentHashMap<K, V> concurrentHashMap) {
+        Map<K, V> map = concurrentHashMap;
+        return map.keySet();
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T, S> ObjectFactory<T> findObjectFactory(
+            ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> objFactoryCachePerSrcType,
+            final Type<S> sourceType, boolean onlyCustomObjectFactories) {
+        Type<?> checkSourceType = sourceType;
+        ObjectFactory<T> result;
+        do {
+            result = (ObjectFactory<T>) objFactoryCachePerSrcType.get(checkSourceType);
+            if (result != null && onlyCustomObjectFactories && !isCustomObjectFactory(result)) {
+                result = null;
             }
+            checkSourceType = checkSourceType.getSuperType();
+        } while (result == null && !TypeFactory.TYPE_OF_OBJECT.equals(checkSourceType));
+        if (result == null) {
+            result = (ObjectFactory<T>) objFactoryCachePerSrcType.get(TypeFactory.TYPE_OF_OBJECT);
         }
         return result;
     }
@@ -951,6 +1045,12 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             synchronized (this) {
                 if (!targetType.isConcrete()) {
                     targetType = (Type<T>) resolveConcreteType(targetType, targetType);
+                }
+                if (targetType == null) {
+                    throw new IllegalStateException(String.format(
+                            "Cannot create ObjectFactory for \n\t destinationType = %s\n\t sourceType = %s",
+                            destinationType,
+                            sourceType));
                 }
                 
                 Constructor<?>[] constructors = targetType.getRawType().getConstructors();
@@ -1019,6 +1119,15 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         }
         
         /*
+         * Look for some (custom) ObjectFactories.
+         * If there is an Object Factory, then the ObjectFactory will generate dynamically the concrete type.
+         * So return the destinationType even if it is not "concrete", because we cannot exactly say what the concrete type will be.
+         */
+        if (customObjectFactoryForDestinationExists(sourceType, destinationType)) {
+            return destinationType;
+        }
+        
+        /*
          * Look for a match in the explicitly registered types
          */
         Set<Type<?>> destinationSet = explicitAToBRegistry.get(sourceType);
@@ -1077,6 +1186,30 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         
         return concreteType;
     }
+
+    private <S, D> boolean customObjectFactoryForDestinationExists(Type<S> sourceType, Type<D> destinationType) {
+        Set<Type<? extends Object>> objFactoryDestTypes = getKeys(objectFactoryRegistry);
+        for (Type<? extends Object> objFactoryDestType : objFactoryDestTypes) {
+            if (destinationType.isAssignableFrom(objFactoryDestType)
+                    && objectFactoryRegistry.get(objFactoryDestType).containsKey(sourceType)) {
+                ObjectFactory<? extends Object> objectFactory = objectFactoryRegistry.get(objFactoryDestType).get(sourceType);
+                if (isCustomObjectFactory(objectFactory)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean isCustomObjectFactory(ObjectFactory<? extends Object> objectFactory) {
+        if (objectFactory instanceof GeneratedObjectFactory) {
+            return false;
+        }
+        if (objectFactory.getClass().equals(DefaultConstructorObjectFactory.class)) {
+            return false;
+        }
+        return true;
+    }
     
     /**
      * @param type
@@ -1119,11 +1252,11 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 if (classMap.getUsedMappers().isEmpty()) {
                     classMap = classMap.copyWithUsedMappers(discoverUsedMappers(classMap));
                 }
-                buildMapper(classMap, /** isAutoGenerated == **/
+                GeneratedMapperBase generatedMapper = buildMapper(classMap, /** isAutoGenerated == **/
                 isBuilding, context);
                 
                 buildObjectFactories(classMap, context);
-                initializeUsedMappers(classMap, context);
+                initializeUsedMappers(generatedMapper, classMap, context);
                 mapperFacade.factoryModified(this);
             } finally {
                 contextFactory.release(context);
@@ -1156,13 +1289,15 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
 
                 buildClassMapRegistry();
 
+                Map<ClassMap<?, ?>, GeneratedMapperBase> generatedMappers = new HashMap<ClassMap<?, ?>, GeneratedMapperBase>();
                 for (ClassMap<?, ?> classMap : classMapRegistry.values()) {
-                    buildMapper(classMap, false, context);
+                    generatedMappers.put(classMap, buildMapper(classMap, false, context));
                 }
-  
-                for (final ClassMap<?, ?> classMap : classMapRegistry.values()) {
-                    buildObjectFactories(classMap, context);
-                    initializeUsedMappers(classMap, context);
+                
+                Set<Entry<ClassMap<?, ?>, GeneratedMapperBase>> generatedMapperEntries = generatedMappers.entrySet();
+                for (Entry<ClassMap<?, ?>, GeneratedMapperBase> generatedMapperEntry : generatedMapperEntries) {
+                    buildObjectFactories(generatedMapperEntry.getKey(), context);
+                    initializeUsedMappers(generatedMapperEntry.getValue(), generatedMapperEntry.getKey(), context);
                 }
                 
             } finally {
@@ -1250,10 +1385,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         return mappers;
     }
     
-    @SuppressWarnings("unchecked")
-    private void initializeUsedMappers(ClassMap<?, ?> classMap, MappingContext context) {
-
-        Mapper<Object, Object> mapper = lookupMapper(new MapperKey(classMap.getAType(), classMap.getBType()), context);
+    private void initializeUsedMappers(Mapper<?, ?> mapper, ClassMap<?, ?> classMap, MappingContext context) {
 
         Set<Mapper<Object, Object>> parentMappers = new LinkedHashSet<Mapper<Object, Object>>();
 
@@ -1267,9 +1399,9 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         
         for (Mapper<Object, Object> curParrentMapper : parentMappers) {
             if (!GeneratedMapperBase.isUsedMappersInitialized(curParrentMapper)) {
-                initializeUsedMappers(getClassMap(new MapperKey(
+                initializeUsedMappers(curParrentMapper, getClassMap(new MapperKey(
                         curParrentMapper.getAType(),
-                    curParrentMapper.getBType())), context);
+                        curParrentMapper.getBType())), context);
             }
         }
 
@@ -1313,7 +1445,21 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         if (parentMapper == null) {
             throw exceptionUtil.newMappingException("Cannot find used mappers for : " + classMap.getMapperClassName());
         }
-        parentMappers.add(parentMapper);
+        if (parentMapper instanceof MultipleMapperWrapper) {
+            MultipleMapperWrapper multiMapperWrapper = (MultipleMapperWrapper) parentMapper;
+            Collection<Mapper<Object, Object>> fromMultipleMappers = multiMapperWrapper.getMappersRegistry();
+            for (Mapper<Object, Object> fromMultipleMapper : fromMultipleMappers) {
+                if (fromMultipleMapper.getAType().isAssignableFrom(classMap.getAType())
+                        && fromMultipleMapper.getBType().isAssignableFrom(classMap.getBType())) {
+                    parentMappers.add(fromMultipleMapper);
+                } else if (fromMultipleMapper.getAType().isAssignableFrom(classMap.getBType())
+                        && fromMultipleMapper.getBType().isAssignableFrom(classMap.getAType())) {
+                    parentMappers.add(fromMultipleMapper);
+                }
+            }
+        } else {
+            parentMappers.add(parentMapper);
+        }
 
         Set<ClassMap<Object, Object>> usedClassMapSet = usedMapperMetadataRegistry.get(parentMapperKey);
         if (usedClassMapSet != null) {
