@@ -110,7 +110,7 @@ public class SourceCodeContext {
         
         int namePos = safeBaseClassName.lastIndexOf(".");
         if (namePos > 0) {
-            this.packageName = safeBaseClassName.substring(0, namePos - 1);
+            this.packageName = safeBaseClassName.substring(0, namePos);
             this.classSimpleName = safeBaseClassName.substring(namePos + 1);
         } else {
             this.packageName = "ma.glasnost.orika.generated";

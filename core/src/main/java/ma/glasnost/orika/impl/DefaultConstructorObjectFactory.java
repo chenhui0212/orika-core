@@ -17,6 +17,9 @@
  */
 package ma.glasnost.orika.impl;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.ObjectFactory;
 
@@ -29,23 +32,37 @@ import ma.glasnost.orika.ObjectFactory;
  */
 public class DefaultConstructorObjectFactory<T> implements ObjectFactory<T> {
 
-    private final Class<T> type;
     private final String description;
+    private Constructor<T> constructor;
     
     public DefaultConstructorObjectFactory(Class<T> type) {
-        this.type = type;
+        this.constructor = getDefaultConstructor(type);
+        constructor.setAccessible(true);
         this.description = getClass().getSimpleName() + "<" + type.getSimpleName() + ">";
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static <T> Constructor<T> getDefaultConstructor(Class<T> type) {
+        for (Constructor<?> c : type.getDeclaredConstructors()) {
+            if (c.getParameterTypes().length ==  0) {
+                return (Constructor<T>) c;
+            }
+        }
+        return null;
     }
     
     /* (non-Javadoc)
      * @see ma.glasnost.orika.ObjectFactory#create(java.lang.Object, ma.glasnost.orika.MappingContext)
      */
+    @Override
     public T create(Object source, MappingContext mappingContext) {
         try {
-            return type.newInstance();
+            return constructor.newInstance();
         } catch (InstantiationException e) {
             throw new IllegalStateException(e);
         } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        } catch (InvocationTargetException e) {
             throw new IllegalStateException(e);
         }
     }

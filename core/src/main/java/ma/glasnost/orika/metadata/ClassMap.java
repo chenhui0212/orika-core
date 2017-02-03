@@ -18,6 +18,7 @@
 
 package ma.glasnost.orika.metadata;
 
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -161,7 +162,37 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
      * @return
      */
     public String getMapperClassName() {
-        return "Orika_" + getBTypeName() + "_" + getATypeName() + "_Mapper";
+        String className = "Orika_" + getBTypeName() + "_" + getATypeName() + "_Mapper";
+        
+        boolean aIsPublic = Modifier.isPublic(getAType().getRawType().getModifiers());
+        boolean bIsPublic = Modifier.isPublic(getBType().getRawType().getModifiers());
+        
+        if (aIsPublic) {
+            if (bIsPublic) {
+                // both public, no package needed
+                return className;
+            } else {
+                // A public, B not --> use package of B
+                return getPackageName(getBType()) + "." + className;
+            }
+        } else {
+            if (bIsPublic) {
+                // A not public, B is --> use package of A
+                return getPackageName(getAType()) + "." + className;
+            } else {
+                // both package private --> make sure they're in the same package
+                String aPackage = getPackageName(getAType());
+                if (aPackage.equals(getPackageName(getBType()))) {
+                    return aPackage + "." + className;
+                } else {
+                    throw new RuntimeException(getAType() + " and " + getBType() + " are both package private but are in different packages");
+                }
+            }
+        }
+    }
+    
+    private static String getPackageName(Type<?> type) {
+        return type.getCanonicalName().replaceFirst("\\.[^\\.]+$", "");
     }
     
     /**
