@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import java.lang.reflect.Modifier;
+import ma.glasnost.orika.impl.generator.Analysis.Visibility;
 
 /**
  * Uses Eclipse JDT to format and compile the source for the specified
@@ -124,20 +124,9 @@ public class EclipseJdtCompilerStrategy extends CompilerStrategy {
     
     public void assureTypeIsAccessible(Class<?> type) throws SourceCodeGenerationException {
         try {
-            if (!Modifier.isPublic(type.getModifiers())) {
+            Visibility visibility = Analysis.getMostRestrictiveVisibility(type);
+            if (visibility != Analysis.Visibility.PUBLIC && visibility != Analysis.Visibility.PACKAGE) {
                 throw new SourceCodeGenerationException(type + " is not accessible");
-            } else if (type.isMemberClass()) {
-                /*
-                 * The type needs to be publicly accessible (including it's
-                 * enclosing classes if any)
-                 */
-                Class<?> currentType = type;
-                while (currentType != null) {
-                    if (!Modifier.isPublic(type.getModifiers())) {
-                        throw new SourceCodeGenerationException(type + " is not accessible");
-                    }
-                    currentType = currentType.getEnclosingClass();
-                }
             }
             
             assertTypeAccessible.invoke(compiler, type);

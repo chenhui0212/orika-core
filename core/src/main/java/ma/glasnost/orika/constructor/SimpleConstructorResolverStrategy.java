@@ -106,7 +106,7 @@ public class SimpleConstructorResolverStrategy implements ConstructorResolverStr
         }
         
         boolean foundDeclaredConstructor = false;
-        Constructor<T>[] constructors = (Constructor<T>[]) targetClass.getRawType().getConstructors();
+        Constructor<T>[] constructors = (Constructor<T>[]) targetClass.getRawType().getDeclaredConstructors();
         TreeMap<Integer, ConstructorMapping<T>> constructorsByMatchedParams = new TreeMap<Integer, ConstructorMapping<T>>();
         for (Constructor<T> constructor: constructors) {
         	ConstructorMapping<T> constructorMapping = new ConstructorMapping<T>();

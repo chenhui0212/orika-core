@@ -21,7 +21,6 @@ package ma.glasnost.orika.impl.generator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Random;
 import java.util.WeakHashMap;
@@ -35,6 +34,7 @@ import javassist.CtField;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
+import ma.glasnost.orika.impl.generator.Analysis.Visibility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,23 +149,10 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
      * assertClassLoaderAccessible(java.lang.Class)
      */
     public void assureTypeIsAccessible(Class<?> type) throws SourceCodeGenerationException {
-        
         if (!type.isPrimitive()) {
-            
-            if (!Modifier.isPublic(type.getModifiers())) {
+            Visibility visibility = Analysis.getMostRestrictiveVisibility(type);
+            if (visibility != Analysis.Visibility.PUBLIC && visibility != Analysis.Visibility.PACKAGE) {
                 throw new SourceCodeGenerationException(type + " is not accessible");
-            } else if (type.isMemberClass()) {
-                /*
-                 * The type needs to be publicly accessible (including it's
-                 * enclosing classes if any)
-                 */
-                Class<?> currentType = type;
-                while (currentType != null) {
-                    if (!Modifier.isPublic(type.getModifiers())) {
-                        throw new SourceCodeGenerationException(type + " is not accessible");
-                    }
-                    currentType = currentType.getEnclosingClass();
-                }
             }
             
             String className = type.getName();

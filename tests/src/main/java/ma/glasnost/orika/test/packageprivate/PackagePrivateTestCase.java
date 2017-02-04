@@ -1,0 +1,49 @@
+package ma.glasnost.orika.test.packageprivate;
+
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.test.MappingUtil;
+import ma.glasnost.orika.test.packageprivate.otherpackage.SomePublicDto;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class PackagePrivateTestCase {
+
+    @Test
+    public void testMappingPackagePrivateToPublic() {
+        SomePrivateEntity source = new SomePrivateEntity();
+        source.setField("test value");
+
+        final SomePublicDto actual = getMapperFacade().map(source, SomePublicDto.class);
+
+        assertEquals(source.getField(), actual.getField());
+    }
+
+    @Test
+    public void testMappingPublicToPackagePrivate() {
+        SomePublicDto source = new SomePublicDto();
+        source.setField("test value");
+
+        final SomePrivateEntity actual = getMapperFacade().map(source, SomePrivateEntity.class);
+
+        assertEquals(source.getField(), actual.getField());
+    }
+
+    @Test
+    public void testMappingPackagePrivateToPackagePrivate() {
+        SomePrivateEntity source = new SomePrivateEntity();
+        source.setField("test value");
+
+        final SimilarEntity actual = getMapperFacade().map(source, SimilarEntity.class);
+
+        assertEquals(source.getField(), actual.getField());
+    }
+
+    private MapperFacade getMapperFacade() {
+        final MapperFactory mapperFactory = MappingUtil.getMapperFactory(true);
+        mapperFactory.classMap(SomePrivateEntity.class, SomePublicDto.class);
+        mapperFactory.classMap(SomePrivateEntity.class, SimilarEntity.class);
+        return mapperFactory.getMapperFacade();
+    }
+}

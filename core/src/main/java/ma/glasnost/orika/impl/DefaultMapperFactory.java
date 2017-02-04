@@ -1053,7 +1053,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                             sourceType));
                 }
                 
-                Constructor<?>[] constructors = targetType.getRawType().getConstructors();
+                Constructor<?>[] constructors = targetType.getRawType().getDeclaredConstructors();
                 if (useAutoMapping || !isBuilt) {
                     if (constructors.length == 1 && constructors[0].getParameterTypes().length == 0) {
                         /*
