@@ -50,6 +50,26 @@ public class PackagePrivateTestCase {
     }
 
     @Test
+    public void testMappingToNestedProtected() throws Exception {
+        SomePublicDto source = new SomePublicDto();
+        source.setField("test value");
+
+        final SomeParentClass.SomeProtectedClass actual = getMapperFacade().map(source, SomeParentClass.SomeProtectedClass.class);
+
+        assertEquals(source.getField(), actual.getField());
+    }
+
+    @Test
+    public void testMappingFromNestedProtected() throws Exception {
+        SomeParentClass.SomeProtectedClass source = new SomeParentClass.SomeProtectedClass();
+        source.setField("test value");
+
+        final SomePublicDto actual = getMapperFacade().map(source, SomePublicDto.class);
+
+        assertEquals(source.getField(), actual.getField());
+    }
+
+    @Test
     public void testPackagePrivateNestedEntities() {
         NestedEntity source = new NestedEntity();
         source.setField("test value");
@@ -75,6 +95,7 @@ public class PackagePrivateTestCase {
         final MapperFactory mapperFactory = MappingUtil.getMapperFactory(true);
         mapperFactory.classMap(SomePrivateEntity.class, SomePublicDto.class);
         mapperFactory.classMap(SomePrivateEntity.class, SimilarEntity.class);
+        mapperFactory.classMap(SomeParentClass.SomeProtectedClass.class, SomePublicDto.class);
         return mapperFactory.getMapperFacade();
     }
 }
