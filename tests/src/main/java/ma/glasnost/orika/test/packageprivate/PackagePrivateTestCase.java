@@ -41,6 +41,15 @@ public class PackagePrivateTestCase {
     }
 
     @Test
+    public void testGeneratedObjectFactory() {
+        SimilarEntityCustomConstructor source = new SimilarEntityCustomConstructor("test value");
+
+        final SimilarEntityCustomConstructor actual = getMapperFacade().map(source, SimilarEntityCustomConstructor.class);
+
+        assertEquals(source.getField(), actual.getField());
+    }
+
+    @Test
     public void testPackagePrivateNestedEntities() {
         NestedEntity source = new NestedEntity();
         source.setField("test value");
