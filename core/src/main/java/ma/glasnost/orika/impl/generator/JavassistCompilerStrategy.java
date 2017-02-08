@@ -151,7 +151,7 @@ public class JavassistCompilerStrategy extends CompilerStrategy {
     public void assureTypeIsAccessible(Class<?> type) throws SourceCodeGenerationException {
         if (!type.isPrimitive()) {
             Visibility visibility = Analysis.getMostRestrictiveVisibility(type);
-            if (visibility != Analysis.Visibility.PUBLIC && visibility != Analysis.Visibility.PACKAGE) {
+            if (visibility == Visibility.PRIVATE) {
                 throw new SourceCodeGenerationException(type + " is not accessible");
             }
             

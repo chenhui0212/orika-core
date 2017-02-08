@@ -173,26 +173,31 @@ public class ClassMap<A, B> implements MappedTypePair<A, B>{
                 return className;
             } else {
                 // A public, B not --> use package of B
-                return getPackageName(getBType()) + "." + className;
+                return prependPackageName(getPackageName(getBType()), className);
             }
         } else {
             if (bIsPublic) {
                 // A not public, B is --> use package of A
-                return getPackageName(getAType()) + "." + className;
+                return prependPackageName(getPackageName(getAType()), className);
             } else {
                 // both package private --> make sure they're in the same package
                 String aPackage = getPackageName(getAType());
                 if (aPackage.equals(getPackageName(getBType()))) {
-                    return aPackage + "." + className;
+                    return prependPackageName(aPackage, className);
                 } else {
                     throw new RuntimeException(getAType() + " and " + getBType() + " are both package private but are in different packages");
                 }
             }
         }
     }
-    
+
+    private static String prependPackageName(String packageName, String className) {
+        return packageName.isEmpty() || packageName.startsWith("java.") ? className : packageName + "." + className;
+    }
+
     private static String getPackageName(Type<?> type) {
-        return type.getCanonicalName().replaceFirst("\\.[^\\.]+$", "");
+        Package typePackage = type.getRawType().getPackage();
+        return type == null ? "" : typePackage.getName();
     }
     
     /**

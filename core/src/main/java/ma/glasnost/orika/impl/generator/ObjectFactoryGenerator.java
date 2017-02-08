@@ -69,8 +69,8 @@ public class ObjectFactoryGenerator {
      */
     public GeneratedObjectFactory build(Type<?> type, Type<?> sourceType, MappingContext context) {
         
-        final String className = type.getSimpleName() + "_" + sourceType.getSimpleName() + "_ObjectFactory" + nameSuffix;
-        
+        String className = type.getSimpleName() + "_" + sourceType.getSimpleName() + "_ObjectFactory" + nameSuffix;
+        className = prependPackageName(getPackageName(type), className);
         try {
             StringBuilder logDetails;
             if (LOGGER.isDebugEnabled()) {
@@ -105,7 +105,15 @@ public class ObjectFactoryGenerator {
             }
         }
     }
-    
+
+    private static String getPackageName(Type<?> type) {
+        Package typePackage = type.getRawType().getPackage();
+        return typePackage == null ? "" : typePackage.getName();
+    }
+    private static String prependPackageName(String packageName, String className) {
+        return packageName.isEmpty() || packageName.startsWith("java.") ? className : packageName + "." + className;
+    }
+
     private void addCreateMethod(SourceCodeContext code, UsedTypesContext usedTypes, UsedConvertersContext usedConverters,
             UsedMapperFacadesContext usedMappers, Type<?> type, Type<?> sourceType, MappingContext mappingContext, StringBuilder logDetails) {
         
