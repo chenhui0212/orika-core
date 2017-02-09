@@ -970,18 +970,19 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
             return null;
         }
         
+        ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> objFactoryCacheForDestType = objectFactoryRegistry
+                .get(destinationType);
+        if (objFactoryCacheForDestType != null) {
+            ObjectFactory<T> result = findObjectFactory(objFactoryCacheForDestType, sourceType, false);
+            if (result != null) {
+                return result;
+            }
+        }
+        
         Set<Type<? extends Object>> objFactoryDestTypes = getKeys(objectFactoryRegistry);
         for (Type<? extends Object> objFactoryDestType : objFactoryDestTypes) {
-            ConcurrentHashMap<Type<? extends Object>, ObjectFactory<? extends Object>> objFactoryCachePerSrcType = objectFactoryRegistry
-                    .get(objFactoryDestType);
-            
-            if (destinationType.equals(objFactoryDestType)) {
-                ObjectFactory<T> result = findObjectFactory(objFactoryCachePerSrcType, sourceType, false);
-                if (result != null) {
-                    return result;
-                }
-            } else if (destinationType.isAssignableFrom(objFactoryDestType)) {
-                ObjectFactory<T> result = findObjectFactory(objFactoryCachePerSrcType, sourceType, true);
+            if (destinationType.isAssignableFrom(objFactoryDestType)) {
+                ObjectFactory<T> result = findObjectFactory(objectFactoryRegistry.get(objFactoryDestType), sourceType, true);
                 if (result != null) {
                     return result;
                 }
