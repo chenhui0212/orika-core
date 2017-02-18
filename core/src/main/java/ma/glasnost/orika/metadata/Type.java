@@ -20,10 +20,17 @@ package ma.glasnost.orika.metadata;
 
 import ma.glasnost.orika.impl.util.ClassUtil;
 
+import java.io.File;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -77,6 +84,30 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         tmpPrimitiveWrapperTypes.add(Double.class);
         PRIMITIVE_WRAPPER_TYPES = Collections.unmodifiableSet(tmpPrimitiveWrapperTypes);
         
+        Set<Class<?>> tmpPrimitiveTypes = new HashSet<Class<?>>();
+        tmpPrimitiveTypes.add(Byte.TYPE);
+        tmpPrimitiveTypes.add(Short.TYPE);
+        tmpPrimitiveTypes.add(Integer.TYPE);
+        tmpPrimitiveTypes.add(Long.TYPE);
+        tmpPrimitiveTypes.add(Boolean.TYPE);
+        tmpPrimitiveTypes.add(Character.TYPE);
+        tmpPrimitiveTypes.add(Float.TYPE);
+        tmpPrimitiveTypes.add(Double.TYPE);
+        
+        Set<Class<?>> tmpImmutableJdk6Types = new HashSet<Class<?>>();
+        tmpImmutableJdk6Types.add(String.class);
+        tmpImmutableJdk6Types.add(BigDecimal.class);
+        tmpImmutableJdk6Types.add(BigInteger.class);
+        tmpImmutableJdk6Types.add(UUID.class);
+        tmpImmutableJdk6Types.add(URL.class);
+        tmpImmutableJdk6Types.add(URI.class);
+        tmpImmutableJdk6Types.add(Locale.class);
+        tmpImmutableJdk6Types.add(File.class);
+        tmpImmutableJdk6Types.add(Inet4Address.class);
+        tmpImmutableJdk6Types.add(Inet6Address.class);
+        tmpImmutableJdk6Types.add(InetSocketAddress.class);
+        tmpImmutableJdk6Types.add(Currency.class);
+        
         Set<Class<?>> tmpImmutableJdk8Types = new HashSet<Class<?>>();
         // TemporalAccessor
         addClassIfExists(tmpImmutableJdk8Types, "java.time.Instant");
@@ -100,18 +131,10 @@ public final class Type<T> implements ParameterizedType, Comparable<Type<?>> {
         addClassIfExists(tmpImmutableJdk8Types, "java.time.Period");
         
         Set<Class<?>> tmpImmutableTypes = new HashSet<Class<?>>();
-        tmpImmutableTypes.addAll(PRIMITIVE_WRAPPER_TYPES);
+        tmpImmutableTypes.addAll(tmpPrimitiveWrapperTypes);
+        tmpImmutableTypes.addAll(tmpPrimitiveTypes);
+        tmpImmutableTypes.addAll(tmpImmutableJdk6Types);
         tmpImmutableTypes.addAll(tmpImmutableJdk8Types);
-        tmpImmutableTypes.add(String.class);
-        tmpImmutableTypes.add(BigDecimal.class);
-        tmpImmutableTypes.add(Byte.TYPE);
-        tmpImmutableTypes.add(Short.TYPE);
-        tmpImmutableTypes.add(Integer.TYPE);
-        tmpImmutableTypes.add(Long.TYPE);
-        tmpImmutableTypes.add(Boolean.TYPE);
-        tmpImmutableTypes.add(Character.TYPE);
-        tmpImmutableTypes.add(Float.TYPE);
-        tmpImmutableTypes.add(Double.TYPE);
         IMMUTABLE_TYPES = Collections.unmodifiableSet(tmpImmutableTypes);
     }
 

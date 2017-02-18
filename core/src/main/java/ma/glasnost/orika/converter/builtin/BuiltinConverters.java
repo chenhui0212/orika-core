@@ -18,17 +18,8 @@
 
 package ma.glasnost.orika.converter.builtin;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -64,19 +55,6 @@ public abstract class BuiltinConverters {
      * <li>java.sql.Date
      * <li>java.sql.Time
      * <li>java.sql.Timestamp
-     * </ul>
-     * <li>PassThroughConverter registered for the following (additional)
-     * immutable types:
-     * <ul>
-     * <li>java.net.URL
-     * <li>java.net.URI
-     * <li>java.util.UUID
-     * <li>java.math.BigInteger
-     * <li>java.util.Locale
-     * <li>java.io.File
-     * <li>java.net.Inet4Address
-     * <li>java.net.Inet6Address
-     * <li>java.net.InetSocketAddress
      * </ul>
      * <li>CloneableConverter registered for the following cloneable types:
      * <ul>
@@ -151,11 +129,6 @@ public abstract class BuiltinConverters {
         converterFactory.registerConverter(new NumericConverters.DoubleToIntegerConverter(false));
         converterFactory.registerConverter(new NumericConverters.DoubleToLongConverter(false));
         
-        /*
-         * Register additional common "immutable" types
-         */
-        converterFactory.registerConverter(new PassThroughConverter.Builtin(URL.class, URI.class, UUID.class, BigInteger.class,
-                Locale.class, File.class, Inet4Address.class, Inet6Address.class, InetSocketAddress.class));
         /*
          * Register additional common "cloneable" types
          */
