@@ -137,6 +137,6 @@ public abstract class BuiltinConverters {
          * Register converter to instantiate by using a constructor on the
          * destination which takes the source as argument
          */
-        // converterFactory.registerConverter(new ConstructorConverter());
+        converterFactory.registerConverter(new ConstructorConverter());
     }
 }

@@ -39,30 +39,59 @@ import org.junit.Assert;
  */
 public class ConstructorConverterTestCase {
 
-	
-	@Test
-	public void testStringBasedConstructor() {
-		MapperFactory factory = MappingUtil.getMapperFactory();
-		factory.getConverterFactory().registerConverter(new ConstructorConverter());
-		MapperFacade mapper = factory.getMapperFacade();
-		
-		String urlString = "http://localhost:80/index.html";
-		URL url = mapper.map(urlString, URL.class);
-		Assert.assertNotNull(url);
-		Assert.assertEquals(urlString, url.toExternalForm());
-	}
-	
-	@Test
-	public void testPrimitiveConstructor() {
-		MapperFactory factory = MappingUtil.getMapperFactory();
-		factory.getConverterFactory().registerConverter(new ConstructorConverter());
-		MapperFacade mapper = factory.getMapperFacade();
-		
-		Double doubleValue = Double.valueOf("4.99"); 
-		BigDecimal bd = mapper.map(doubleValue, BigDecimal.class);
-		Assert.assertNotNull(bd);
-		Assert.assertEquals(doubleValue, bd.doubleValue(), 0.0001);
-	}
-	
-	
+    @Test
+    public void testStringBasedConstructor() {
+        MapperFactory factory = MappingUtil.getMapperFactory();
+        factory.getConverterFactory().registerConverter(new ConstructorConverter());
+        MapperFacade mapper = factory.getMapperFacade();
+        
+        String urlString = "http://localhost:80/index.html";
+        URL url = mapper.map(urlString, URL.class);
+        Assert.assertNotNull(url);
+        Assert.assertEquals(urlString, url.toExternalForm());
+    }
+    
+    @Test
+    public void testPrimitiveConstructor() {
+        MapperFactory factory = MappingUtil.getMapperFactory();
+        factory.getConverterFactory().registerConverter(new ConstructorConverter());
+        MapperFacade mapper = factory.getMapperFacade();
+        
+        Double doubleValue = Double.valueOf("4.99");
+        BigDecimal bd = mapper.map(doubleValue, BigDecimal.class);
+        Assert.assertNotNull(bd);
+        Assert.assertEquals(doubleValue, bd.doubleValue(), 0.0001);
+    }
+    
+    @Test
+    public void testRegisterdAsBuiltinConverterAndWorksWithCustomType() {
+        MapperFactory factory = MappingUtil.getMapperFactory();
+        MapperFacade mapper = factory.getMapperFacade();
+        
+        StringContainer strCont = mapper.map("test", StringContainer.class);
+        Assert.assertNotNull(strCont);
+        Assert.assertEquals("test", strCont.getString());
+    }
+    
+    public static class StringContainer {
+        private String string;
+        
+        public StringContainer() {
+            super();
+        }
+        
+        public StringContainer(String string) {
+            super();
+            this.string = string;
+        }
+        
+        public String getString() {
+            return string;
+        }
+        
+        public void setString(String string) {
+            this.string = string;
+        }
+        
+    }
 }
