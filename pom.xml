@@ -314,6 +314,13 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+	    <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-javadoc-plugin</artifactId>
+	      <configuration>
+		<additionalparam>-Xdoclint:none</additionalparam>
+	      </configuration>
+	    </plugin>
 
         </plugins>
 
@@ -384,44 +391,6 @@
             <modules>
                 <module>tests-jdk8</module>
             </modules>
-        </profile>
-        <profile>
-            <id>docs</id>
-            <build>
-                <plugins>
-                    <!-- Generate a source jar for the project -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Generate a JavaDoc jar for the project -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <additionalparam>${javadoc.opts}</additionalparam>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
