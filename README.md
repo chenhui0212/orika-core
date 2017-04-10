@@ -7,7 +7,7 @@
 Orika !
 -----------------------------------------------------------------------
 
-**NEW** We are pleased to announce the release of Orika **1.5.0** ! _This version is available on Maven central repository_ 
+**NEW** We are pleased to announce the release of Orika **1.5.1** ! _This version is available on Maven central repository_ 
 
 What?
 =====
