@@ -17,7 +17,10 @@
  */
 package ma.glasnost.orika.metadata;
 
+import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class TypeKey {
 
-	private static volatile WeakHashMap<java.lang.reflect.Type, Integer> knownTypes = new WeakHashMap<java.lang.reflect.Type, Integer>();
+	private static volatile Map<java.lang.reflect.Type, Integer> knownTypes = Collections.synchronizedMap(new WeakHashMap<java.lang.reflect.Type, Integer>());
 	private static AtomicInteger currentIndex = new AtomicInteger();
 
 	/**
