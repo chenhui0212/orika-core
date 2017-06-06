@@ -18,16 +18,16 @@
 
 package ma.glasnost.orika.test.constructor;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import ma.glasnost.orika.test.common.types.TestCaseClasses.PrimitiveWrapperHolder;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 
 public interface TestCaseClasses {
 
@@ -181,7 +181,32 @@ public interface TestCaseClasses {
             return dateOfBirth;
         }
     }
-    
+
+    static class PersonVO4 {
+
+        private final String firstName;
+        private final String lastName;
+        private final long age;
+
+        public PersonVO4(String pFirstName, String pLastName, long pAge) {
+            firstName = pFirstName;
+            lastName = pLastName;
+            age = pAge;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public long getAge() {
+            return age;
+        }
+    }
+
     public class NestedPrimitiveHolder {
     	
     	private char charValue;

@@ -18,8 +18,9 @@
 
 package ma.glasnost.orika.test.constructor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.apache.commons.collections.list.TreeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.net.URL;
 import java.net.URLStreamHandler;
@@ -30,11 +31,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingException;
+import ma.glasnost.orika.constructor.ConstructorResolverStrategy;
+import ma.glasnost.orika.constructor.PrefixParamConstructorResolverStrategy;
 import ma.glasnost.orika.converter.builtin.DateToStringConverter;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.Author;
@@ -60,12 +64,12 @@ import ma.glasnost.orika.test.constructor.TestCaseClasses.Person;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.PersonVO;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.PersonVO2;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.PersonVO3;
+import ma.glasnost.orika.test.constructor.TestCaseClasses.PersonVO4;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.PrimitiveNumberHolder;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.WrapperHolder;
 
-import org.apache.commons.collections.list.TreeList;
-import org.junit.Test;
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ConstructorMappingTestCase {
     
@@ -465,8 +469,41 @@ public class ConstructorMappingTestCase {
     	Assert.assertEquals(dto1.portX, url.getPort());
     	
     }
-    
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	@Test
+	public void testFindConstructor_mapParamNames_ok() {
+		ConstructorResolverStrategy constructorStrategy = new PrefixParamConstructorResolverStrategy();
+		DefaultMapperFactory.Builder builder = new DefaultMapperFactory.Builder();
+		builder.constructorResolverStrategy(constructorStrategy);
+		MapperFactory factory = builder.build();
+
+		testPersonV04Mapping(factory);
+	}
+
+	@Test(expected = MappingException.class)
+	public void testFindConstructor_doNotMapParamNames_ex() {
+		testPersonV04Mapping(MappingUtil.getMapperFactory());
+	}
+
+	private void testPersonV04Mapping(MapperFactory factory) {
+		Person person = newPerson();
+
+		PersonVO4 vo = factory.getMapperFacade().map(person, PersonVO4.class);
+
+		Assert.assertEquals(person.getFirstName(), vo.getFirstName());
+		Assert.assertEquals(person.getLastName(), vo.getLastName());
+		Assert.assertTrue(person.getAge() == vo.getAge());
+	}
+
+	private Person newPerson() {
+		Person person = new Person();
+		person.setFirstName("Abdelkrim");
+		person.setLastName("EL KHETTABI");
+		person.setAge(31L);
+		return person;
+	}
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Common mapping validations
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
