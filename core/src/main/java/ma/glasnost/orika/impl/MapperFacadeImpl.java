@@ -786,9 +786,10 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
      * @return
      */
     private <S, D> D mapElement(S source, ElementStrategyContext<S, D> context) {
-        if (context.strategy == null || !source.getClass().equals(context.sourceClass)) {
+    	Class<?> sourceClass = getClass(source);
+        if (context.strategy == null || !sourceClass.equals(context.sourceClass)) {
             context.strategy = resolveMappingStrategy(source, context.sourceType, context.destinationType, false, context.mappingContext);
-            context.sourceClass = source.getClass();
+            context.sourceClass = sourceClass;
         } else {
             context.mappingContext.setResolvedSourceType(context.sourceType);
             context.mappingContext.setResolvedDestinationType(context.destinationType);
