@@ -19,11 +19,8 @@
 package ma.glasnost.orika.test.unenhance.inheritance;
 
 import java.io.Serializable;
-
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.unenhance.HibernateUnenhanceStrategy;
+import java.util.Arrays;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -38,6 +35,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import ma.glasnost.orika.unenhance.HibernateUnenhanceStrategy;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:HibernateProxyTestCase-context.xml")
 @Transactional
@@ -46,6 +48,7 @@ public class HibernateProxyTestCase {
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	private Serializable sub1Id;
 	private Serializable sub21Id;
 	private Serializable sub22Id;
 
@@ -58,7 +61,7 @@ public class HibernateProxyTestCase {
 		Sub1Entity sub1 = new Sub1Entity();
 		sub1.setMyProperty("my property on sub1");
 		sub1.setSub1Property(1);
-		getSession().save(sub1);
+		sub1Id = getSession().save(sub1);
 
 		Sub2Entity sub21 = new Sub2Entity();
 		sub21.setMyProperty("my property on sub2");
@@ -144,5 +147,19 @@ public class HibernateProxyTestCase {
 		
 		Assert.assertEquals(Sub1EntityDTO.class, sub21Dto.getReferences().getClass());
 		Assert.assertEquals(Sub2EntityDTO.class, sub22Dto.getReferences().getClass());
+	}
+
+	@Test
+	public void testMappingCollections() {
+		MapperFacade mapper = buildMapper();
+
+		List<MyEntity> entities = Arrays.asList((MyEntity) getSession().load(MyEntity.class, sub22Id),
+				(MyEntity) getSession().load(MyEntity.class, sub21Id),
+				(MyEntity) getSession().load(MyEntity.class, sub1Id));
+		
+		List<MyEntityDTO> mappedList = mapper.mapAsList(entities, MyEntityDTO.class);
+		Assert.assertEquals(Sub2EntityDTO.class, mappedList.get(0).getClass());
+		Assert.assertEquals(Sub2EntityDTO.class, mappedList.get(1).getClass());
+		Assert.assertEquals(Sub1EntityDTO.class, mappedList.get(2).getClass());
 	}
 }
