@@ -1,11 +1,11 @@
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.OrikaSystemProperties;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class DefaultPackageTestCase {
     public static class Label {
@@ -34,7 +34,7 @@ public class DefaultPackageTestCase {
 
     @Test
     public void test() {
-        
+
         System.setProperty(OrikaSystemProperties.COMPILER_STRATEGY,
                 EclipseJdtCompilerStrategy.class.getName());
 
@@ -50,25 +50,6 @@ public class DefaultPackageTestCase {
         Label label = mapper.map(xmlLabel1, Label.class);
 
         Assert.assertEquals(xmlLabel1.getText(), label.getText());
-        
-    }
-    
-    public static void main(String[] args) {
 
-        System.setProperty(OrikaSystemProperties.COMPILER_STRATEGY,
-                EclipseJdtCompilerStrategy.class.getName());
-
-        System.setProperty(OrikaSystemProperties.WRITE_SOURCE_FILES, "true");
-        System.setProperty(OrikaSystemProperties.WRITE_CLASS_FILES, "true");
-
-        MapperFactory factory = new DefaultMapperFactory.Builder().build();
-        MapperFacade mapper = factory.getMapperFacade();
-
-        XmlLabel xmlLabel1 = new XmlLabel();
-        xmlLabel1.setText("label");
-
-        Label label = mapper.map(xmlLabel1, Label.class);
-
-        System.out.println("Done!");
     }
 }
