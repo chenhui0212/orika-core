@@ -560,7 +560,7 @@ public class DateAndTimeConverters {
     }
     
     public static boolean _polyCanConvert(Type<?> a, Type<?> b, Type<?> c, Type<?> d) {
-        return (a.isAssignableFrom(c)) && (d.isAssignableFrom(b));
+        return (a.isAssignableFrom(c)) && (!d.getRawType().equals(Object.class) && d.isAssignableFrom(b));
     }
     
     public static boolean polyCanConvert(Type<?> a, Type<?> b, Type<?> c, Type<?> d) {
