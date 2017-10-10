@@ -18,13 +18,12 @@
 
 package ma.glasnost.orika.metadata;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * CaseInsensitiveClassMapBuilder is an extension of ClassMapBuilder which performs
@@ -37,9 +36,6 @@ import ma.glasnost.orika.property.PropertyResolverStrategy;
  */
 public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
 
-    /**
-     *
-     */
     public static class Factory extends ClassMapBuilderFactory {
 
         /* (non-Javadoc)
@@ -70,88 +66,72 @@ public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
     protected CaseInsensitiveClassMapBuilder(Type<A> aType, Type<B> bType, MapperFactory mapperFactory,
             PropertyResolverStrategy propertyResolver, DefaultFieldMapper[] defaults) {
         super(aType, bType, mapperFactory, propertyResolver, defaults);
-        
-        lowercasePropertiesForA = new LinkedHashMap<String, String>();
-        for (String prop: this.getPropertyExpressions(getAType()).keySet()) {
-            lowercasePropertiesForA.put(prop.toLowerCase(), prop);
-        }
-        
-        lowercasePropertiesForB = new LinkedHashMap<String, String>();
-        for (String prop: this.getPropertyExpressions(getBType()).keySet()) {
-            lowercasePropertiesForB.put(prop.toLowerCase(), prop);
-        }
+
+        lowercasePropertiesForA = lowercasePropertiesFor(getAType());
+        lowercasePropertiesForB = lowercasePropertiesFor(getBType());
+
         initialized = true;
     }
 
     /* (non-Javadoc)
      * @see ma.glasnost.orika.metadata.ClassMapBuilder#byDefault(ma.glasnost.orika.DefaultFieldMapper[])
-     * 
+     *
      * Applies default mapping allowing for case-insensitive matching of property names
-     * 
+     *
      */
     @Override
     public ClassMapBuilder<A, B> byDefault(MappingDirection direction, DefaultFieldMapper... withDefaults) {
-        
+
         super.byDefault(direction, withDefaults);
-        
-        DefaultFieldMapper[] defaults;
-        if (withDefaults.length == 0) {
-            defaults = getDefaultFieldMappers();
-        } else {
-            defaults = withDefaults;
-        }
-        
-        for (final Entry<String, String> entry : lowercasePropertiesForA.entrySet()) {
-            String propertyNameA = entry.getValue();
-            String lowercaseName = entry.getKey();
+
+        for (final String propertyNameA : getPropertiesForTypeA()) {
             if (!getMappedPropertiesForTypeA().contains(propertyNameA)) {
+                String lowercaseName = propertyNameA.toLowerCase();
                 if (lowercasePropertiesForB.containsKey(lowercaseName)) {
                     String propertyNameB = lowercasePropertiesForB.get(lowercaseName);
                     if (!getMappedPropertiesForTypeB().contains(propertyNameB)) {
                         /*
                          * Don't include the default mapping of Class to Class; this
-                         * property is resolved for all types, but can't be mapped 
+                         * property is resolved for all types, but can't be mapped
                          * in either direction.
                          */
                         if (!propertyNameA.equals("class")) {
                             fieldMap(propertyNameA, propertyNameB, true).direction(direction).add();
                         }
                     }
-                } else {
-                    Property prop = resolvePropertyForA(propertyNameA);
-                    for (DefaultFieldMapper defaulter : defaults) {
-                        String suggestion = defaulter.suggestMappedField(propertyNameA, prop.getType());
-                        if (suggestion != null && getPropertiesForTypeB().contains(suggestion)) {
-                            if (!getMappedPropertiesForTypeB().contains(suggestion)) {
-                                fieldMap(propertyNameA, suggestion, true).direction(direction).add();
-                            }
-                        }
-                    }
                 }
             }
         }
-        
+
         return this;
     }
-    
+
     /**
      * Resolves a property for the particular type, based on the provided property expression
-     * 
+     *
      * @param type the type to resolve
      * @param expr the property expression to resolve
      * @return the Property referenced by the provided expression
      */
+    @Override
     protected Property resolveProperty(java.lang.reflect.Type type, String expr) {
         String expression = expr;
         if (initialized) {
-            Map<String, String> lowercaseProps = type.equals(getAType()) ? 
-                    lowercasePropertiesForA : lowercasePropertiesForB;
+            Map<String, String> lowercaseProps = type.equals(getAType()) ? lowercasePropertiesForA : lowercasePropertiesForB;
             String resolvedExpression = lowercaseProps.get(expr.toLowerCase());
             if (resolvedExpression != null) {
                 expression = resolvedExpression;
             }
-        } 
+        }
         return super.resolveProperty(type, expression);
     }
-    
+
+    private Map<String, String> lowercasePropertiesFor(Type type) {
+        final LinkedHashMap<String, String> properties = new LinkedHashMap<String, String>();
+        for (String property : this.getPropertyExpressions(type).keySet()) {
+            properties.put(property.toLowerCase(), property);
+        }
+        return properties;
+    }
+
 }
