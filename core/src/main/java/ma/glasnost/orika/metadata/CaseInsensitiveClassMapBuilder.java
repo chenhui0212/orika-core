@@ -18,13 +18,12 @@
 
 package ma.glasnost.orika.metadata;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * CaseInsensitiveClassMapBuilder is an extension of ClassMapBuilder which performs
@@ -101,10 +100,9 @@ public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
             defaults = withDefaults;
         }
         
-        for (final Entry<String, String> entry : lowercasePropertiesForA.entrySet()) {
-            String propertyNameA = entry.getValue();
-            String lowercaseName = entry.getKey();
+        for (final String propertyNameA : getPropertiesForTypeA()) {
             if (!getMappedPropertiesForTypeA().contains(propertyNameA)) {
+                String lowercaseName = propertyNameA.toLowerCase();
                 if (lowercasePropertiesForB.containsKey(lowercaseName)) {
                     String propertyNameB = lowercasePropertiesForB.get(lowercaseName);
                     if (!getMappedPropertiesForTypeB().contains(propertyNameB)) {
