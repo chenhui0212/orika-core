@@ -84,13 +84,6 @@ public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
 
         super.byDefault(direction, withDefaults);
 
-        DefaultFieldMapper[] defaults;
-        if (withDefaults.length == 0) {
-            defaults = getDefaultFieldMappers();
-        } else {
-            defaults = withDefaults;
-        }
-
         for (final String propertyNameA : getPropertiesForTypeA()) {
             if (!getMappedPropertiesForTypeA().contains(propertyNameA)) {
                 String lowercaseName = propertyNameA.toLowerCase();
@@ -106,22 +99,13 @@ public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
                             fieldMap(propertyNameA, propertyNameB, true).direction(direction).add();
                         }
                     }
-                } else {
-                    Property prop = resolvePropertyForA(propertyNameA);
-                    for (DefaultFieldMapper defaulter : defaults) {
-                        String suggestion = defaulter.suggestMappedField(propertyNameA, prop.getType());
-                        if (suggestion != null && getPropertiesForTypeB().contains(suggestion)) {
-                            if (!getMappedPropertiesForTypeB().contains(suggestion)) {
-                                fieldMap(propertyNameA, suggestion, true).direction(direction).add();
-                            }
-                        }
-                    }
                 }
             }
         }
 
         return this;
     }
+
     /**
      * Resolves a property for the particular type, based on the provided property expression
      *
@@ -129,11 +113,11 @@ public class CaseInsensitiveClassMapBuilder<A,B> extends ClassMapBuilder<A,B> {
      * @param expr the property expression to resolve
      * @return the Property referenced by the provided expression
      */
+    @Override
     protected Property resolveProperty(java.lang.reflect.Type type, String expr) {
         String expression = expr;
         if (initialized) {
-            Map<String, String> lowercaseProps = type.equals(getAType()) ?
-                    lowercasePropertiesForA : lowercasePropertiesForB;
+            Map<String, String> lowercaseProps = type.equals(getAType()) ? lowercasePropertiesForA : lowercasePropertiesForB;
             String resolvedExpression = lowercaseProps.get(expr.toLowerCase());
             if (resolvedExpression != null) {
                 expression = resolvedExpression;
