@@ -17,7 +17,6 @@
  */
 package ma.glasnost.orika.test.metadata;
 
-import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.CaseInsensitiveClassMapBuilder;
@@ -28,82 +27,68 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author matt.deboer@gmail.com
- * 
- */
 public class CaseInsensitiveClassMapBuilderTest {
     
     @Test
     public void byDefault() {
-        
         MapperFactory factory = new DefaultMapperFactory.Builder()
-            .classMapBuilderFactory(new CaseInsensitiveClassMapBuilder.Factory()).build();
+                .classMapBuilderFactory(new CaseInsensitiveClassMapBuilder.Factory())
+                .build();
         
-        factory.classMap(Source.class, Destination.class).byDefault().register();
+        factory.classMap(Source.class, Destination.class)
+                .byDefault()
+                .register();
 
-        MapperFacade mapper = factory.getMapperFacade();
-        
         Source s = new Source();
         s.lastNAME = "Smith";
         s.firstName = "Joe";
         s.age = 25;
         
-        Destination d = mapper.map(s, Destination.class);
-        /*
-         * Check that properties we expect were mapped
-         */
+        Destination d = factory.getMapperFacade().map(s, Destination.class);
+
         assertEquals(s.firstName, d.fIrStNaMe);
         assertEquals(s.lastNAME, d.LastName);
         assertEquals(s.age, d.AGE);
     }
     
     @Test
-    public void fieldMap_withoutNestedProperties() {
-        
+    public void fieldMap_without_nested_properties() {
         MapperFactory factory = new DefaultMapperFactory.Builder()
-            .classMapBuilderFactory(new CaseInsensitiveClassMapBuilder.Factory()).build();
+                .classMapBuilderFactory(new CaseInsensitiveClassMapBuilder.Factory())
+                .build();
         
         factory.classMap(Source.class, Destination.class)
-            .field("FIRSTname", "FIRSTname")
-            .field("lastNAME", "lastNAME")
-            .field("aGE", "aGE")
-            .register();
-        
+                .field("FIRSTname", "FIRSTname")
+                .field("lastNAME", "lastNAME")
+                .field("aGE", "aGE")
+                .register();
 
-        MapperFacade mapper = factory.getMapperFacade();
-        
         Source s = new Source();
         s.lastNAME = "Smith";
         s.firstName = "Joe";
         s.age = 25;
         
-        Destination d = mapper.map(s, Destination.class);
-        /*
-         * Check that properties we expect were mapped
-         */
+        Destination d = factory.getMapperFacade().map(s, Destination.class);
+
         assertEquals(s.firstName, d.fIrStNaMe);
         assertEquals(s.lastNAME, d.LastName);
         assertEquals(s.age, d.AGE);
     }
     
     @Test
-    public void fieldMap_withNestedProperties() {
-        
+    public void fieldMap_with_nested_properties() {
         MapperFactory factory = new DefaultMapperFactory.Builder()
-            .classMapBuilderFactory(new CaseInsensitiveClassMapBuilder.Factory()).build();
+                .classMapBuilderFactory(new CaseInsensitiveClassMapBuilder.Factory())
+                .build();
         
         factory.classMap(Source.class, Destination.class)
-            .field("FIRSTname", "FIRSTname")
-            .field("lastNAME", "lastNAME")
-            .field("aGE", "aGE")
-            .field("name.first", "name.first")
-            .field("name.last", "name.last")
-            .register();
-        
+                .field("FIRSTname", "FIRSTname")
+                .field("lastNAME", "lastNAME")
+                .field("aGE", "aGE")
+                .field("name.first", "name.first")
+                .field("name.last", "name.last")
+                .register();
 
-        MapperFacade mapper = factory.getMapperFacade();
-        
         Source s = new Source();
         s.lastNAME = "Smith";
         s.firstName = "Joe";
@@ -112,10 +97,8 @@ public class CaseInsensitiveClassMapBuilderTest {
         s.NaMe.FIRST = "Joe";
         s.NaMe.LAST = "Smith";
         
-        Destination d = mapper.map(s, Destination.class);
-        /*
-         * Check that properties we expect were mapped
-         */
+        Destination d = factory.getMapperFacade().map(s, Destination.class);
+
         assertEquals(s.firstName, d.fIrStNaMe);
         assertEquals(s.lastNAME, d.LastName);
         assertEquals(s.age, d.AGE);
@@ -133,12 +116,10 @@ public class CaseInsensitiveClassMapBuilderTest {
                 .byDefault()
                 .register();
 
-        MapperFacade mapper = factory.getMapperFacade();
-
         final SourceDate source = new SourceDate();
         source.date = new Date();
 
-        DestinationDate destination = mapper.map(source, DestinationDate.class);
+        DestinationDate destination = factory.getMapperFacade().map(source, DestinationDate.class);
 
         assertEquals(source.date, destination.date.toGregorianCalendar().getTime());
     }
