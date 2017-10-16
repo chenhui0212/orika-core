@@ -18,11 +18,11 @@
 
 package ma.glasnost.orika;
 
-import java.lang.reflect.ParameterizedType;
-
 import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
+
+import java.lang.reflect.ParameterizedType;
 
 /**
  * CustomFilter provides the base implementation of Filter.
@@ -84,8 +84,8 @@ public abstract class CustomFilter<A, B> implements Filter<A, B> {
      * @see ma.glasnost.orika.Filter#appliesTo(ma.glasnost.orika.metadata.Property, ma.glasnost.orika.metadata.Property)
      */
     public boolean appliesTo(Property source, Property destination) {
-        return sourceType.isAssignableFrom(getObjectType(source.getType())) &&
-               destinationType.isAssignableFrom(getObjectType(destination.getType()));
+        return source != null && sourceType.isAssignableFrom(getObjectType(source.getType())) &&
+                destination != null && destinationType.isAssignableFrom(getObjectType(destination.getType()));
     }
 
     private static Type<?> getObjectType(Type<?> type) {
