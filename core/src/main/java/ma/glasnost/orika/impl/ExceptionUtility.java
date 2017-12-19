@@ -56,7 +56,7 @@ public class ExceptionUtility {
     }
     
     /**
-     * @param e
+     * @param me
      * @return
      */
     public MappingException decorate(MappingException me) {

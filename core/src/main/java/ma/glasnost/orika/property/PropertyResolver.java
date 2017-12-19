@@ -213,7 +213,8 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
      * method is available, use it to refine the type. The results of
      * pd.getPropertyType() are sometimes inconsistent across platforms.
      * 
-     * @param pd
+     * @param rawType
+     * @param readMethod
      * @return
      */
     private Class<?> resolveRawPropertyType(Class<?> rawType, Method readMethod) {
@@ -660,8 +661,8 @@ public abstract class PropertyResolver implements PropertyResolverStrategy {
      *            the property's owning type
      * @param expr
      *            the property expression to resolve
-     * @param properties
-     *            the known properties for the type
+     * @param isNestedLookup
+     * @param owner
      * @return the resolved Property
      * @throws MappingException
      *             if the expression cannot be resolved to a property for the

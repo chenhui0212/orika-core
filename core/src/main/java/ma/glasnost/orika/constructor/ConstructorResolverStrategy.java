@@ -42,7 +42,7 @@ public interface ConstructorResolverStrategy {
      * 
      * @param <T>
      */
-    public static class ConstructorMapping<T> {
+    class ConstructorMapping<T> {
     	
     	private Constructor<T> constructor;
     	private List<FieldMap> mappedFields;

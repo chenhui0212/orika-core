@@ -30,7 +30,7 @@ public interface MappingContextFactory {
      * 
      * @return an instance of MappingContext
      */
-    public MappingContext getContext();
+    MappingContext getContext();
     
     /**
      * Allows for implementations that reuse objects to clean-up/clear any resources
@@ -38,12 +38,12 @@ public interface MappingContextFactory {
      * 
      * @param context the context to be recycled
      */
-    public void release(MappingContext context);
+    void release(MappingContext context);
     
     
     /**
      * @return a reference to the global properties map for this mapping context factory; any properties
      * set here are available from any individual MappingContext created by this factory.
      */
-    public Map<Object, Object> getGlobalProperties();
+    Map<Object, Object> getGlobalProperties();
 }

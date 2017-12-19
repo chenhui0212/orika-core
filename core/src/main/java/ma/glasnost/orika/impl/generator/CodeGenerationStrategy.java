@@ -48,7 +48,7 @@ public interface CodeGenerationStrategy {
      * 
      * @param mapperFactory the MapperFactory to apply
      */
-    public void setMapperFactory(MapperFactory mapperFactory);
+    void setMapperFactory(MapperFactory mapperFactory);
     
     /**
      * Convenience method to add a specification at a relative position with respect to
@@ -58,12 +58,12 @@ public interface CodeGenerationStrategy {
      * @param relativePosition the relative position
      * @param relativeSpec the other relative spec (for Positions BEFORE, AFTER, or IN_PLACE_OF)
      */
-    public void addSpecification(Specification spec, Position relativePosition, Class<? extends Specification> relativeSpec);
+    void addSpecification(Specification spec, Position relativePosition, Class<? extends Specification> relativeSpec);
     
     /**
      * @return the defined specifications 
      */
-    public List<Specification> getSpecifications();
+    List<Specification> getSpecifications();
     
     /**
      * Convenience method to add an AggregateSpecification at a relative position with respect to
@@ -73,10 +73,10 @@ public interface CodeGenerationStrategy {
      * @param relativePosition the relative position
      * @param relativeSpec the other relative spec (for Positions BEFORE, AFTER, or IN_PLACE_OF)
      */
-    public void addAggregateSpecification(AggregateSpecification spec, Position relativePosition, Class<AggregateSpecification> relativeSpec);
+    void addAggregateSpecification(AggregateSpecification spec, Position relativePosition, Class<AggregateSpecification> relativeSpec);
     
     /**
      * @return the defined aggregate specifications
      */
-    public List<AggregateSpecification> getAggregateSpecifications();
+    List<AggregateSpecification> getAggregateSpecifications();
 }

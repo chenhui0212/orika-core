@@ -40,7 +40,7 @@ public interface MappingStrategy extends MappedTypePair<Object, Object> {
      * @param context the current mapping context
      * @return the mapping result
      */
-    public Object map(Object sourceObject, Object destinationObject, MappingContext context);
+    Object map(Object sourceObject, Object destinationObject, MappingContext context);
     
     /**
      * MappingStrategyKey defines the minimum information necessary to cache a
@@ -49,7 +49,7 @@ public interface MappingStrategy extends MappedTypePair<Object, Object> {
      * @author matt.deboer@gmail.com
      *
      */
-    public static final class Key {
+    final class Key {
         
         private final Class<?> rawSourceType;
         private final java.lang.reflect.Type sourceType;

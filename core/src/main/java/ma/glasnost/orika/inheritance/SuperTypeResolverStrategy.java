@@ -34,7 +34,7 @@ public interface SuperTypeResolverStrategy {
      * @param type
      * @return true if the proposed super-type is acceptable
      */
-    public boolean accept(Type<?> type);
+    boolean accept(Type<?> type);
     
     /**
      * 
@@ -42,11 +42,11 @@ public interface SuperTypeResolverStrategy {
      * @return true if a super-type should be looked up for the proposed type; 
      * false signifies that the class should be returned as-is.
      */
-    public boolean shouldLookupSuperType(Type<?> type);
+    boolean shouldLookupSuperType(Type<?> type);
     
     /**
      * @return true if a super class(es) should be looked-up first before
      * trying interfaces
      */
-    public boolean shouldPreferClassOverInterface();
+    boolean shouldPreferClassOverInterface();
 }

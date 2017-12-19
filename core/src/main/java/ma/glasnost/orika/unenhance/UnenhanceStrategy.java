@@ -41,7 +41,7 @@ public interface UnenhanceStrategy {
      * @param type
      * @return
      */
-    public <T> Type<T> unenhanceType(T object, Type<T> type);
+    <T> Type<T> unenhanceType(T object, Type<T> type);
     
-    public <T> T unenhanceObject(T object, Type<T> type);
+    <T> T unenhanceObject(T object, Type<T> type);
 }

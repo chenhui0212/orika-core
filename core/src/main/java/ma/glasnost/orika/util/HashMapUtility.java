@@ -34,9 +34,7 @@ public class HashMapUtility {
     
     /**
      * Generates a new instance of ConcurrentLinkedHashMap with the specified max weighted capacity
-     * 
-     * @param keyClass
-     * @param valClass
+     *
      * @param capacity
      * @return a new instance of ConcurrentLinkedHashMap with the specified max weighted capacity
      */

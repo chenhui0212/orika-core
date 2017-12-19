@@ -115,7 +115,7 @@ public class NestedProperty extends Property {
         private Property.Builder parent;
         
         /**
-         * @param owningType
+         * @param parent
          * @param name
          */
         Builder(Property.Builder parent, String name) {

@@ -28,7 +28,7 @@ public interface ConverterFactory {
 	 * Sets the MapperFactory which will be used by this ConverterFactory to obtain
 	 * a MapperFacade needed by it's registered converters.
 	 * 
-	 * @param mapperfactory
+	 * @param mapperFacade
 	 */
 	void setMapperFacade(MapperFacade mapperFacade);
 	

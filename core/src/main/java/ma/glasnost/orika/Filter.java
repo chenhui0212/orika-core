@@ -42,7 +42,7 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      *            the destination property
      * @return true if this Filter applies
      */
-    public boolean appliesTo(Property source, Property destination);
+    boolean appliesTo(Property source, Property destination);
     
     /**
      * Called at code generation time to determine whether this filter modifies
@@ -55,7 +55,7 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      * @return true if this Filter should be called to filter the source value
      *         the mapping results
      */
-    public boolean filtersSource();
+    boolean filtersSource();
     
     /**
      * Called at code generation time to determine whether this filter modifies
@@ -68,7 +68,7 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      * @return true if this Filter should be called to filter the destination of
      *         the mapping results
      */
-    public boolean filtersDestination();
+    boolean filtersDestination();
     
     /**
      * This method is called at runtime to determine whether the mapping implied
@@ -91,7 +91,7 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      *            the current mapping context
      * @return true if the fields represented by these types and names
      */
-    public <S extends A, D extends B> boolean shouldMap(Type<S> sourceType, String sourceName, S source, Type<D> destType, String destName,
+    <S extends A, D extends B> boolean shouldMap(Type<S> sourceType, String sourceName, S source, Type<D> destType, String destName,
             D dest, MappingContext mappingContext);
     
     /**
@@ -116,7 +116,7 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      *            the current mapping context
      * @return the filtered output value
      */
-    public <D extends B> D filterDestination(D destinationValue, Type<?> sourceType, String sourceName, Type<D> destType, String destName,
+    <D extends B> D filterDestination(D destinationValue, Type<?> sourceType, String sourceName, Type<D> destType, String destName,
             MappingContext mappingContext);
     
     /**
@@ -142,7 +142,7 @@ public interface Filter<A, B> extends MappedTypePair<A, B> {
      *            the current mapping context
      * @return the filtered output value
      */
-    public <S extends A> S filterSource(S sourceValue, Type<S> sourceType, String sourceName, Type<?> destType, String destName,
+    <S extends A> S filterSource(S sourceValue, Type<S> sourceType, String sourceName, Type<?> destType, String destName,
             MappingContext mappingContext);
     
 }
