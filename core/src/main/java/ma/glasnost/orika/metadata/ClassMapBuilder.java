@@ -354,7 +354,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     /**
      * 
      * 
-     * @param fieldA
+     * @param fieldNameA
      * @param fieldB
      * @param byDefault
      * @return
@@ -393,7 +393,7 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     /**
      * 
      * 
-     * @param fieldA
+     * @param fieldNameA
      * @param fieldB
      * @param byDefault
      * @return
@@ -421,7 +421,6 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
      * 
      * @param fieldA
      * @param fieldB
-     * @param byDefault
      * @return
      */
     public ClassMapBuilder<A, B> field(Property fieldA, Property fieldB) {
@@ -431,9 +430,8 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
     /**
      * 
      * 
-     * @param fieldA
+     * @param fieldNameA
      * @param fieldB
-     * @param byDefault
      * @return
      */
     public ClassMapBuilder<A, B> field(String fieldNameA, Property fieldB) {
@@ -445,7 +443,6 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
      * 
      * @param fieldA
      * @param fieldNameB
-     * @param byDefault
      * @return
      */
     public ClassMapBuilder<A, B> field(Property fieldA, String fieldNameB) {
@@ -457,7 +454,6 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
      * 
      * @param fieldA
      * @param fieldB
-     * @param byDefault
      * @return this ClassMapBuilder
      */
     public ClassMapBuilder<A, B> field(Property.Builder fieldA, Property.Builder fieldB) {
@@ -469,7 +465,6 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
      * 
      * @param fieldNameA
      * @param fieldB
-     * @param byDefault
      * @return this ClassMapBuilder
      */
     public ClassMapBuilder<A, B> field(String fieldNameA, Property.Builder fieldB) {
@@ -481,7 +476,6 @@ public class ClassMapBuilder<A, B> implements MappedTypePair<A, B> {
      * 
      * @param fieldA
      * @param fieldNameB
-     * @param byDefault
      * @return this ClassMapBuilder
      */
     public ClassMapBuilder<A, B> field(Property.Builder fieldA, String fieldNameB) {

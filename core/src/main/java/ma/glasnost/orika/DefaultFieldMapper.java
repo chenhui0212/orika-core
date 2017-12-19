@@ -34,6 +34,5 @@ public interface DefaultFieldMapper {
 	 * @return a suggested optional mapping name for the given property,
 	 * or <code>null</code> if no suggestion for the given property
 	 */
-	public String suggestMappedField(String fromProperty, Type<?> fromPropertyType);
-	
+	String suggestMappedField(String fromProperty, Type<?> fromPropertyType);
 }

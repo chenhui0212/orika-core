@@ -18,30 +18,7 @@
 
 package ma.glasnost.orika.impl.generator;
 
-import static java.lang.String.format;
-import static ma.glasnost.orika.impl.Specifications.aMultiOccurrenceElementMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import ma.glasnost.orika.BoundMapperFacade;
-import ma.glasnost.orika.Converter;
-import ma.glasnost.orika.Filter;
-import ma.glasnost.orika.MapEntry;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.*;
 import ma.glasnost.orika.Properties;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.AggregateFilter;
@@ -53,6 +30,13 @@ import ma.glasnost.orika.impl.generator.specification.AbstractSpecification;
 import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.*;
 import ma.glasnost.orika.property.PropertyResolverStrategy;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.lang.String.format;
+import static ma.glasnost.orika.impl.Specifications.aMultiOccurrenceElementMap;
 
 /**
  * SourceCodeContext contains the state information necessary while generating
@@ -237,8 +221,7 @@ public class SourceCodeContext {
      * source and/or class files to be written.
      * 
      * @return the (generated) compiled class
-     * @throws CannotCompileException
-     * @throws IOException
+     * @throws SourceCodeGenerationException
      */
     protected Class<?> compileClass() throws SourceCodeGenerationException {
         try {
@@ -250,8 +233,7 @@ public class SourceCodeContext {
     
     /**
      * @return a new instance of the (generated) compiled class
-     * @throws CannotCompileException
-     * @throws IOException
+     * @throws SourceCodeGenerationException
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
@@ -523,7 +505,6 @@ public class SourceCodeContext {
      * @param dest
      * @param srcNodes
      * @param destNodes
-     * @param mappings
      *            any relevant declared field mappings
      * @return a code snippet suitable to use as an equality comparison test for
      *         the provided source and destination nodes
@@ -856,7 +837,8 @@ public class SourceCodeContext {
      * Proxies the destination property as necessary for filters that filter
      * destination values.
      * 
-     * @param destinationProperty
+     * @param src
+     * @param dest
      * @param filter
      * @return
      */
@@ -892,7 +874,8 @@ public class SourceCodeContext {
      * Proxies the source property as necessary for filters that filter source
      * values.
      * 
-     * @param sourceProperty
+     * @param src
+     * @param dest
      * @param filter
      * @return
      */

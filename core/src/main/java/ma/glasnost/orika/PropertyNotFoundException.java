@@ -29,7 +29,6 @@ public class PropertyNotFoundException extends MappingException {
 
     /**
      * @param message
-     * @param type
      */
     public PropertyNotFoundException(String message) {
         super(message);

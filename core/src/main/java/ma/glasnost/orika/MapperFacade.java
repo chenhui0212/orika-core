@@ -274,8 +274,6 @@ public interface MapperFacade {
      *            the Array from which to map
      * @param destinationClass
      *            the type of elements to be contained in the returned Set.
-     * @param context
-     *            the context from the current mapping request
      * @return a new Array containing elements of type
      *         <code>destinationClass</code> mapped from the elements of
      *         <code>source</code>.
@@ -494,7 +492,6 @@ public interface MapperFacade {
      *            the type of the source elements
      * @param destinationType
      *            the type of the new object to return
-     * @param context
      *            the current mapping context
      * @return a new List containing elements of type
      *         <code>destinationType</code> mapped from the elements of
@@ -583,7 +580,6 @@ public interface MapperFacade {
      *            the type of the source elements
      * @param destinationType
      *            the type of the new object to return
-     * @param context
      *            the current mapping context
      * @return the destination Array mapped from the elements of
      *         <code>source</code>.

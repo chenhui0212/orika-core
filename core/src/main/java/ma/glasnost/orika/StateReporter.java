@@ -22,7 +22,6 @@ public final class StateReporter {
      * 
      * @param out
      * @param mapperFactory
-     * @param mapperFacade
      */
     public static void reportCurrentState(StringBuilder out, MapperFactory mapperFactory) {
     	ConverterFactory converterFactory = mapperFactory.getConverterFactory();
@@ -56,7 +55,7 @@ public final class StateReporter {
 	 * @author mattdeboer
 	 *
 	 */
-	public static interface Reportable {
+	public interface Reportable {
 
 		/**
 		 * Writes details of the current state of this object to the provided

@@ -43,7 +43,6 @@ public class ConstructorParameterResolver {
      * TODO: this isn't a correct mapping, as
      * 
      * @param type
-     * @param dynamicPropertyExpression
      * @return the property (of any format)
      */
     public Map<String, Set<Property>> getProperties(java.lang.reflect.Type type) {

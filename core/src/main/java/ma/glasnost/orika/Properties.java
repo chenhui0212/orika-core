@@ -31,5 +31,4 @@ public enum Properties {
     UNENHANCE_STRATEGY,
     FILTERS,
     CAPTURE_FIELD_CONTEXT
-    ;
 }

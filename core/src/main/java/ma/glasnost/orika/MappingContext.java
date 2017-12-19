@@ -261,7 +261,7 @@ public class MappingContext {
      *            the destination object being mapped into
      * @deprecated This variant exists for backwards compatibility only; if
      *             overriding, override
-     *             {@link #beginMapping(Type, String, Object, Type, String, Object)}
+     *             {@link #beginMapping(Type, Object, Type, String, Object)}
      *             instead.
      */
     @Deprecated
