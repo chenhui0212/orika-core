@@ -17,14 +17,15 @@
  */
 package ma.glasnost.orika;
 
+import ma.glasnost.orika.metadata.Type;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import ma.glasnost.orika.metadata.Type;
-import ma.glasnost.orika.metadata.TypeFactory;
+import static ma.glasnost.orika.metadata.TypeFactory.valueOf;
 
 
 /**
@@ -82,8 +83,8 @@ public class MapEntry<K, V> implements Map.Entry<K, V> {
      */
     @SuppressWarnings("unchecked")
     public static <K, V> Type<MapEntry<K, V>> concreteEntryType(Type<? extends Map<K, V>> mapType) {
-        
-        Type<?> type = TypeFactory.valueOf(MapEntry.class, mapType.getActualTypeArguments()); 
+        Type<?> mapInterface = mapType.findInterface(valueOf(Map.class));
+        Type<?> type = valueOf(MapEntry.class, mapInterface.getActualTypeArguments()); 
         return (Type<MapEntry<K, V>>)type; 
     }
     
@@ -100,7 +101,7 @@ public class MapEntry<K, V> implements Map.Entry<K, V> {
     @SuppressWarnings("unchecked")
     public static <K, V> Type<Map.Entry<K, V>> entryType(Type<? extends Map<K, V>> mapType) {
         
-        Type<?> type = TypeFactory.valueOf(Map.Entry.class, mapType.getActualTypeArguments()); 
+        Type<?> type = valueOf(Map.Entry.class, mapType.getActualTypeArguments()); 
         return (Type<Map.Entry<K, V>>)type; 
     }
     
