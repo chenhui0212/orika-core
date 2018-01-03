@@ -294,6 +294,72 @@ public class BeanToMapGenerationTestCase {
         Assert.assertEquals(name.last, mapBack.last);
     }
 
+	@Test
+	public void testDoubleNestedMapElement() {
+
+		MapperFactory factory = MappingUtil.getMapperFactory();
+
+		factory.classMap(Person.class, PersonDto3.class)
+				.field("name.first", "names['self']['first']")
+				.field("name.last", "names['self']['last']")
+				.field("father.first", "names['father']['first']")
+				.field("father.last", "names['father']['last']")
+				.register();
+
+		MapperFacade mapper = factory.getMapperFacade();
+
+		Person person = new Person();
+		person.name = new Name();
+		person.name.first = "Chuck";
+		person.name.last = "Testa";
+		person.father = new Name();
+		person.father.first = "Buck";
+		person.father.last = "Testa";
+
+		PersonDto3 result = mapper.map(person, PersonDto3.class);
+
+		Assert.assertNotNull(result.names);
+		Assert.assertEquals(person.name.first, result.names.get("self").get("first"));
+		Assert.assertEquals(person.name.last, result.names.get("self").get("last"));
+		Assert.assertEquals(person.father.first, result.names.get("father").get("first"));
+		Assert.assertEquals(person.father.last, result.names.get("father").get("last"));
+
+		Person mapBack = mapper.map(result, Person.class);
+
+		Assert.assertNotNull(mapBack.name.first);
+		Assert.assertEquals(person.name.first, mapBack.name.first);
+		Assert.assertEquals(person.name.last, mapBack.name.last);
+		Assert.assertEquals(person.father.first, mapBack.father.first);
+		Assert.assertEquals(person.father.last, mapBack.father.last);
+
+	}
+
+	@Test
+	public void testMapWithGenericSuperclassImplementation() {
+
+		MapperFactory factory = MappingUtil.getMapperFactory();
+
+		factory.classMap(Person.class, PersonDto4.class)
+				.field("name.first", "names['self'].first")
+				.register();
+
+		MapperFacade mapper = factory.getMapperFacade();
+
+		Person person = new Person();
+		person.name = new Name();
+		person.name.first = "Chuck";
+
+		PersonDto4 result = mapper.map(person, PersonDto4.class);
+
+		Assert.assertNotNull(result.names);
+		Assert.assertEquals(person.name.first, result.names.get("self").first);
+
+		Person mapBack = mapper.map(result, Person.class);
+
+		Assert.assertNotNull(mapBack.name.first);
+		Assert.assertEquals(person.name.first, mapBack.name.first);
+	}
+
     public static enum NameFields {
         FIRST, LAST;
     }
@@ -309,6 +375,14 @@ public class BeanToMapGenerationTestCase {
 	
 	public static class PersonDto2 {
 	    public Map<String, Name> names = new HashMap<String, Name>();
+	}
+
+	public static class PersonDto3 {
+		public Map<String, Map<String, String>> names = new HashMap<String, Map<String, String>>();
+	}
+
+	public static class PersonDto4 {
+		public NameMap names = new NameMap();
 	}
 	
 	public static class Student {
@@ -327,6 +401,10 @@ public class BeanToMapGenerationTestCase {
 		public double point;
 		public double percentage;
 		public String letter;
+	}
+	
+	public static class NameMap extends HashMap<String, Name>{
+		
 	}
 
 }
