@@ -334,6 +334,32 @@ public class BeanToMapGenerationTestCase {
 
 	}
 
+	@Test
+	public void testMapWithGenericSuperclassImplementation() {
+
+		MapperFactory factory = MappingUtil.getMapperFactory();
+
+		factory.classMap(Person.class, PersonDto4.class)
+				.field("name.first", "names['self'].first")
+				.register();
+
+		MapperFacade mapper = factory.getMapperFacade();
+
+		Person person = new Person();
+		person.name = new Name();
+		person.name.first = "Chuck";
+
+		PersonDto4 result = mapper.map(person, PersonDto4.class);
+
+		Assert.assertNotNull(result.names);
+		Assert.assertEquals(person.name.first, result.names.get("self").first);
+
+		Person mapBack = mapper.map(result, Person.class);
+
+		Assert.assertNotNull(mapBack.name.first);
+		Assert.assertEquals(person.name.first, mapBack.name.first);
+	}
+
     public static enum NameFields {
         FIRST, LAST;
     }
@@ -354,6 +380,10 @@ public class BeanToMapGenerationTestCase {
 	public static class PersonDto3 {
 		public Map<String, Map<String, String>> names = new HashMap<String, Map<String, String>>();
 	}
+
+	public static class PersonDto4 {
+		public NameMap names = new NameMap();
+	}
 	
 	public static class Student {
 	    public Grade grade;
@@ -371,6 +401,10 @@ public class BeanToMapGenerationTestCase {
 		public double point;
 		public double percentage;
 		public String letter;
+	}
+	
+	public static class NameMap extends HashMap<String, Name>{
+		
 	}
 
 }
