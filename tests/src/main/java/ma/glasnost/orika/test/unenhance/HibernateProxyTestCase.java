@@ -22,6 +22,8 @@ import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.BookDTO;
 
+import java.io.Serializable;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Assert;
@@ -44,7 +46,10 @@ public class HibernateProxyTestCase {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
-	  
+	
+	private Serializable bookId;
+
+
 	
 	protected Session getSession() {
 	    return sessionFactory.getCurrentSession();
@@ -66,7 +71,7 @@ public class HibernateProxyTestCase {
 		book2.setTitle("The Prophet 2");
 		book.setAuthor(author);
 		
-		getSession().save(book);
+		bookId = getSession().save(book);
 		getSession().save(book2);
 		
 		/*
@@ -83,7 +88,7 @@ public class HibernateProxyTestCase {
 	@Test
 	public void testMappingProxyObject() {
 		
-		Book book = (Book) getSession().load(Book.class, 1L);
+		Book book = (Book) getSession().load(Book.class, bookId);
 		for (int i=0; i < 100; ++i) {
 			BookDTO bookDto = mapper.map(book, BookDTO.class);
 	

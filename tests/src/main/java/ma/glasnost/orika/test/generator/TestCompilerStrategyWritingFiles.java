@@ -87,7 +87,8 @@ public class TestCompilerStrategyWritingFiles {
     	
     	} finally {
     		// Note: this is coming from hibernate jar which is included only for test
-    		IOUtils.deleteRecursive(generatedSrc.getParentFile().getAbsolutePath(), true);
+    		//TODO: is this still needed? The function doesn't exist anymore
+    		//IOUtils.deleteRecursive(generatedSrc.getParentFile().getAbsolutePath(), true);
     	}
     	
     }

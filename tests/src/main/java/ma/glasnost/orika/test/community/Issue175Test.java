@@ -2,8 +2,8 @@ package ma.glasnost.orika.test.community;
 
 import ma.glasnost.orika.OrikaSystemProperties;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Test;
 
 import java.util.ArrayList;

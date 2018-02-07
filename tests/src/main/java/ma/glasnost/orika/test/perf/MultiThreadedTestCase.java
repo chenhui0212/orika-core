@@ -50,7 +50,7 @@ import ma.glasnost.orika.test.common.types.TestCaseClasses.Library;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.LibraryDTO;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.LibraryImpl;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
