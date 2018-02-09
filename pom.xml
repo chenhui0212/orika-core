@@ -173,12 +173,12 @@
                 <version>3.2.2</version>
                 <scope>test</scope>
             </dependency>
-
+            
             <dependency>
-                <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
-                <artifactId>concurrentlinkedhashmap-lru</artifactId>
-                <version>1.4.2</version>
-            </dependency>
+			    <groupId>com.github.ben-manes.caffeine</groupId>
+			    <artifactId>caffeine</artifactId>
+			    <version>2.6.1</version>
+			</dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>

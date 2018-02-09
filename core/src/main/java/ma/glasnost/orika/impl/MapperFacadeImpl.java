@@ -18,7 +18,7 @@
 
 package ma.glasnost.orika.impl;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.github.benmanes.caffeine.cache.Cache;
 import ma.glasnost.orika.*;
 import ma.glasnost.orika.MappingStrategy.Key;
 import ma.glasnost.orika.StateReporter.Reportable;
@@ -38,7 +38,7 @@ import java.util.Map.Entry;
 
 import static ma.glasnost.orika.StateReporter.DIVIDER;
 import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
-import static ma.glasnost.orika.util.HashMapUtility.getConcurrentLinkedHashMap;
+import static ma.glasnost.orika.util.HashMapUtility.getCache;
 
 /**
  * MapperFacadeImpl is the base implementation of MapperFacade
@@ -49,7 +49,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     private final MappingContextFactory contextFactory;
     protected final UnenhanceStrategy unenhanceStrategy;
     private final UnenhanceStrategy userUnenhanceStrategy;
-    private final ConcurrentLinkedHashMap<Key, MappingStrategy> strategyCache = getConcurrentLinkedHashMap(500);
+    private final Cache<Key, MappingStrategy> strategyCache = getCache(500l);
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final ExceptionUtility exceptionUtil;
     
@@ -145,7 +145,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             final java.lang.reflect.Type initialDestinationType, final boolean mapInPlace, final MappingContext context) {
         
         Key key = new Key(getClass(sourceObject), initialSourceType, initialDestinationType, mapInPlace);
-        MappingStrategy strategy = strategyCache.get(key);
+        MappingStrategy strategy = strategyCache.getIfPresent(key);
         
         if (strategy == null) {
             
@@ -186,10 +186,8 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             if (log.isDebugEnabled()) {
                 log.debug(strategyRecorder.describeDetails());
             }
-            MappingStrategy existing = strategyCache.putIfAbsent(key, strategy);
-            if (existing != null) {
-                strategy = existing;
-            }
+            strategyCache.put(key, strategy);
+    
         }
         
         /*
@@ -1007,7 +1005,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     }
     
     public void factoryModified(MapperFactory factory) {
-        strategyCache.clear();
+        strategyCache.invalidateAll();
     }
     
     /**
@@ -1019,11 +1017,11 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
     public void reportCurrentState(StringBuilder out) {
         out.append(DIVIDER);
         out.append("\nResolved strategies: ")
-                .append(strategyCache.size())
+                .append(strategyCache.estimatedSize())
                 .append(" (approximate size: ")
                 .append(humanReadableSizeInMemory(strategyCache))
                 .append(")");
-        for (Entry<Key, MappingStrategy> entry : strategyCache.entrySet()) {
+        for (Entry<Key, MappingStrategy> entry : strategyCache.asMap().entrySet()) {
             out.append("\n").append(entry.getKey()).append(": ").append(entry.getValue());
         }
         out.append(DIVIDER);

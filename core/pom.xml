@@ -38,8 +38,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.googlecode.concurrentlinkedhashmap</groupId>
-			<artifactId>concurrentlinkedhashmap-lru</artifactId>
+		    <groupId>com.github.ben-manes.caffeine</groupId>
+		    <artifactId>caffeine</artifactId>
 		</dependency>
 
 		<dependency>
