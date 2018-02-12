@@ -1,8 +1,8 @@
 package ma.glasnost.orika.test.community.issue121.util;
 
-import org.apache.commons.lang.RandomStringUtils;
-
 import java.util.Random;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  * @author: Ilya Krokhmalyov YC14IK1

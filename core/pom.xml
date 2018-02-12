@@ -104,13 +104,12 @@
 	        <plugin>
 	          <groupId>org.codehaus.mojo</groupId>
 	          <artifactId>animal-sniffer-maven-plugin</artifactId>
-	          <version>1.15</version>
+	          <version>1.16</version>
 	          <configuration>
-	            <signature>
-	              <groupId>org.codehaus.mojo.signature</groupId>
-	              <artifactId>java16</artifactId>
-	              <version>1.1</version>
-	            </signature>
+	          <jdk>
+            <version>[1.7.0)</version>
+            <vendor>sun</vendor>
+          </jdk>
 	          </configuration>
 	          <executions>
 	            <execution>
