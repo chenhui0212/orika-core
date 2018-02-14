@@ -10,7 +10,7 @@
 	<name>Orika - tests for JDK8</name>
 
 	<properties>
-		<javassist.version>3.20.0-GA</javassist.version>
+		<javassist.version>3.22.0-GA</javassist.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
