@@ -107,7 +107,7 @@
 	          <version>1.16</version>
 	          <configuration>
 	          <jdk>
-            <version>[1.7.0)</version>
+            <version>[1.8.0)</version>
             <vendor>sun</vendor>
           </jdk>
 	          </configuration>
