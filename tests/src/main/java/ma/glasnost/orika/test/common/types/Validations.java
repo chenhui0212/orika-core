@@ -23,8 +23,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.apache.commons.collections.list.TreeList;
-
 import ma.glasnost.orika.test.common.types.TestCaseClasses.Author;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.AuthorDTO;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.AuthorNested;
@@ -83,11 +81,9 @@ public class Validations {
     	assertNotNull(library.getBooks());
     	assertNotNull(dto.getBooks());
     	
-    	@SuppressWarnings("unchecked")
-		List<Book> sortedBooks = new TreeList(library.getBooks()); 
+		List<Book> sortedBooks = library.getBooks(); 
     	
-    	@SuppressWarnings("unchecked")
-		List<BookDTO> sortedDTOs = new TreeList(dto.getBooks());
+		List<BookDTO> sortedDTOs = dto.getBooks();
     	
     	assertEquals(sortedBooks.size(), sortedDTOs.size());
     	
@@ -106,11 +102,9 @@ public class Validations {
     	assertNotNull(library.getBooks());
     	assertNotNull(dto.getBooks());
     	
-    	@SuppressWarnings("unchecked")
-		List<BookNested> sortedBooks = new TreeList(library.getBooks()); 
+		List<BookNested> sortedBooks = library.getBooks(); 
     	
-    	@SuppressWarnings("unchecked")
-		List<BookDTO> sortedDTOs = new TreeList(dto.getBooks());
+		List<BookDTO> sortedDTOs = dto.getBooks();
     	
     	assertEquals(sortedBooks.size(), sortedDTOs.size());
     	

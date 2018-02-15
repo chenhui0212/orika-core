@@ -60,7 +60,6 @@ import ma.glasnost.orika.test.constructor.TestCaseClasses.PersonVO3;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.PrimitiveNumberHolder;
 import ma.glasnost.orika.test.constructor.TestCaseClasses.WrapperHolder;
 
-import org.apache.commons.collections.list.TreeList;
 import org.junit.Test;
 
 public class ConstructorMappingTestCase {
@@ -538,11 +537,9 @@ public class ConstructorMappingTestCase {
     	assertNotNull(library.getBooks());
     	assertNotNull(dto.getBooks());
     	
-    	@SuppressWarnings("unchecked")
-		List<Book> sortedBooks = new TreeList(library.getBooks()); 
+		List<Book> sortedBooks = library.getBooks(); 
     	
-    	@SuppressWarnings("unchecked")
-		List<BookDTO> sortedDTOs = new TreeList(dto.getBooks());
+		List<BookDTO> sortedDTOs = dto.getBooks();
     	
     	assertEquals(sortedBooks.size(), sortedDTOs.size());
     	
@@ -561,11 +558,9 @@ public class ConstructorMappingTestCase {
     	assertNotNull(library.getBooks());
     	assertNotNull(dto.getBooks());
     	
-    	@SuppressWarnings("unchecked")
-		List<BookNested> sortedBooks = new TreeList(library.getBooks()); 
+		List<BookNested> sortedBooks = library.getBooks(); 
     	
-    	@SuppressWarnings("unchecked")
-		List<BookDTO> sortedDTOs = new TreeList(dto.getBooks());
+		List<BookDTO> sortedDTOs = dto.getBooks();
     	
     	assertEquals(sortedBooks.size(), sortedDTOs.size());
     	

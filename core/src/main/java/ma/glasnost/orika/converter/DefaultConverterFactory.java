@@ -45,7 +45,7 @@ import ma.glasnost.orika.util.HashMapUtility;
  */
 public class DefaultConverterFactory implements ConverterFactory, Reportable {
     
-    private static final Integer CACHE_SIZE = 2000;
+    private static final long CACHE_SIZE = 2000L;
     private final Map<ConverterKey, Converter<Object, Object>> converterCache;
     private Collection<Converter<Object, Object>> converters;
     private final Map<String, Converter<Object, Object>> convertersMap;
@@ -68,8 +68,8 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
      * converters.
      */
     public DefaultConverterFactory() {
-        this(HashMapUtility.<ConverterKey, Converter<Object, Object>> getConcurrentLinkedHashMap(CACHE_SIZE),
-                new LinkedHashSet<Converter<Object, Object>>());
+    	this(HashMapUtility.<ConverterKey, Converter<Object, Object>> getCache(CACHE_SIZE).asMap(),
+        new LinkedHashSet<Converter<Object, Object>>());
     }
     
     public synchronized void setMapperFacade(MapperFacade mapperFacade) {
