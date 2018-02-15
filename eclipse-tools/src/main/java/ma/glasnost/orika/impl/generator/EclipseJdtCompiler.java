@@ -96,10 +96,10 @@ public class EclipseJdtCompiler {
 	 * 
 	 * @return
 	 */
-	private Map<Object, Object> getFormattingOptions() {
+	private Map<String, String> getFormattingOptions() {
 
 		@SuppressWarnings("unchecked")
-		Map<Object, Object> options = DefaultCodeFormatterConstants
+		Map<String, String> options = DefaultCodeFormatterConstants
 				.getEclipseDefaultSettings();
 		options.put(JavaCore.COMPILER_SOURCE, JAVA_COMPILER_SOURCE_VERSION);
 		options.put(JavaCore.COMPILER_COMPLIANCE,
@@ -111,7 +111,7 @@ public class EclipseJdtCompiler {
 
 	private CompilerOptions getCompilerOptions() {
 
-		Map<Object, Object> options = new HashMap<Object, Object>();
+		Map<String, String> options = new HashMap<String, String>();
 
 		options.put(CompilerOptions.OPTION_LocalVariableAttribute,
 				CompilerOptions.GENERATE);
