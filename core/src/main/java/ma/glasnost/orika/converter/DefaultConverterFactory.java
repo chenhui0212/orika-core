@@ -35,7 +35,6 @@ import ma.glasnost.orika.impl.util.ClassUtil;
 import ma.glasnost.orika.metadata.ConverterKey;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
-import ma.glasnost.orika.util.HashMapUtility;
 
 /**
  * DefaultConverterFactory is the base implementation of ConverterFactory
@@ -45,7 +44,6 @@ import ma.glasnost.orika.util.HashMapUtility;
  */
 public class DefaultConverterFactory implements ConverterFactory, Reportable {
     
-    private static final long CACHE_SIZE = 2000L;
     private final Map<ConverterKey, Converter<Object, Object>> converterCache;
     private Collection<Converter<Object, Object>> converters;
     private final Map<String, Converter<Object, Object>> convertersMap;
@@ -68,7 +66,7 @@ public class DefaultConverterFactory implements ConverterFactory, Reportable {
      * converters.
      */
     public DefaultConverterFactory() {
-    	this(HashMapUtility.<ConverterKey, Converter<Object, Object>> getCache(CACHE_SIZE).asMap(),
+    	this(new ConcurrentHashMap<>(),
         new LinkedHashSet<Converter<Object, Object>>());
     }
     

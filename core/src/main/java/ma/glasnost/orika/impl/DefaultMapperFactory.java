@@ -18,7 +18,6 @@
 
 package ma.glasnost.orika.impl;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import ma.glasnost.orika.*;
 import ma.glasnost.orika.Properties;
 import ma.glasnost.orika.StateReporter.Reportable;
@@ -53,7 +52,6 @@ import static java.lang.System.getProperty;
 import static ma.glasnost.orika.OrikaSystemProperties.*;
 import static ma.glasnost.orika.StateReporter.DIVIDER;
 import static ma.glasnost.orika.StateReporter.humanReadableSizeInMemory;
-import static ma.glasnost.orika.util.HashMapUtility.getCache;
 
 /**
  * The mapper factory is the heart of Orika, a small container where metadata
@@ -71,7 +69,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     protected final MapperGenerator mapperGenerator;
     protected final ObjectFactoryGenerator objectFactoryGenerator;
 
-    protected final Cache<MapperKey, ClassMap<Object, Object>> classMapRegistry;
+    protected final ConcurrentHashMap<MapperKey, ClassMap<Object, Object>> classMapRegistry;
     protected final SortedCollection<Mapper<Object, Object>> mappersRegistry;
     protected final SortedCollection<Filter<Object, Object>> filtersRegistry;
     protected final MappingContextFactory contextFactory;
@@ -109,7 +107,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         
         this.converterFactory = new ConverterFactoryFacade(builder.converterFactory);
         this.compilerStrategy = builder.compilerStrategy;
-        this.classMapRegistry = getCache(Long.valueOf(Integer.MAX_VALUE));
+        this.classMapRegistry = new ConcurrentHashMap<>();
         this.mappersRegistry = new SortedCollection<Mapper<Object, Object>>(Ordering.MAPPER);
         this.filtersRegistry = new SortedCollection<Filter<Object, Object>>(Ordering.FILTER);
         this.explicitAToBRegistry = new ConcurrentHashMap<Type<?>, Set<Type<?>>>();
@@ -1281,7 +1279,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 }
                 converterFactory.setMapperFacade(mapperFacade);
                 
-                for (Map.Entry<MapperKey, ClassMap<Object, Object>> classMapEntry : classMapRegistry.asMap().entrySet()) {
+                for (Map.Entry<MapperKey, ClassMap<Object, Object>> classMapEntry : classMapRegistry.entrySet()) {
                     ClassMap<Object, Object> classMap = classMapEntry.getValue();
                     if (classMap.getUsedMappers().isEmpty()) {
                         classMapEntry.setValue(classMap.copyWithUsedMappers(discoverUsedMappers(classMap)));
@@ -1291,7 +1289,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
                 buildClassMapRegistry();
 
                 Map<ClassMap<?, ?>, GeneratedMapperBase> generatedMappers = new HashMap<ClassMap<?, ?>, GeneratedMapperBase>();
-                for (ClassMap<?, ?> classMap : classMapRegistry.asMap().values()) {
+                for (ClassMap<?, ?> classMap : classMapRegistry.values()) {
                     generatedMappers.put(classMap, buildMapper(classMap, false, context));
                 }
                 
@@ -1326,11 +1324,11 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
         // prepare a map for classmap (stored as set)
         Map<MapperKey, ClassMap<Object, Object>> classMapsDictionary = new HashMap<MapperKey, ClassMap<Object, Object>>();
         
-        for (final ClassMap<Object, Object> classMap : classMapRegistry.asMap().values()) {
+        for (final ClassMap<Object, Object> classMap : classMapRegistry.values()) {
             classMapsDictionary.put(new MapperKey(classMap.getAType(), classMap.getBType()), classMap);
         }
         
-        for (final ClassMap<?, ?> classMap : classMapRegistry.asMap().values()) {
+        for (final ClassMap<?, ?> classMap : classMapRegistry.values()) {
             MapperKey key = new MapperKey(classMap.getAType(), classMap.getBType());
             
             Set<ClassMap<Object, Object>> usedClassMapSet = new LinkedHashSet<ClassMap<Object, Object>>();
@@ -1369,7 +1367,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
          * should only add the most-specific of the available mappers to avoid
          * calling the same mapper multiple times during a single map request;
          */
-        for (ClassMap<?, ?> map : classMapRegistry.asMap().values()) {
+        for (ClassMap<?, ?> map : classMapRegistry.values()) {
             if (map.getAType().isAssignableFrom(classMapBuilder.getAType()) && map.getBType().isAssignableFrom(classMapBuilder.getBType())) {
                 if (!map.getAType().equals(classMapBuilder.getAType()) || !map.getBType().equals(classMapBuilder.getBType())) {
                     MapperKey key = new MapperKey(map.getAType(), map.getBType());
@@ -1515,7 +1513,7 @@ public class DefaultMapperFactory implements MapperFactory, Reportable {
     
     @SuppressWarnings("unchecked")
     public <A, B> ClassMap<A, B> getClassMap(MapperKey mapperKey) {
-        return (ClassMap<A, B>) classMapRegistry.getIfPresent(mapperKey);
+        return (ClassMap<A, B>) classMapRegistry.get(mapperKey);
     }
     
     public Set<Type<? extends Object>> lookupMappedClasses(Type<?> type) {
