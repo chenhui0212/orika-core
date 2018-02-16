@@ -21,19 +21,16 @@ package ma.glasnost.orika.test.boundmapperfacade;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.ClassMap;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeBuilder;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class GenericCollectionsTestCase {
     
@@ -50,11 +47,11 @@ public class GenericCollectionsTestCase {
         }
         
         public boolean equals(Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(name, ((Person) that).name);
         }
         
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(name);
         }
     }
     

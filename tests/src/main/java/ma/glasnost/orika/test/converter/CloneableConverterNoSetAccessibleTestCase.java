@@ -22,19 +22,18 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.converter.builtin.CloneableConverter;
 import ma.glasnost.orika.test.MappingUtil;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class CloneableConverterNoSetAccessibleTestCase {
     
@@ -124,11 +123,11 @@ public class CloneableConverterNoSetAccessibleTestCase {
         }
         
         public boolean equals(Object that) {
-        	return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(id, ((SampleCloneable) that).id);
         }
         
         public int hashCode() {
-        	return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(id);
         }
     }
 

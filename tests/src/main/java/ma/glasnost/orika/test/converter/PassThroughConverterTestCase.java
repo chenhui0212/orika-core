@@ -18,16 +18,16 @@
 
 package ma.glasnost.orika.test.converter;
 
+import java.util.Objects;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeBuilder;
 import ma.glasnost.orika.test.MappingUtil;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class PassThroughConverterTestCase {
     
@@ -132,12 +132,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(id, ((A) that).id);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(id);
         }
         
     }
@@ -155,12 +155,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(string, ((B) that).string);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(string);
         }
         
     }
@@ -188,12 +188,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(a, ((C) that).a) && Objects.equals(b, ((C) that).b);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(a,b);
         }
     }
     
@@ -220,12 +220,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(a, ((D) that).a) && Objects.equals(b, ((D) that).b);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(a,b);
         }
     }
     
@@ -243,12 +243,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(held, ((Holder<T>) that).held);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(held);
         }
     }
     
@@ -266,12 +266,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(held, ((Container<T>) that).held);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(held);
         }
     }
     
@@ -289,12 +289,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(held, ((Wrapper<T>) that).held);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(held);
         }
     }
     
@@ -312,12 +312,12 @@ public class PassThroughConverterTestCase {
         
         @Override
         public boolean equals(final Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
+        	return Objects.equals(held, ((Decorator<T>) that).held);
         }
         
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+        	return Objects.hash(held);
         }
     }
     

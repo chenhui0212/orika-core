@@ -5,11 +5,10 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -294,8 +293,7 @@ public class MappingContextFactoryExtensibilityTestCase {
         
         @Override
         public int hashCode() {
-            return new HashCodeBuilder().append(getName()).toHashCode();
-            
+        	return Objects.hash(getName());            
         }
         
         @Override
@@ -310,10 +308,8 @@ public class MappingContextFactoryExtensibilityTestCase {
                 return false;
             }
             Person rhs = (Person) obj;
-            return new EqualsBuilder()
-                    .append(getName(), rhs.getName())
-                    .isEquals();
             
+            return Objects.equals(getName(), rhs.getName());            
         }
         
         @Override

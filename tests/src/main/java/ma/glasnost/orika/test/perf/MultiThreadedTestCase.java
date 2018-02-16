@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.net.URLDecoder;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -50,7 +52,6 @@ import ma.glasnost.orika.test.common.types.TestCaseClasses.Library;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.LibraryDTO;
 import ma.glasnost.orika.test.common.types.TestCaseClasses.LibraryImpl;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -185,10 +186,11 @@ public class MultiThreadedTestCase {
         Person person = new Person();
         person.setFirstName("Abdelkrim");
         person.setLastName("EL KHETTABI");
-        Calendar cal = Calendar.getInstance();
-        cal = DateUtils.truncate(cal, Calendar.DAY_OF_MONTH);
-        cal.add(Calendar.YEAR, -31);
-        person.setDateOfBirth(cal.getTime());
+        LocalDate birthDate = LocalDate.now().minusYears(31);
+        Date date = Date.from(birthDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        
+        person.setDateOfBirth(date);
         person.setAge(31L);
         
         PersonVO vo = mapper.map(person, PersonVO.class);
@@ -196,7 +198,7 @@ public class MultiThreadedTestCase {
         Assert.assertEquals(person.getFirstName(), vo.getFirstName());
         Assert.assertEquals(person.getLastName(), vo.getLastName());
         Assert.assertTrue(person.getAge() == vo.getAge());
-        Assert.assertEquals(cal.getTime(), vo.getDateOfBirth());
+        Assert.assertEquals(date, vo.getDateOfBirth());
         
         Person mapBack = mapper.map(vo, Person.class);
         Assert.assertEquals(person, mapBack);
