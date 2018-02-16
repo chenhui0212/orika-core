@@ -1,13 +1,18 @@
 package ma.glasnost.orika.test.boundmapperfacade;
 
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.test.MappingUtil;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.test.MappingUtil;
 
 /**
  * @author: jad7 jad7kii@gmail.com

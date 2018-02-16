@@ -22,7 +22,6 @@ import org.junit.Test;
 
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.test.MappingUtil;
 
 /**
@@ -37,7 +36,7 @@ public class Issue38TestCase {
 	public void testAvoidEmptyObjectCreation() {
 		MapperFactory factory = MappingUtil.getMapperFactory();
 		
-		factory.registerClassMap(ClassMapBuilder.map(A.class, B.class).field("b.i1", "i1").field("b.i2", "i2").toClassMap());
+		factory.registerClassMap(factory.classMap(A.class, B.class).field("b.i1", "i1").field("b.i2", "i2").toClassMap());
 		
 		MapperFacade mapperFacade = factory.getMapperFacade();
 		
@@ -59,7 +58,7 @@ public class Issue38TestCase {
 	public void testCreateDestinationIfNotNull() {
 		MapperFactory factory = MappingUtil.getMapperFactory();
 		
-		factory.registerClassMap(ClassMapBuilder.map(A.class, B.class).field("b.i1", "i1").field("b.i2", "i2").toClassMap());
+		factory.registerClassMap(factory.classMap(A.class, B.class).field("b.i1", "i1").field("b.i2", "i2").toClassMap());
 		
 		MapperFacade mapperFacade = factory.getMapperFacade();
 		

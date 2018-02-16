@@ -20,14 +20,13 @@ package ma.glasnost.orika.test.metadata;
 import static ma.glasnost.orika.metadata.MappingDirection.A_TO_B;
 import static ma.glasnost.orika.metadata.MappingDirection.B_TO_A;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.CaseInsensitiveClassMapBuilder;
-import ma.glasnost.orika.metadata.MappingDirection;
-
-import org.junit.Test;
-import org.junit.Assert;
 
 /**
  * @author matt.deboer@gmail.com

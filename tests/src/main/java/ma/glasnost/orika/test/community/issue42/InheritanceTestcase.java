@@ -18,6 +18,9 @@
 
 package ma.glasnost.orika.test.community.issue42;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -26,9 +29,6 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 public class InheritanceTestcase {
     
     @Test
@@ -36,9 +36,9 @@ public class InheritanceTestcase {
         
         MapperFactory mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new EclipseJdtCompilerStrategy()).build();
         
-        mapperFactory.registerClassMap(ClassMapBuilder.map(BaseEntity.class, BaseEntityDto.class).byDefault().toClassMap());
+        mapperFactory.registerClassMap(mapperFactory.classMap(BaseEntity.class, BaseEntityDto.class).byDefault().toClassMap());
         
-        ClassMapBuilder<BaseUser, BaseUserDto> userClassMapBuilder = ClassMapBuilder.map(BaseUser.class, BaseUserDto.class);
+        ClassMapBuilder<BaseUser, BaseUserDto> userClassMapBuilder = mapperFactory.classMap(BaseUser.class, BaseUserDto.class);
         userClassMapBuilder.customize(new CustomMapper<BaseUser, BaseUserDto>() {
             @Override
             public void mapAtoB(BaseUser a, BaseUserDto b, MappingContext mappingContext) {
@@ -52,13 +52,11 @@ public class InheritanceTestcase {
         });
         mapperFactory.registerClassMap(userClassMapBuilder.use(BaseEntity.class, BaseEntityDto.class).byDefault().toClassMap());
         
-        mapperFactory.registerClassMap(ClassMapBuilder.map(Customer.class, CustomerDto.class)
+        mapperFactory.registerClassMap(mapperFactory.classMap(Customer.class, CustomerDto.class)
                 .use(BaseUser.class, BaseUserDto.class)
                 .byDefault()
                 .toClassMap());
-        
-        mapperFactory.build();
-        
+                
         MapperFacade mapperFacade = mapperFactory.getMapperFacade();
         
         Customer customer = new Customer();

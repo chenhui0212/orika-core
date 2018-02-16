@@ -18,14 +18,13 @@
 
 package ma.glasnost.orika.test.fieldmap;
 
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.ClassMap;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
-import ma.glasnost.orika.test.MappingUtil;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.metadata.ClassMap;
+import ma.glasnost.orika.test.MappingUtil;
 
 public class NestedPropertyTestCase {
     
@@ -35,11 +34,9 @@ public class NestedPropertyTestCase {
     public void setUp() {
         mapperFactory = MappingUtil.getMapperFactory();
         
-        ClassMap<LineDTO, Line> classMap = ClassMapBuilder.map(LineDTO.class, Line.class).field("x0", "start.x").field("y0", "start.y")
+        ClassMap<LineDTO, Line> classMap = mapperFactory.classMap(LineDTO.class, Line.class).field("x0", "start.x").field("y0", "start.y")
                 .field("x1", "end.x").field("y1", "end.y").toClassMap();
         mapperFactory.registerClassMap(classMap);
-        
-        mapperFactory.build();
     }
     
     @Test

@@ -28,11 +28,13 @@ import java.util.GregorianCalendar;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.generator.EclipseJdtCompiler;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.MavenProjectUtil;
@@ -48,9 +50,6 @@ import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.Library;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.LibraryChild;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.LibraryMyDTO;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.LibraryParent;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class SuperTypeMappingTestCase {
     
@@ -202,16 +201,15 @@ public class SuperTypeMappingTestCase {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
         
-        factory.registerClassMap(ClassMapBuilder.map(AuthorParent.class, AuthorMyDTO.class)
+        factory.registerClassMap(factory.classMap(AuthorParent.class, AuthorMyDTO.class)
                 .field("name", "myName")
                 .byDefault()
                 .toClassMap());
-        factory.registerClassMap(ClassMapBuilder.map(BookParent.class, BookMyDTO.class)
+        factory.registerClassMap(factory.classMap(BookParent.class, BookMyDTO.class)
                 .field("title", "myTitle")
                 .field("author", "myAuthor")
                 .byDefault()
                 .toClassMap());
-        factory.build();
         
         MapperFacade mapper = factory.getMapperFacade();
         

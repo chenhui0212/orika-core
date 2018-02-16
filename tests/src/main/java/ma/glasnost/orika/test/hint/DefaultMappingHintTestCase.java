@@ -18,11 +18,13 @@
 
 package ma.glasnost.orika.test.hint;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import ma.glasnost.orika.DefaultFieldMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingHint;
-import ma.glasnost.orika.OrikaSystemProperties;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
+import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.Author;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.AuthorMyDTO;
@@ -33,10 +35,6 @@ import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.BookParent;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.Library;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.LibraryMyDTO;
 import ma.glasnost.orika.test.unenhance.SuperTypeTestCaseClasses.LibraryParent;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 public class DefaultMappingHintTestCase {
     
@@ -65,13 +63,12 @@ public class DefaultMappingHintTestCase {
     public void testMappingByDefaultWithNoHint() throws Exception {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.registerClassMap(ClassMapBuilder.map(Library.class, LibraryMyDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(Library.class, LibraryMyDTO.class).byDefault().toClassMap());
         
-        factory.registerClassMap(ClassMapBuilder.map(Author.class, AuthorMyDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(Author.class, AuthorMyDTO.class).byDefault().toClassMap());
         
-        factory.registerClassMap(ClassMapBuilder.map(Book.class, BookMyDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(Book.class, BookMyDTO.class).byDefault().toClassMap());
         
-        factory.build();
         MapperFacade mapper = factory.getMapperFacade();
         
         Book book = createBook(BookParent.class);
@@ -90,31 +87,31 @@ public class DefaultMappingHintTestCase {
      */
     @Test
     public void testMappingByDefaultWithHint() throws Exception {
-        
-        MappingHint myHint =
+
+    	DefaultFieldMapper myHint =
         /**
          * This sample hint converts "myProperty" to "property", and vis-versa.
          */
-        new MappingHint() {
-            
-            public String suggestMappedField(String fromProperty, Class<?> fromPropertyType) {
-                if (fromProperty.startsWith("my")) {
+        new DefaultFieldMapper() {
+ 
+			@Override
+			public String suggestMappedField(String fromProperty, Type<?> fromPropertyType) {
+				if (fromProperty.startsWith("my")) {
                     return fromProperty.substring(2, 3).toLowerCase() + fromProperty.substring(3);
                 } else {
                     return "my" + fromProperty.substring(0, 1).toUpperCase() + fromProperty.substring(1);
                 }
-            }
+			}
             
         };
         
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.registerClassMap(ClassMapBuilder.map(Library.class, LibraryMyDTO.class).byDefault(myHint).toClassMap());
+        factory.registerClassMap(factory.classMap(Library.class, LibraryMyDTO.class).byDefault(myHint).toClassMap());
         
-        factory.registerClassMap(ClassMapBuilder.map(Author.class, AuthorMyDTO.class).byDefault(myHint).toClassMap());
+        factory.registerClassMap(factory.classMap(Author.class, AuthorMyDTO.class).byDefault(myHint).toClassMap());
         
-        factory.registerClassMap(ClassMapBuilder.map(Book.class, BookMyDTO.class).byDefault(myHint).toClassMap());
+        factory.registerClassMap(factory.classMap(Book.class, BookMyDTO.class).byDefault(myHint).toClassMap());
         
-        factory.build();
         MapperFacade mapper = factory.getMapperFacade();
         
         Book book = createBook(BookParent.class);
@@ -135,25 +132,25 @@ public class DefaultMappingHintTestCase {
     @Test
     public void testMappingWithRegisteredHintAndNoClassMap() throws Exception {
         
-        MappingHint myHint =
+    	DefaultFieldMapper myHint =
         /**
          * This sample hint converts "myProperty" to "property", and vis-versa.
          */
-        new MappingHint() {
-            
-            public String suggestMappedField(String fromProperty, Class<?> fromPropertyType) {
+        new DefaultFieldMapper() {
+
+			@Override
+			public String suggestMappedField(String fromProperty, Type<?> fromPropertyType) {
                 if (fromProperty.startsWith("my")) {
                     return fromProperty.substring(2, 3).toLowerCase() + fromProperty.substring(3);
                 } else {
                     return "my" + fromProperty.substring(0, 1).toUpperCase() + fromProperty.substring(1);
                 }
-            }
+			}
             
         };
         
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.registerMappingHint(myHint);
-        factory.build();
+        factory.registerDefaultFieldMapper(myHint);
         
         MapperFacade mapper = factory.getMapperFacade();
         

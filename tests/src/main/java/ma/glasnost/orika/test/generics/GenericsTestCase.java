@@ -104,7 +104,7 @@ public class GenericsTestCase {
         
         Type<?> t = new TypeBuilder<TestEntry<Holder<Long>, Holder<String>>>() {}.build();
         PropertyResolverStrategy propertyResolver = UtilityResolver.getDefaultPropertyResolverStrategy();
-        Property p = propertyResolver.getNestedProperty(t, "key.held");
+        Property p = propertyResolver.getProperty(t, "key.held");
         Assert.assertEquals(p.getType().getRawType(), Long.class);
         Assert.assertEquals(p.getType(), TypeFactory.valueOf(Long.class));
         

@@ -137,7 +137,7 @@ public class MultiOccurrenceToMultiOccurrenceTestCase {
                     person.birthDate.toXMLFormat()));
         }
         
-        MapOfPeople mapBack = mapper.map(result, MapOfPeople.class);
+        mapper.map(result, MapOfPeople.class);
     }
     
     @SuppressWarnings("serial")

@@ -26,7 +26,7 @@ import ma.glasnost.orika.metadata.Type;
  * help with guessing default mappings of fields when a straight
  * equivalent name match is not found
  * 
- * @deprecated use ma.glasnost.orika.FieldSuggester instead
+ * @deprecated use ma.glasnost.orika.DefaultFieldMapper instead
  * @author matt.deboer@gmail.com
  */
 @Deprecated

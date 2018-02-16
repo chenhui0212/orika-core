@@ -18,12 +18,11 @@
 
 package ma.glasnost.orika.test.fieldmap;
 
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
-import ma.glasnost.orika.test.MappingUtil;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.test.MappingUtil;
 
 public class NestedExpressionTestCase {
     
@@ -31,7 +30,7 @@ public class NestedExpressionTestCase {
     public void testNestedProperty() {
         
         MapperFactory factory = MappingUtil.getMapperFactory();
-        factory.registerClassMap(ClassMapBuilder.map(Order.class, OrderDTO.class).field("product.state.type.label", "stateLabel")
+        factory.registerClassMap(factory.classMap(Order.class, OrderDTO.class).field("product.state.type.label", "stateLabel")
                 .field("product.name", "productName").toClassMap());
         
         StateType type = new StateType();

@@ -18,16 +18,15 @@
 package ma.glasnost.orika.test.community;
 
 import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.community.issue26.Order;
 import ma.glasnost.orika.test.community.issue26.OrderData;
 import ma.glasnost.orika.test.community.issue26.OrderID;
 import ma.glasnost.orika.test.community.issue26.OrderIDConverter;
-
-import org.junit.Test;
 
 /**
  * Generic super-type not recognized.

@@ -18,12 +18,11 @@
 
 package ma.glasnost.orika.test.converter;
 
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
-import ma.glasnost.orika.test.MappingUtil;
-
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
+
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.test.MappingUtil;
 
 public class ConverterTestCase {
     

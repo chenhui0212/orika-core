@@ -25,13 +25,12 @@ import static org.hamcrest.Matchers.is;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeBuilder;
-
-import org.junit.Test;
 
 /**
  * MappingException: cannot determine runtime type of destination collection.
@@ -152,15 +151,14 @@ public class Issue30TestCase {
 		Type<InventoryDTO<VideoCardDTO>> iv2 = new TypeBuilder<InventoryDTO<VideoCardDTO>>() {
 		}.build();
 
-		factory.registerClassMap(ClassMapBuilder.map(HardDrive.class,
+		factory.registerClassMap(factory.classMap(HardDrive.class,
 				HardDriveDTO.class).toClassMap());
-		factory.registerClassMap(ClassMapBuilder.map(VideoCard.class,
+		factory.registerClassMap(factory.classMap(VideoCard.class,
 				VideoCardDTO.class).toClassMap());
-		factory.registerClassMap(ClassMapBuilder.map(ih1, ih2).byDefault()
+		factory.registerClassMap(factory.classMap(ih1, ih2).byDefault()
 				.toClassMap());
-		factory.registerClassMap(ClassMapBuilder.map(iv1, iv2).byDefault()
+		factory.registerClassMap(factory.classMap(iv1, iv2).byDefault()
 				.toClassMap());
-		factory.build();
 
 		List<HardDrive> hardDrives = new ArrayList<HardDrive>();
 		hardDrives.add(new HardDrive());
@@ -169,7 +167,7 @@ public class Issue30TestCase {
 		Inventory<HardDrive> inventory = new Inventory<HardDrive>();
 		inventory.setItems(hardDrives);
 
-		InventoryDTO inventoryDTO = factory.getMapperFacade().map(inventory,
+		InventoryDTO<?> inventoryDTO = factory.getMapperFacade().map(inventory,
 				InventoryDTO.class);
 		
 		

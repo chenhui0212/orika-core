@@ -113,7 +113,7 @@ public class Issue17TestCase {
     @Test
     public void testMappingToStringArray_empty() {
         final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
-        final ClassMapBuilder<A, B> builder = ClassMapBuilder.map(A.class, B.class);
+        final ClassMapBuilder<A, B> builder = mapperFactory.classMap(A.class, B.class);
         
         mapperFactory.registerClassMap(builder.byDefault().toClassMap());
         
@@ -149,7 +149,7 @@ public class Issue17TestCase {
             }
         });
         
-        final ClassMapBuilder<A, C> builder = ClassMapBuilder.map(A.class, C.class);
+        final ClassMapBuilder<A, C> builder = mapperFactory.classMap(A.class, C.class);
         
         mapperFactory.registerClassMap(builder.byDefault().toClassMap());
         
@@ -170,7 +170,7 @@ public class Issue17TestCase {
     @Test
     public void testMappingToStringToPrimitiveArray_empty() {
         final MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
-        final ClassMapBuilder<A, C> builder = ClassMapBuilder.map(A.class, C.class);
+        final ClassMapBuilder<A, C> builder = mapperFactory.classMap(A.class, C.class);
         
         mapperFactory.registerClassMap(builder.byDefault().toClassMap());
         
@@ -206,7 +206,7 @@ public class Issue17TestCase {
             }
         });
         
-        final ClassMapBuilder<D, C> builder = ClassMapBuilder.map(D.class, C.class);
+        final ClassMapBuilder<D, C> builder = mapperFactory.classMap(D.class, C.class);
         
         mapperFactory.registerClassMap(builder.byDefault().toClassMap());
         

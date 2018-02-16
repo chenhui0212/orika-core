@@ -26,16 +26,13 @@ import java.util.Date;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.converter.builtin.DateAndTimeConverters.CalendarToXmlGregorianCalendarConverter;
 import ma.glasnost.orika.converter.builtin.DateAndTimeConverters.DateToCalendarConverter;
 import ma.glasnost.orika.converter.builtin.DateAndTimeConverters.DateToXmlGregorianCalendarConverter;
-import ma.glasnost.orika.converter.builtin.DateAndTimeConverters.LongToDateConverter;
-import ma.glasnost.orika.converter.builtin.DateAndTimeConverters.LongToXmlGregorianCalendarConverter;
 import ma.glasnost.orika.test.MappingUtil;
-
-import org.junit.Test;
 
 /**
  * DateAndTimeConverters provides a set of individual converters

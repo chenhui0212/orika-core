@@ -19,13 +19,12 @@ package ma.glasnost.orika.test.community;
 
 import java.io.Serializable;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class AutomaticStringConversionTestCase {
 
