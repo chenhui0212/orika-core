@@ -1,16 +1,16 @@
 package ma.glasnost.orika.test.community;
 
-import ma.glasnost.orika.OrikaSystemProperties;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import ma.glasnost.orika.OrikaSystemProperties;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
 
 public class Issue175Test {
 
@@ -56,7 +56,7 @@ public class Issue175Test {
     public static class Source {
 
         private String value;
-        private List<NestedSource> nested = new ArrayList();
+        private List<NestedSource> nested = new ArrayList<>();
 
         public void setValue(String value) {
             this.value = value;
@@ -76,7 +76,8 @@ public class Issue175Test {
 
         @Override
         public boolean equals(Object obj) {
-            return EqualsBuilder.reflectionEquals(this, obj);
+        	return Objects.equals(value, ((Source) obj).value) &&
+        			Objects.equals(nested, ((Source) obj).nested);
         }
     }
 
@@ -107,7 +108,7 @@ public class Issue175Test {
 
         @Override
         public boolean equals(Object obj) {
-            return EqualsBuilder.reflectionEquals(this, obj);
+        	return Objects.equals(id, ((NestedSource) obj).id);
         }
     }
 

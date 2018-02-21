@@ -20,11 +20,7 @@ package ma.glasnost.orika.test.common.types;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import java.util.Objects;
 
 public interface TestCaseClasses {
 
@@ -83,16 +79,32 @@ public interface TestCaseClasses {
 			return byteValue;
 		}
 
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "PrimitiveHolder [shortValue=" + shortValue + ", intValue=" + intValue + ", longValue=" + longValue
+					+ ", floatValue=" + floatValue + ", doubleValue=" + doubleValue + ", charValue=" + charValue
+					+ ", booleanValue=" + booleanValue + ", byteValue=" + byteValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof PrimitiveHolder)) {
+				return false;
+			}
+			PrimitiveHolder castOther = (PrimitiveHolder) other;
+			return Objects.equals(shortValue, castOther.shortValue) && Objects.equals(intValue, castOther.intValue)
+					&& Objects.equals(longValue, castOther.longValue)
+					&& Objects.equals(floatValue, castOther.floatValue)
+					&& Objects.equals(doubleValue, castOther.doubleValue)
+					&& Objects.equals(charValue, castOther.charValue)
+					&& Objects.equals(booleanValue, castOther.booleanValue)
+					&& Objects.equals(byteValue, castOther.byteValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(shortValue, intValue, longValue, floatValue, doubleValue, charValue, booleanValue,
+					byteValue);
 		}
     }	
     
@@ -154,16 +166,30 @@ public interface TestCaseClasses {
 		public void setByteValue(byte byteValue) {
 			this.byteValue = byteValue;
 		}
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "PrimitiveHolderDTO [shortValue=" + shortValue + ", intValue=" + intValue + ", longValue="
+					+ longValue + ", floatValue=" + floatValue + ", doubleValue=" + doubleValue + ", charValue="
+					+ charValue + ", booleanValue=" + booleanValue + ", byteValue=" + byteValue + "]";
+		}
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof PrimitiveHolderDTO)) {
+				return false;
+			}
+			PrimitiveHolderDTO castOther = (PrimitiveHolderDTO) other;
+			return Objects.equals(shortValue, castOther.shortValue) && Objects.equals(intValue, castOther.intValue)
+					&& Objects.equals(longValue, castOther.longValue)
+					&& Objects.equals(floatValue, castOther.floatValue)
+					&& Objects.equals(doubleValue, castOther.doubleValue)
+					&& Objects.equals(charValue, castOther.charValue)
+					&& Objects.equals(booleanValue, castOther.booleanValue)
+					&& Objects.equals(byteValue, castOther.byteValue);
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(shortValue, intValue, longValue, floatValue, doubleValue, charValue, booleanValue,
+					byteValue);
 		}
     }
     
@@ -223,16 +249,32 @@ public interface TestCaseClasses {
 			return byteValue;
 		}
 
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "PrimitiveWrapperHolder [shortValue=" + shortValue + ", intValue=" + intValue + ", longValue="
+					+ longValue + ", floatValue=" + floatValue + ", doubleValue=" + doubleValue + ", charValue="
+					+ charValue + ", booleanValue=" + booleanValue + ", byteValue=" + byteValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof PrimitiveWrapperHolder)) {
+				return false;
+			}
+			PrimitiveWrapperHolder castOther = (PrimitiveWrapperHolder) other;
+			return Objects.equals(shortValue, castOther.shortValue) && Objects.equals(intValue, castOther.intValue)
+					&& Objects.equals(longValue, castOther.longValue)
+					&& Objects.equals(floatValue, castOther.floatValue)
+					&& Objects.equals(doubleValue, castOther.doubleValue)
+					&& Objects.equals(charValue, castOther.charValue)
+					&& Objects.equals(booleanValue, castOther.booleanValue)
+					&& Objects.equals(byteValue, castOther.byteValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(shortValue, intValue, longValue, floatValue, doubleValue, charValue, booleanValue,
+					byteValue);
 		}
     }
     
@@ -295,16 +337,30 @@ public interface TestCaseClasses {
 		public void setByteValue(Byte byteValue) {
 			this.byteValue = byteValue;
 		}
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "PrimitiveWrapperHolderDTO [shortValue=" + shortValue + ", intValue=" + intValue + ", longValue="
+					+ longValue + ", floatValue=" + floatValue + ", doubleValue=" + doubleValue + ", charValue="
+					+ charValue + ", booleanValue=" + booleanValue + ", byteValue=" + byteValue + "]";
+		}
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof PrimitiveWrapperHolderDTO)) {
+				return false;
+			}
+			PrimitiveWrapperHolderDTO castOther = (PrimitiveWrapperHolderDTO) other;
+			return Objects.equals(shortValue, castOther.shortValue) && Objects.equals(intValue, castOther.intValue)
+					&& Objects.equals(longValue, castOther.longValue)
+					&& Objects.equals(floatValue, castOther.floatValue)
+					&& Objects.equals(doubleValue, castOther.doubleValue)
+					&& Objects.equals(charValue, castOther.charValue)
+					&& Objects.equals(booleanValue, castOther.booleanValue)
+					&& Objects.equals(byteValue, castOther.byteValue);
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(shortValue, intValue, longValue, floatValue, doubleValue, charValue, booleanValue,
+					byteValue);
 		}
     }
  
@@ -345,16 +401,23 @@ public interface TestCaseClasses {
 			return author;
 		}
 
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "BookImpl [title=" + title + ", author=" + author + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof BookImpl)) {
+				return false;
+			}
+			BookImpl castOther = (BookImpl) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(author, castOther.author);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, author);
 		}
 	}
 	
@@ -370,16 +433,23 @@ public interface TestCaseClasses {
 			return name;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "AuthorImpl [name=" + name + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof AuthorImpl)) {
+				return false;
+			}
+			AuthorImpl castOther = (AuthorImpl) other;
+			return Objects.equals(name, castOther.name);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(name);
 		}
 	}
 	
@@ -395,16 +465,23 @@ public interface TestCaseClasses {
 			
 			return name;
 		}
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "AuthorNested [name=" + name + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof AuthorNested)) {
+				return false;
+			}
+			AuthorNested castOther = (AuthorNested) other;
+			return Objects.equals(name, castOther.name);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(name);
 		}
 	}
 	
@@ -428,16 +505,23 @@ public interface TestCaseClasses {
 		public String getFullName() {
 			return firstName + " " + lastName;
 		}
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "Name [firstName=" + firstName + ", lastName=" + lastName + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof Name)) {
+				return false;
+			}
+			Name castOther = (Name) other;
+			return Objects.equals(firstName, castOther.firstName) && Objects.equals(lastName, castOther.lastName);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(firstName, lastName);
 		}
 	}
 	
@@ -460,16 +544,23 @@ public interface TestCaseClasses {
 		public List<BookNested> getBooks() {
 			return books;
 		}
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "LibraryNested [title=" + title + ", books=" + books + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof LibraryNested)) {
+				return false;
+			}
+			LibraryNested castOther = (LibraryNested) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(books, castOther.books);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, books);
 		}
 	}
 	
@@ -490,16 +581,23 @@ public interface TestCaseClasses {
 		public AuthorNested getAuthor() {
 			return author;
 		}
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "BookNested [title=" + title + ", author=" + author + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof BookNested)) {
+				return false;
+			}
+			BookNested castOther = (BookNested) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(author, castOther.author);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, author);
 		}
 		
 	}
@@ -526,16 +624,23 @@ public interface TestCaseClasses {
 			return books;
 		}
 
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "LibraryImpl [title=" + title + ", books=" + books + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof LibraryImpl)) {
+				return false;
+			}
+			LibraryImpl castOther = (LibraryImpl) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(books, castOther.books);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, books);
 		}
 		
 	}
@@ -563,16 +668,23 @@ public interface TestCaseClasses {
 			this.name = name;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "AuthorDTO [name=" + name + ", additionalValue=" + additionalValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof AuthorDTO)) {
+				return false;
+			}
+			AuthorDTO castOther = (AuthorDTO) other;
+			return Objects.equals(name, castOther.name) && Objects.equals(additionalValue, castOther.additionalValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, additionalValue);
 		}
 	}
 	
@@ -606,16 +718,24 @@ public interface TestCaseClasses {
 			this.author = author;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "BookDTO [title=" + title + ", author=" + author + ", additionalValue=" + additionalValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof BookDTO)) {
+				return false;
+			}
+			BookDTO castOther = (BookDTO) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(author, castOther.author)
+					&& Objects.equals(additionalValue, castOther.additionalValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, author, additionalValue);
 		}
 	}
 	
@@ -648,16 +768,24 @@ public interface TestCaseClasses {
 			return books;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "LibraryDTO [title=" + title + ", books=" + books + ", additionalValue=" + additionalValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof LibraryDTO)) {
+				return false;
+			}
+			LibraryDTO castOther = (LibraryDTO) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(books, castOther.books)
+					&& Objects.equals(additionalValue, castOther.additionalValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, books, additionalValue);
 		}
 	}
 
@@ -683,16 +811,23 @@ public interface TestCaseClasses {
 			this.name = name;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "AuthorMyDTO [name=" + name + ", additionalValue=" + additionalValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof AuthorMyDTO)) {
+				return false;
+			}
+			AuthorMyDTO castOther = (AuthorMyDTO) other;
+			return Objects.equals(name, castOther.name) && Objects.equals(additionalValue, castOther.additionalValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, additionalValue);
 		}
 	}
 	
@@ -726,16 +861,24 @@ public interface TestCaseClasses {
 			this.author = author;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "BookMyDTO [title=" + title + ", author=" + author + ", additionalValue=" + additionalValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof BookMyDTO)) {
+				return false;
+			}
+			BookMyDTO castOther = (BookMyDTO) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(author, castOther.author)
+					&& Objects.equals(additionalValue, castOther.additionalValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, author, additionalValue);
 		}
 	}
 	
@@ -768,16 +911,24 @@ public interface TestCaseClasses {
 			return books;
 		}
 		
-		public boolean equals(Object that) {
-			return EqualsBuilder.reflectionEquals(this,that);
-		}
-		
-		public int hashCode() {
-			return HashCodeBuilder.reflectionHashCode(this);
-		}
-		
+		@Override
 		public String toString() {
-			return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+			return "LibraryMyDTO [title=" + title + ", books=" + books + ", additionalValue=" + additionalValue + "]";
+		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof LibraryMyDTO)) {
+				return false;
+			}
+			LibraryMyDTO castOther = (LibraryMyDTO) other;
+			return Objects.equals(title, castOther.title) && Objects.equals(books, castOther.books)
+					&& Objects.equals(additionalValue, castOther.additionalValue);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(title, books, additionalValue);
 		}
 	}
 }

@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import ma.glasnost.orika.CustomMapper;
@@ -34,7 +33,7 @@ public class Issue176WithSuperClassesTestCase {
                 b = new B1();
             } else if ("2".equals(a.type)) {
                 b = new B2();
-            } else if (StringUtils.isEmpty(a.type)) {
+            } else if (a.type == null || a.type.isEmpty()) {
                 b = new B();
             } else {
                 throw new IllegalArgumentException("type not supported: " + a.type);
@@ -159,7 +158,7 @@ public class Issue176WithSuperClassesTestCase {
         
         // run the Test
         A a0 = new A();
-        a0.type = StringUtils.EMPTY;
+        a0.type = "";
         A a1 = new A();
         a1.type = "1";
         a1.x = 11;

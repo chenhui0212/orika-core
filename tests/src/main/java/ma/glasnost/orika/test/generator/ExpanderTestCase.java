@@ -20,12 +20,11 @@ package ma.glasnost.orika.test.generator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
@@ -33,8 +32,6 @@ import ma.glasnost.orika.impl.generator.EclipseJdtCompilerStrategy;
 import ma.glasnost.orika.metadata.ScoringClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeBuilder;
-
-import org.junit.Test;
 
 /**
  * This test case demonstrates two things together:
@@ -57,44 +54,67 @@ public class ExpanderTestCase {
         public int yearNumber;
         public String yearAnimal;
         public List<Month> months = new ArrayList<Month>();
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-        }
-        public boolean equals(Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
-        }
-        public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
-        }
+        @Override
+		public String toString() {
+			return "Year [yearNumber=" + yearNumber + ", yearAnimal=" + yearAnimal + ", months=" + months + "]";
+		}
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof Year)) {
+				return false;
+			}
+			Year castOther = (Year) other;
+			return Objects.equals(yearNumber, castOther.yearNumber) && Objects.equals(yearAnimal, castOther.yearAnimal)
+					&& Objects.equals(months, castOther.months);
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(yearNumber, yearAnimal, months);
+		}
     }
     
     public static class Month {
         public int monthNumber;
         public String monthName;
         public List<Day> days = new ArrayList<Day>();
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-        }
-        public boolean equals(Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
-        }
-        public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
-        }
+        @Override
+		public String toString() {
+			return "Month [monthNumber=" + monthNumber + ", monthName=" + monthName + ", days=" + days + "]";
+		}
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof Month)) {
+				return false;
+			}
+			Month castOther = (Month) other;
+			return Objects.equals(monthNumber, castOther.monthNumber) && Objects.equals(monthName, castOther.monthName)
+					&& Objects.equals(days, castOther.days);
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(monthNumber, monthName, days);
+		}
     }
     
     public static class Day {
         public int dayNumber;
         public String dayOfWeek;
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-        }
-        public boolean equals(Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
-        }
-        public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
-        }
+        @Override
+		public String toString() {
+			return "Day [dayNumber=" + dayNumber + ", dayOfWeek=" + dayOfWeek + "]";
+		}
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof Day)) {
+				return false;
+			}
+			Day castOther = (Day) other;
+			return Objects.equals(dayNumber, castOther.dayNumber) && Objects.equals(dayOfWeek, castOther.dayOfWeek);
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(dayNumber, dayOfWeek);
+		}
     }
     
     public static class FlatData {
@@ -104,15 +124,27 @@ public class ExpanderTestCase {
         public String yearAnimal;
         public int monthNumber;
         public String monthName;
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-        }
-        public boolean equals(Object that) {
-            return EqualsBuilder.reflectionEquals(this, that);
-        }
-        public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
-        }
+        @Override
+		public String toString() {
+			return "FlatData [dayNumber=" + dayNumber + ", dayOfWeek=" + dayOfWeek + ", yearNumber=" + yearNumber
+					+ ", yearAnimal=" + yearAnimal + ", monthNumber=" + monthNumber + ", monthName=" + monthName + "]";
+		}
+		@Override
+		public boolean equals(final Object other) {
+			if (!(other instanceof FlatData)) {
+				return false;
+			}
+			FlatData castOther = (FlatData) other;
+			return Objects.equals(dayNumber, castOther.dayNumber) && Objects.equals(dayOfWeek, castOther.dayOfWeek)
+					&& Objects.equals(yearNumber, castOther.yearNumber)
+					&& Objects.equals(yearAnimal, castOther.yearAnimal)
+					&& Objects.equals(monthNumber, castOther.monthNumber)
+					&& Objects.equals(monthName, castOther.monthName);
+		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(dayNumber, dayOfWeek, yearNumber, yearAnimal, monthNumber, monthName);
+		}
     }
     
     @Test
