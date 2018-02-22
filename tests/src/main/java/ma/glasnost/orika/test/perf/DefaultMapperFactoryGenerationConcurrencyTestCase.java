@@ -21,14 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.ClassMap;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultMapperFactoryGenerationConcurrencyTestCase {
     
@@ -57,9 +55,7 @@ public class DefaultMapperFactoryGenerationConcurrencyTestCase {
             this.property = property;
         }
     }
-    
-    private static Logger logger = LoggerFactory.getLogger(DefaultMapperFactoryGenerationConcurrencyTestCase.class.getName());
-    
+        
     private static Throwable throwable = null;
  
     private class ConcurrencyTestRunnable implements Runnable {
@@ -78,7 +74,7 @@ public class DefaultMapperFactoryGenerationConcurrencyTestCase {
                 
                 A from = new A();
                 from.setProperty("test");
-                B to = mapper.map(from, B.class);
+                mapper.map(from, B.class);
             }
             
             catch(Exception e) {

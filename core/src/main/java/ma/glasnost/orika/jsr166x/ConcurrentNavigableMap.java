@@ -24,8 +24,7 @@
 
 package ma.glasnost.orika.jsr166x;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A {@link ConcurrentMap} supporting {@link NavigableMap} operations.

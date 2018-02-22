@@ -34,7 +34,6 @@ import ma.glasnost.orika.Filter;
 import ma.glasnost.orika.MapEntry;
 import ma.glasnost.orika.PropertyNotFoundException;
 import ma.glasnost.orika.impl.util.ClassUtil;
-import ma.glasnost.orika.impl.util.StringUtil;
 import ma.glasnost.orika.metadata.NestedProperty;
 import ma.glasnost.orika.metadata.Property;
 import ma.glasnost.orika.metadata.Type;

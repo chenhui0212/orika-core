@@ -18,14 +18,14 @@
 
 package ma.glasnost.orika.test.inheritance;
 
-import ma.glasnost.orika.MapperBase;
+import org.junit.Assert;
+import org.junit.Test;
+
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.ClassMapBuilder;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class UserProvidedInheritanceTestCase {
     
@@ -34,7 +34,7 @@ public class UserProvidedInheritanceTestCase {
     public void testFail() {
         MapperFactory factory = new DefaultMapperFactory.Builder().build();
         
-        factory.registerClassMap(ClassMapBuilder.map(Base.class, BaseDto.class).customize(new MapperBase<Base, BaseDto>() {
+        factory.registerClassMap(ClassMapBuilder.map(Base.class, BaseDto.class).customize(new CustomMapper<Base, BaseDto>() {
             @Override
             public void mapAtoB(Base base, BaseDto baseDto, MappingContext context) {
                 baseDto.setBaseField(base.getBaseTrickField());

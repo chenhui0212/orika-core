@@ -18,26 +18,24 @@
 
 package ma.glasnost.orika.test.fieldmap;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.metadata.ClassMap;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.test.MappingUtil;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class OverrideFieldNameTestCase {
     
     @Test
     public void testSimpleFieldMap() {
-        ClassMap<Address, AddressDTO> classMap = ClassMapBuilder.map(Address.class, AddressDTO.class).field("country", "countryName")
-                .field("city", "cityName").toClassMap();
         MapperFactory factory = MappingUtil.getMapperFactory();
+
+        ClassMap<Address, AddressDTO> classMap = factory.classMap(Address.class, AddressDTO.class).field("country", "countryName")
+                .field("city", "cityName").toClassMap();
         factory.registerClassMap(classMap);
-        
-        factory.build();
-        
+                
         MapperFacade mapper = factory.getMapperFacade();
         
         Address adress = new Address();

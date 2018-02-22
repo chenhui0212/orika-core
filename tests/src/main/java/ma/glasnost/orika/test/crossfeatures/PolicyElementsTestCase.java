@@ -21,9 +21,11 @@ package ma.glasnost.orika.test.crossfeatures;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.test.MappingUtil;
 import ma.glasnost.orika.test.crossfeatures.PolicyElementsTestCaseClasses.CustomerElement;
@@ -40,9 +42,6 @@ import ma.glasnost.orika.test.crossfeatures.PolicyElementsTestCaseClasses.Policy
 import ma.glasnost.orika.test.crossfeatures.PolicyElementsTestCaseClasses.ProductElement;
 import ma.glasnost.orika.test.crossfeatures.PolicyElementsTestCaseClasses.ProductElementDTO;
 import ma.glasnost.orika.unenhance.UnenhanceStrategy;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class PolicyElementsTestCase {
     
@@ -67,11 +66,11 @@ public class PolicyElementsTestCase {
     
     private void configureMapperFactory(MapperFactory factory) {
         
-        factory.registerClassMap(ClassMapBuilder.map(Policy.class, PolicyDTO.class).byDefault().toClassMap());
-        factory.registerClassMap(ClassMapBuilder.map(CustomerElement.class, CustomerElementDTO.class).byDefault().toClassMap());
-        factory.registerClassMap(ClassMapBuilder.map(ProductElement.class, ProductElementDTO.class).byDefault().toClassMap());
-        factory.registerClassMap(ClassMapBuilder.map(OtherElement.class, OtherElementDTO.class).byDefault().toClassMap());
-        factory.registerClassMap(ClassMapBuilder.map(OneOtherElement.class, OneOtherElementDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(Policy.class, PolicyDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(CustomerElement.class, CustomerElementDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(ProductElement.class, ProductElementDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(OtherElement.class, OtherElementDTO.class).byDefault().toClassMap());
+        factory.registerClassMap(factory.classMap(OneOtherElement.class, OneOtherElementDTO.class).byDefault().toClassMap());
     }
     
     @Test

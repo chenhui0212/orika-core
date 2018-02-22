@@ -19,14 +19,13 @@
 package ma.glasnost.orika.test.inheritance;
 
 import org.junit.Assert;
-import ma.glasnost.orika.MapperBase;
+import org.junit.Test;
+
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.metadata.ClassMapBuilder;
 import ma.glasnost.orika.test.MappingUtil;
-
-import org.junit.Test;
 
 public class InheritanceTestCase {
     
@@ -53,10 +52,8 @@ public class InheritanceTestCase {
     @Test
     public void resolveConcreteClass() {
         MapperFacade mapper = factory.getMapperFacade();
-        factory.registerClassMap(ClassMapBuilder.map(ChildEntity.class, ChildDTO.class).byDefault().toClassMap());
-        
-        factory.build();
-        
+        factory.registerClassMap(factory.classMap(ChildEntity.class, ChildDTO.class).byDefault().toClassMap());
+                
         ChildEntity entity = new ChildEntity();
         entity.setId(1L);
         entity.setName("Khettabi");
@@ -69,8 +66,8 @@ public class InheritanceTestCase {
     
     @Test
     public void testDifferentLevelOfInheritance() {
-        factory.registerClassMap(ClassMapBuilder.map(ChildEntity.class, Child2DTO.class)
-                .customize(new MapperBase<ChildEntity, Child2DTO>() {
+        factory.registerClassMap(factory.classMap(ChildEntity.class, Child2DTO.class)
+                .customize(new CustomMapper<ChildEntity, Child2DTO>() {
                     
                     @Override
                     public void mapAtoB(ChildEntity a, Child2DTO b, MappingContext context) {
@@ -78,9 +75,7 @@ public class InheritanceTestCase {
                     }
                     
                 }).byDefault().toClassMap());
-        
-        factory.build();
-        
+                
         MapperFacade mapper = factory.getMapperFacade();
         
         ChildEntity entity = new ChildEntity();

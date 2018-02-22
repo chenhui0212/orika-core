@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import ma.glasnost.orika.BoundMapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
@@ -17,18 +20,12 @@ import ma.glasnost.orika.test.community.issue121.bobjects.BObject1;
 import ma.glasnost.orika.test.community.issue121.bobjects.BObject2Container;
 import ma.glasnost.orika.test.community.issue121.util.RandomUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author: Ilya Krokhmalyov YC14IK1
  * @since: 8/23/13
  */
 
 public class Issue121TestCase {
-    private static Logger LOG = LoggerFactory.getLogger(Issue121TestCase.class);
     
     public BoundMapperFacade<AMapAObjects1, BContainerListBObject1> getFacade(MapperFactory mapperFactory) {
         return mapperFactory.getMapperFacade(AMapAObjects1.class, BContainerListBObject1.class);
@@ -103,7 +100,7 @@ public class Issue121TestCase {
         BoundMapperFacade<AMapAObjects1, BContainerListBObject1> mapper = getFacade(mapperFactory);
         
         AMapAObjects1 instance = getInstance();
-        BContainerListBObject1 result = mapper.map(instance);
+        mapper.map(instance);
         
     }
     
