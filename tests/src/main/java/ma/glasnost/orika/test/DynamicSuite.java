@@ -419,7 +419,7 @@ public class DynamicSuite extends ParentRunner<Runner> {
 								constructor
 										.setBody("{ super($1); this.scenarioName = $2; }");
 								subClass.addConstructor(constructor);
-								proxyClass = subClass.toClass();
+								proxyClass = (Class<? extends Runner>)subClass.toClass();
 
 							}
 						}
