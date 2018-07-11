@@ -4,10 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.io.File;
 import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -26,13 +23,11 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -171,51 +166,13 @@ public class JavaDateApiTest {
     
     
     @SuppressWarnings("unchecked")
-    private <T> List<Class<T>> getJdkClasses(String rootPackage, final Class<T> type) throws Exception {
-        
-        String rootPackagePath = rootPackage.replace('.', '/');
-        String path = type.getName().replace('.', '/') + ".class";
-        URL resource = ClassLoader.getSystemClassLoader().getResource(path);
-        if (resource == null) {
-            throw new RuntimeException("Unexpected problem: No resource for " + path);
-        }
-        String filePath = resource.getFile();
-        File jarFile = getJarFile(filePath);
-        
-        List<Class<T>> subTypes = new ArrayList<>();
-        
-        try (ZipFile zipFile = new ZipFile(jarFile)) {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry zipEntry = entries.nextElement();
-                if (zipEntry.getName().startsWith(rootPackagePath)) {
-                    String className = zipEntry.getName();
-                    if (className.endsWith(".class")) {
-                        className = className.substring(0, className.length() - ".class".length());
-                        className = className.replace('/', '.');
-                        Class<?> clazz = Class.forName(className);
-                        if (type.isAssignableFrom(clazz)) {
-                            subTypes.add((Class<T>) clazz);
-                        }
-                    }
-                }
-            }
-        }
-        Collections.sort(subTypes, (type1, type2) -> type1.getName().compareTo(type2.getName()));
-        
+    private <T> List<Class<? extends T>> getJdkClasses(String rootPackage, final Class<T> type) {
+        List<Class<? extends T>> subTypes = new ArrayList<>();
+        new FastClasspathScanner("!!",rootPackage)
+                .matchClassesImplementing(type, subTypes::add)
+                .scan();
+        subTypes.sort(Comparator.comparing(Class::getName));
         return subTypes;
-    }
-
-    private File getJarFile(String filePath) throws Exception {
-        String jarFilePath = filePath;
-        jarFilePath = URLDecoder.decode(jarFilePath, "UTF-8");
-        if (jarFilePath.startsWith("file:")) {
-            jarFilePath = jarFilePath.substring(jarFilePath.lastIndexOf("file:") + "file:".length(), jarFilePath.length());
-        }
-        if (jarFilePath.contains(".jar!")) {
-        	jarFilePath = jarFilePath.substring(0, jarFilePath.lastIndexOf(".jar!"))+ ".jar";
-        }
-        return new File(jarFilePath);
     }
     
     public static class A {
