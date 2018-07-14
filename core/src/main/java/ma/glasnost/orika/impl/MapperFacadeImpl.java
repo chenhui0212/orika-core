@@ -308,11 +308,13 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             final MappingContext context, final MappingStrategy suggestedStrategy) {
         MappingStrategy strategy = suggestedStrategy;
         try {
-            if (strategy == null) {
-                strategy = resolveMappingStrategy(sourceObject, sourceType, destinationType, true, context);
+            if (context.getMappedObject(sourceObject, destinationType) == null) {
+                if (strategy == null) {
+                  strategy =
+                      resolveMappingStrategy(sourceObject, sourceType, destinationType, true, context);
+                }
+                strategy.map(sourceObject, destinationObject, context);
             }
-            strategy.map(sourceObject, destinationObject, context);
-            
         } catch (MappingException e) {
             throw exceptionUtil.decorate(e);
         } catch (RuntimeException e) {
