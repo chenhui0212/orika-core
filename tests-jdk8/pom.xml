@@ -10,7 +10,6 @@
 	<name>Orika - tests for JDK8</name>
 
 	<properties>
-		<javassist.version>3.22.0-GA</javassist.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
@@ -64,6 +63,12 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.lukehutch</groupId>
+			<artifactId>fast-classpath-scanner</artifactId>
+			<version>3.1.9</version>
 		</dependency>
 
 	</dependencies>
