@@ -78,8 +78,10 @@ public abstract class UseCustomMapperStrategy extends AbstractMappingStrategy {
         } finally {
             context.endMapping();
         }
-        
+
+        // ==================== Start ====================
         return afterMap(newInstance);
+        // ==================== End ====================
     }
     
     /**
@@ -98,7 +100,7 @@ public abstract class UseCustomMapperStrategy extends AbstractMappingStrategy {
     protected Object afterMap(Object destinationObject) {
         return destinationObject;
     }
-    // ==================== Start ====================
+    // ==================== End ====================
 
     protected void describeMembers(Map<String, Object> members) {
     	members.put("customMapper", customMapper);

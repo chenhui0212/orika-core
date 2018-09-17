@@ -219,7 +219,7 @@ public class MappingStrategyRecorder {
                 resolvedStrategy = new InstantiateByDefaultAndUseCustomMapperBuilderStrategy(resolvedSourceType, resolvedDestinationType, resolvedMapper,
                         unenhanceStrategy);
             }
-            // ==================== Start ====================
+            // ==================== End ====================
 
             else if (resolvedObjectFactory != null) {
                 resolvedStrategy = new InstantiateAndUseCustomMapperStrategy(resolvedSourceType, resolvedDestinationType, resolvedMapper,
