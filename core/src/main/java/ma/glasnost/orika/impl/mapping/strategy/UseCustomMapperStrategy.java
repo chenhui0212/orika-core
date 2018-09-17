@@ -79,7 +79,7 @@ public abstract class UseCustomMapperStrategy extends AbstractMappingStrategy {
             context.endMapping();
         }
         
-        return afterMap(resolvedSourceObject, newInstance, context);
+        return afterMap(newInstance);
     }
     
     /**
@@ -93,9 +93,12 @@ public abstract class UseCustomMapperStrategy extends AbstractMappingStrategy {
      */
     protected abstract Object getInstance(Object sourceObject, Object destinationObject, MappingContext context);
 
-    protected Object afterMap(Object sourceObject, Object destinationObject, MappingContext context) {
+    // ==================== Start ====================
+    // 默认映射之后的目标类处理过程
+    protected Object afterMap(Object destinationObject) {
         return destinationObject;
     }
+    // ==================== Start ====================
 
     protected void describeMembers(Map<String, Object> members) {
     	members.put("customMapper", customMapper);

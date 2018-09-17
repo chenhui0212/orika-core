@@ -44,8 +44,12 @@ public class InstantiateByDefaultAndUseCustomMapperBuilderStrategy extends UseCu
         super(sourceType, destinationType, customMapper, unenhancer);
     }
 
+    /**
+     * 实例化 gRPC 类的内部类 Builder
+     */
     protected Object getInstance(Object sourceObject, Object destinationObject, MappingContext context) {
         try {
+            // 通过调用 gRPC 类的 newBuilder 方法，生成其内部类 Builder 的实例
             Method newBuilder = destinationType.getRawType().getEnclosingClass().getMethod("newBuilder");
             return newBuilder.invoke(null);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
@@ -54,10 +58,10 @@ public class InstantiateByDefaultAndUseCustomMapperBuilderStrategy extends UseCu
     }
 
     @Override
-    protected Object afterMap(Object sourceObject, Object destinationObject, MappingContext context) {
+    protected Object afterMap(Object destinationObject) {
         try {
+            // 通过调用 Builder 的 build 方法，生成 gRPC 类实例
             Method build = destinationType.getRawType().getMethod("build");
-
             return build.invoke(destinationObject);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
