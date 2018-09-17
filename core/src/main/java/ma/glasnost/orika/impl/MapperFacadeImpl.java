@@ -152,7 +152,14 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             Type<S> sourceType = (Type<S>) (initialSourceType != null ? TypeFactory.valueOf(initialSourceType)
                     : typeOf(sourceObject));
             Type<D> destinationType = TypeFactory.valueOf(initialDestinationType);
-            
+            try {
+                if (isBuilderPattern(destinationType.getRawType())) {
+                    destinationType = (Type<D>) TypeFactory.valueOf(Class.forName(destinationType.getRawType().getName() + "$Builder"));
+                }
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
             MappingStrategyRecorder strategyRecorder = new MappingStrategyRecorder(key, unenhanceStrategy);
             
             final Type<S> resolvedSourceType = normalizeSourceType(sourceObject, sourceType, destinationType);
@@ -176,7 +183,7 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 
                 strategyRecorder.setResolvedDestinationType(resolvedDestinationType);
                 strategyRecorder.setResolvedMapper(resolveMapper(resolvedSourceType, resolvedDestinationType, context));
-                if (!mapInPlace) {
+                if (!mapInPlace && !destinationType.getRawType().getName().endsWith("Builder")) {
                     strategyRecorder.setResolvedObjectFactory(
                             mapperFactory.lookupObjectFactory(resolvedDestinationType, resolvedSourceType, context));
                 }
@@ -200,6 +207,15 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
         context.setResolvedStrategy(strategy);
         
         return strategy;
+    }
+
+    private boolean isBuilderPattern(Class<?> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.getName().equals("newBuilder")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private <S, D> Type<? extends D> resolveDestinationType(MappingContext context, Type<S> sourceType, Type<D> destinationType, Type<S> resolvedSourceType) {

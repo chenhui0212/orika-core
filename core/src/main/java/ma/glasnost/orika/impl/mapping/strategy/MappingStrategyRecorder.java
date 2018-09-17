@@ -211,7 +211,10 @@ public class MappingStrategyRecorder {
             if (mapReverse) {
                 resolvedMapper = ReversedMapper.reverse(resolvedMapper);
             }
-            if (resolvedObjectFactory != null) {
+            if (resolvedDestinationType.getRawType().getSimpleName().endsWith("Builder")) {
+                resolvedStrategy = new InstantiateByDefaultAndUseCustomMapperBuilderStrategy(resolvedSourceType, resolvedDestinationType, resolvedMapper,
+                        unenhanceStrategy);
+            } else if (resolvedObjectFactory != null) {
                 resolvedStrategy = new InstantiateAndUseCustomMapperStrategy(resolvedSourceType, resolvedDestinationType, resolvedMapper,
                         resolvedObjectFactory, unenhanceStrategy);
             } else {
