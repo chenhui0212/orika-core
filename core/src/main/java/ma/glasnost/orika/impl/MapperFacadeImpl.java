@@ -18,6 +18,7 @@
 
 package ma.glasnost.orika.impl;
 
+import com.google.protobuf.GeneratedMessageV3;
 import ma.glasnost.orika.*;
 import ma.glasnost.orika.MappingStrategy.Key;
 import ma.glasnost.orika.StateReporter.Reportable;
@@ -152,7 +153,19 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
             Type<S> sourceType = (Type<S>) (initialSourceType != null ? TypeFactory.valueOf(initialSourceType)
                     : typeOf(sourceObject));
             Type<D> destinationType = TypeFactory.valueOf(initialDestinationType);
-            
+
+            // ==================== Start ====================
+            try {
+                // 如果目标类型为继承 gRPC GeneratedMessageV3，则目标类型转换为 GeneratedMessageV3 内部类 Builder 类型
+                if (GeneratedMessageV3.class.isAssignableFrom(destinationType.getRawType())) {
+                    destinationType = (Type<D>) TypeFactory.valueOf(
+                            Class.forName(destinationType.getRawType().getName() + "$Builder"));
+                }
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            // ==================== End ====================
+
             MappingStrategyRecorder strategyRecorder = new MappingStrategyRecorder(key, unenhanceStrategy);
             
             final Type<S> resolvedSourceType = normalizeSourceType(sourceObject, sourceType, destinationType);
@@ -176,10 +189,13 @@ public class MapperFacadeImpl implements MapperFacade, Reportable {
                 
                 strategyRecorder.setResolvedDestinationType(resolvedDestinationType);
                 strategyRecorder.setResolvedMapper(resolveMapper(resolvedSourceType, resolvedDestinationType, context));
-                if (!mapInPlace) {
+
+                // ==================== Start ====================
+                if (!mapInPlace && !GeneratedMessageV3.Builder.class.isAssignableFrom(destinationType.getRawType())) {
                     strategyRecorder.setResolvedObjectFactory(
                             mapperFactory.lookupObjectFactory(resolvedDestinationType, resolvedSourceType, context));
                 }
+                // ==================== End ====================
             }
             strategy = strategyRecorder.playback();
             if (log.isDebugEnabled()) {

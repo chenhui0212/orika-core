@@ -18,6 +18,7 @@
 
 package ma.glasnost.orika.impl.mapping.strategy;
 
+import com.google.protobuf.GeneratedMessageV3;
 import ma.glasnost.orika.Converter;
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MappingStrategy;
@@ -211,7 +212,16 @@ public class MappingStrategyRecorder {
             if (mapReverse) {
                 resolvedMapper = ReversedMapper.reverse(resolvedMapper);
             }
-            if (resolvedObjectFactory != null) {
+
+            // ==================== Start ====================
+            // 当目标类型为 GeneratedMessageV3.Builder 子类，则使用自定义的 CustomMapper 策略
+            if (GeneratedMessageV3.Builder.class.isAssignableFrom(resolvedDestinationType.getRawType())) {
+                resolvedStrategy = new InstantiateByDefaultAndUseCustomMapperBuilderStrategy(resolvedSourceType, resolvedDestinationType, resolvedMapper,
+                        unenhanceStrategy);
+            }
+            // ==================== End ====================
+
+            else if (resolvedObjectFactory != null) {
                 resolvedStrategy = new InstantiateAndUseCustomMapperStrategy(resolvedSourceType, resolvedDestinationType, resolvedMapper,
                         resolvedObjectFactory, unenhanceStrategy);
             } else {
